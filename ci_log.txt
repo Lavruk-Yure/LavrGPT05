@@ -1,0 +1,491 @@
+======================================== 
+🕐 Початок CI-перевірки: 23.10.2025 12:33:14,29 
+======================================== 
+ 
+---------- [1/4] ISORT ---------- 
+Виконується: python -m isort . --profile black 
+Skipped 1 files
+✅ Завершено за 1.35 сек. 
+---------------------------------------- 
+ 
+---------- [2/4] BLACK ---------- 
+Виконується: python -m black . --check 
+All done! \u2728 \U0001f370 \u2728
+120 files would be left unchanged.
+✅ Завершено за 0.973 сек. 
+---------------------------------------- 
+ 
+---------- [3/4] FLAKE8 ---------- 
+Виконується: python -m flake8 . --statistics 
+✅ Завершено за 2.42 сек. 
+---------------------------------------- 
+ 
+---------- [4/4] PYTEST ---------- 
+Виконується: python -m pytest -v --tb short 
+============================= test session starts =============================
+platform win32 -- Python 3.13.6, pytest-8.4.2, pluggy-1.6.0 -- D:\LavrGPT\venv313\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\LavrGPT\LavrGPT05
+configfile: pytest.ini
+testpaths: tests
+plugins: twisted-1.14.3
+collecting ... collected 41 items
+
+tests/backtester/test_backtester.py::test_backtester_dummy_strategy PASSED [  2%]
+tests/backtester/test_backtester_live_compact.py::test_live_backtester_compact FAILED [  4%]
+tests/backtester/test_backtester_live_compact_realtime.py::test_live_compact_realtime_backtester FAILED [  7%]
+tests/backtester/test_backtester_live_graph.py::test_live_graph_backtester FAILED [  9%]
+tests/backtester/test_backtester_live_graph_orders.py::test_backtester_live_graph_orders PASSED [ 12%]
+tests/backtester/test_backtester_live_graph_stats.py::test_live_graph_stats_backtester FAILED [ 14%]
+tests/backtester/test_backtester_live_graph_stats_conf.py::test_live_graph_stats_backtester FAILED [ 17%]
+tests/backtester/test_backtester_live_graph_stats_matplotlib.py::test_live_graph_matplotlib_with_pytest_mpl PASSED [ 19%]
+tests/backtester/test_backtester_live_monitor.py::test_backtester_live_monitor FAILED [ 21%]
+tests/backtester/test_backtester_live_realtime.py::test_live_realtime_backtester FAILED [ 24%]
+tests/backtester/test_backtester_live_stats.py::test_live_stats_backtester FAILED [ 26%]
+tests/backtester/test_backtester_monitor.py::test_backtester_runs_and_logs PASSED [ 29%]
+tests/backtester/test_backtester_monitor_execution.py::test_backtester_run_and_log PASSED [ 31%]
+tests/backtester/test_backtester_sma.py::test_backtester_runs FAILED     [ 34%]
+tests/live/test_AutoModes_Brokers.py::test_order_manager_auto_modes[IBAdapter-EURUSD-BUY-1.0-1.12-1.1-1.15] PASSED [ 36%]
+tests/live/test_AutoModes_Brokers.py::test_order_manager_auto_modes[CTraderAdapter-EURUSD-SELL-2.0-1.11-1.09-1.14] PASSED [ 39%]
+tests/live/test_AutoModes_Brokers.py::test_order_manager_auto_modes[DummyBroker-EURUSD-BUY-0.5-1.13-1.11-1.16] PASSED [ 41%]
+tests/live/test_AutoModes_DummyCT.py::test_dummy_ctrader PASSED          [ 43%]
+tests/live/test_cTraderAPI.py::test_ctrader_connection PASSED            [ 46%]
+tests/live/test_cTraderAPI01.py::test_ctrader_client_callbacks PASSED    [ 48%]
+tests/live/test_cTraderAPI02.py::test_ctrader_demo_auth PASSED           [ 51%]
+tests/live/test_cTraderAPI03.py::test_ctrader_demo_auth PASSED           [ 53%]
+tests/live/test_cTraderAPI04.py::test_ctrader_demo_no_auth PASSED        [ 56%]
+tests/live/test_cTraderAPI05.py::test_ctrader_demo_subscription PASSED   [ 58%]
+tests/live/test_cTraderAPI06.py::test_ctrader_demo_no_subscription PASSED [ 60%]
+tests/live/test_cTraderAPI14.py::test_save_and_load_tokens PASSED        [ 63%]
+tests/live/test_cTraderAPI14.py::test_token_is_valid PASSED              [ 65%]
+tests/live/test_cTraderAPI14.py::test_refresh_token_http PASSED          [ 68%]
+tests/live/test_cTraderAPI14.py::test_obtain_token_by_code_interactive PASSED [ 70%]
+tests/live/test_cTraderAPI15.py::test_full_token_flow PASSED             [ 73%]
+tests/live/test_ctrader_open_api_protobuf.py::test_ctrader_connection PASSED [ 75%]
+tests/unit/test_execution.py::test_submit_and_close_order PASSED         [ 78%]
+tests/unit/test_order_manager.py::test_order_manager_modes[OrderMode.MANUAL-EURUSD-BUY-1.0-1.12-1.1-1.15] PASSED [ 80%]
+tests/unit/test_order_manager.py::test_order_manager_modes[OrderMode.SEMI_AUTO-EURUSD-SELL-2.0-1.11-1.09-1.14] PASSED [ 82%]
+tests/unit/test_order_manager.py::test_order_manager_modes[OrderMode.AUTO-EURUSD-BUY-0.5-1.13-1.11-1.16] PASSED [ 85%]
+tests/unit/test_risk_manager.py::test_trade_1 PASSED                     [ 87%]
+tests/unit/test_risk_manager.py::test_trade_2 FAILED                     [ 90%]
+tests/unit/test_risk_manager.py::test_trade_3 FAILED                     [ 92%]
+tests/unit/test_risk_manager.py::test_trade_4_blocked_due_to_max_trades FAILED [ 95%]
+tests/unit/test_token_manager.py::test_save_and_load_tokens FAILED       [ 97%]
+tests/unit/test_token_manager.py::test_refresh_if_needed_no_file FAILED  [100%]
+
+================================== FAILURES ===================================
+________________________ test_live_backtester_compact _________________________
+tests\backtester\test_backtester_live_compact.py:45: in test_live_backtester_compact
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+____________________ test_live_compact_realtime_backtester ____________________
+tests\backtester\test_backtester_live_compact_realtime.py:48: in test_live_compact_realtime_backtester
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+_________________________ test_live_graph_backtester __________________________
+tests\backtester\test_backtester_live_graph.py:40: in test_live_graph_backtester
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+______________________ test_live_graph_stats_backtester _______________________
+tests\backtester\test_backtester_live_graph_stats.py:42: in test_live_graph_stats_backtester
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+______________________ test_live_graph_stats_backtester _______________________
+tests\backtester\test_backtester_live_graph_stats_conf.py:42: in test_live_graph_stats_backtester
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+________________________ test_backtester_live_monitor _________________________
+tests\backtester\test_backtester_live_monitor.py:47: in test_backtester_live_monitor
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\test_backtester_live_monitor_pytest.csv'
+________________________ test_live_realtime_backtester ________________________
+tests\backtester\test_backtester_live_realtime.py:48: in test_live_realtime_backtester
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+_________________________ test_live_stats_backtester __________________________
+tests\backtester\test_backtester_live_stats.py:49: in test_live_stats_backtester
+    data = bt.load_data()
+           ^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+____________________________ test_backtester_runs _____________________________
+tests\backtester\test_backtester_sma.py:43: in test_backtester_runs
+    trades = bt.run()
+             ^^^^^^^^
+core\backtester.py:66: in run
+    data = self.load_data()
+           ^^^^^^^^^^^^^^^^
+core\backtester.py:38: in load_data
+    with open(self.data_file, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\test_backtester_sma_data.csv'
+________________________________ test_trade_2 _________________________________
+tests\unit\test_risk_manager.py:62: in test_trade_2
+    assert tp == 475, "Take profit calculation mismatch for Trade 2"
+E   AssertionError: Take profit calculation mismatch for Trade 2
+E   assert 425 == 475
+________________________________ test_trade_3 _________________________________
+tests\unit\test_risk_manager.py:84: in test_trade_3
+    assert (
+E   AssertionError: Balance not updated correctly after Trade 3
+E   assert 9800 == 9840
+E    +  where 9800 = <core.risk_manager.RiskManager object at 0x0000029217E7CD60>.balance
+___________________ test_trade_4_blocked_due_to_max_trades ____________________
+tests\unit\test_risk_manager.py:95: in test_trade_4_blocked_due_to_max_trades
+    assert not valid, "Trade 4 should be blocked due to max trades per day"
+E   AssertionError: Trade 4 should be blocked due to max trades per day
+E   assert not True
+---------------------------- Captured stdout call -----------------------------
+\n\U0001f4e9 Message: ProtoMessage\n
+__________________________ test_save_and_load_tokens __________________________
+tests\unit\test_token_manager.py:37: in test_save_and_load_tokens
+    assert os.path.exists(TEST_TOKEN_FILE)
+E   AssertionError: assert False
+E    +  where False = <built-in function _path_exists>('test_tokens.json')
+E    +    where <built-in function _path_exists> = <module 'ntpath' (frozen)>.exists
+E    +      where <module 'ntpath' (frozen)> = os.path
+---------------------------- Captured stdout call -----------------------------
+\u2705 \u0422\u043e\u043a\u0435\u043d\u0438 \u0437\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u043e \u0443 tokens.json
+_______________________ test_refresh_if_needed_no_file ________________________
+tests\unit\test_token_manager.py:51: in test_refresh_if_needed_no_file
+    assert result is None
+E   AssertionError: assert {'access_token': 'test_access', 'refresh_token': 'test_refresh', 'expires_in': 3600, 'expires_at': 1761215610, '_comment': '\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u043d\u043e \u0437\u0433\u0435\u043d\u0435\u0440\u043e\u0432\u0430\u043d\u0438\u0439 tokens.json. \u041d\u0435 \u0437\u0431\u0435\u0440\u0456\u0433\u0430\u0442\u0438 \u0432 \u0440\u0435\u043f\u043e\u0437\u0438\u0442\u043e\u0440\u0456\u0457.'} is None
+---------------------------- Captured stdout call -----------------------------
+\n\U0001f4e9 Message: ProtoMessage\n
+============================== warnings summary ===============================
+..\venv313\Lib\site-packages\eventkit\util.py:21
+  D:\LavrGPT\venv313\Lib\site-packages\eventkit\util.py:21: DeprecationWarning: There is no current event loop
+    return asyncio.get_event_loop_policy().get_event_loop()
+
+tests\backtester\test_backtester_live_graph_stats_matplotlib.py:73
+  D:\LavrGPT\LavrGPT05\tests\backtester\test_backtester_live_graph_stats_matplotlib.py:73: PytestUnknownMarkWarning: Unknown pytest.mark.mpl_image_compare - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.mpl_image_compare
+
+..\venv313\Lib\site-packages\google\protobuf\internal\well_known_types.py:91
+  D:\LavrGPT\venv313\Lib\site-packages\google\protobuf\internal\well_known_types.py:91: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    _EPOCH_DATETIME_NAIVE = datetime.datetime.utcfromtimestamp(0)
+
+tests/backtester/test_backtester_live_graph_stats_matplotlib.py::test_live_graph_matplotlib_with_pytest_mpl
+  D:\LavrGPT\LavrGPT05\monitoring\monitor_live_graph_matplotlib.py:29: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+    plt.pause(self.update_interval / 1000.0)
+
+Unhandled Error
+Traceback (most recent call last):
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 536, in addCallbacks
+    self._runCallbacks()
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 1078, in _runCallbacks
+    current.result = callback(  # type: ignore[misc]
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 516, in _continueFiring
+    callable(*args, **kwargs)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 848, in disconnectAll
+    log.callWithLogger(
+--- <exception caught here> ---
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 96, in callWithLogger
+    return callWithContext({"system": lp}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 80, in callWithContext
+    return context.call({ILogContext: newCtx}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 117, in callWithContext
+    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 82, in callWithContext
+    return func(*args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 510, in connectionLost
+    self._commonConnection.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 328, in connectionLost
+    protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\tls.py", line 409, in connectionLost
+    ProtocolWrapper.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\policies.py", line 114, in connectionLost
+    self.wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\endpoints.py", line 163, in connectionLost
+    return self._wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\application\internet.py", line 463, in connectionLost
+    return self._protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\tcpProtocol.py", line 27, in connectionLost
+    self.factory.disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\factory.py", line 13, in disconnected
+    self.client._disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\client.py", line 38, in _disconnected
+    self._disconnectedCallback(self, reason)
+  File "D:\LavrGPT\LavrGPT05\tests\live\test_cTraderAPI04.py", line 22, in on_disconnected
+    print("\U0001f50c Disconnected:", reason)
+  File "C:\Program Files\Python313\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+builtins.UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>
+
+Unhandled Error
+Traceback (most recent call last):
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 536, in addCallbacks
+    self._runCallbacks()
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 1078, in _runCallbacks
+    current.result = callback(  # type: ignore[misc]
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 516, in _continueFiring
+    callable(*args, **kwargs)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 848, in disconnectAll
+    log.callWithLogger(
+--- <exception caught here> ---
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 96, in callWithLogger
+    return callWithContext({"system": lp}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 80, in callWithContext
+    return context.call({ILogContext: newCtx}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 117, in callWithContext
+    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 82, in callWithContext
+    return func(*args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 510, in connectionLost
+    self._commonConnection.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 328, in connectionLost
+    protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\tls.py", line 409, in connectionLost
+    ProtocolWrapper.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\policies.py", line 114, in connectionLost
+    self.wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\endpoints.py", line 163, in connectionLost
+    return self._wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\application\internet.py", line 463, in connectionLost
+    return self._protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\tcpProtocol.py", line 27, in connectionLost
+    self.factory.disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\factory.py", line 13, in disconnected
+    self.client._disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\client.py", line 38, in _disconnected
+    self._disconnectedCallback(self, reason)
+  File "D:\LavrGPT\LavrGPT05\tests\live\test_cTraderAPI.py", line 30, in on_disconnected
+    print("\U0001f50c Disconnected:", reason)
+  File "C:\Program Files\Python313\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+builtins.UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>
+
+Unhandled Error
+Traceback (most recent call last):
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 536, in addCallbacks
+    self._runCallbacks()
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 1078, in _runCallbacks
+    current.result = callback(  # type: ignore[misc]
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 516, in _continueFiring
+    callable(*args, **kwargs)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 848, in disconnectAll
+    log.callWithLogger(
+--- <exception caught here> ---
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 96, in callWithLogger
+    return callWithContext({"system": lp}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 80, in callWithContext
+    return context.call({ILogContext: newCtx}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 117, in callWithContext
+    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 82, in callWithContext
+    return func(*args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 510, in connectionLost
+    self._commonConnection.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 328, in connectionLost
+    protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\tls.py", line 409, in connectionLost
+    ProtocolWrapper.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\policies.py", line 114, in connectionLost
+    self.wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\endpoints.py", line 163, in connectionLost
+    return self._wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\application\internet.py", line 463, in connectionLost
+    return self._protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\tcpProtocol.py", line 27, in connectionLost
+    self.factory.disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\factory.py", line 13, in disconnected
+    self.client._disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\client.py", line 38, in _disconnected
+    self._disconnectedCallback(self, reason)
+  File "D:\LavrGPT\LavrGPT05\tests\live\test_cTraderAPI03.py", line 49, in on_disconnected
+    print("\U0001f50c Disconnected:", reason)
+  File "C:\Program Files\Python313\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+builtins.UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>
+
+Unhandled Error
+Traceback (most recent call last):
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 536, in addCallbacks
+    self._runCallbacks()
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 1078, in _runCallbacks
+    current.result = callback(  # type: ignore[misc]
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 516, in _continueFiring
+    callable(*args, **kwargs)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 848, in disconnectAll
+    log.callWithLogger(
+--- <exception caught here> ---
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 96, in callWithLogger
+    return callWithContext({"system": lp}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 80, in callWithContext
+    return context.call({ILogContext: newCtx}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 117, in callWithContext
+    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 82, in callWithContext
+    return func(*args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 510, in connectionLost
+    self._commonConnection.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 328, in connectionLost
+    protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\tls.py", line 409, in connectionLost
+    ProtocolWrapper.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\policies.py", line 114, in connectionLost
+    self.wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\endpoints.py", line 163, in connectionLost
+    return self._wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\application\internet.py", line 463, in connectionLost
+    return self._protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\tcpProtocol.py", line 27, in connectionLost
+    self.factory.disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\factory.py", line 13, in disconnected
+    self.client._disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\client.py", line 38, in _disconnected
+    self._disconnectedCallback(self, reason)
+  File "D:\LavrGPT\LavrGPT05\tests\live\test_cTraderAPI05.py", line 35, in on_disconnected
+    print("\U0001f50c Disconnected:", reason)
+  File "C:\Program Files\Python313\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+builtins.UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>
+
+Unhandled Error
+Traceback (most recent call last):
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 536, in addCallbacks
+    self._runCallbacks()
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 1078, in _runCallbacks
+    current.result = callback(  # type: ignore[misc]
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 516, in _continueFiring
+    callable(*args, **kwargs)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 848, in disconnectAll
+    log.callWithLogger(
+--- <exception caught here> ---
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 96, in callWithLogger
+    return callWithContext({"system": lp}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 80, in callWithContext
+    return context.call({ILogContext: newCtx}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 117, in callWithContext
+    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 82, in callWithContext
+    return func(*args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 510, in connectionLost
+    self._commonConnection.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 328, in connectionLost
+    protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\tls.py", line 409, in connectionLost
+    ProtocolWrapper.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\policies.py", line 114, in connectionLost
+    self.wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\endpoints.py", line 163, in connectionLost
+    return self._wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\application\internet.py", line 463, in connectionLost
+    return self._protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\tcpProtocol.py", line 27, in connectionLost
+    self.factory.disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\factory.py", line 13, in disconnected
+    self.client._disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\client.py", line 38, in _disconnected
+    self._disconnectedCallback(self, reason)
+  File "D:\LavrGPT\LavrGPT05\tests\live\test_cTraderAPI02.py", line 49, in on_disconnected
+    print("\U0001f50c Disconnected:", reason)
+  File "C:\Program Files\Python313\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+builtins.UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>
+
+Unhandled Error
+Traceback (most recent call last):
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 536, in addCallbacks
+    self._runCallbacks()
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\defer.py", line 1078, in _runCallbacks
+    current.result = callback(  # type: ignore[misc]
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 516, in _continueFiring
+    callable(*args, **kwargs)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\base.py", line 848, in disconnectAll
+    log.callWithLogger(
+--- <exception caught here> ---
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 96, in callWithLogger
+    return callWithContext({"system": lp}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\log.py", line 80, in callWithContext
+    return context.call({ILogContext: newCtx}, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 117, in callWithContext
+    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\python\context.py", line 82, in callWithContext
+    return func(*args, **kw)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 510, in connectionLost
+    self._commonConnection.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\tcp.py", line 328, in connectionLost
+    protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\tls.py", line 409, in connectionLost
+    ProtocolWrapper.connectionLost(self, reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\protocols\policies.py", line 114, in connectionLost
+    self.wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\internet\endpoints.py", line 163, in connectionLost
+    return self._wrappedProtocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\twisted\application\internet.py", line 463, in connectionLost
+    return self._protocol.connectionLost(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\tcpProtocol.py", line 27, in connectionLost
+    self.factory.disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\factory.py", line 13, in disconnected
+    self.client._disconnected(reason)
+  File "D:\LavrGPT\venv313\Lib\site-packages\ctrader_open_api\client.py", line 38, in _disconnected
+    self._disconnectedCallback(self, reason)
+  File "D:\LavrGPT\LavrGPT05\tests\live\test_cTraderAPI06.py", line 35, in on_disconnected
+    print("\U0001f50c Disconnected:", reason)
+  File "C:\Program Files\Python313\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+builtins.UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/backtester/test_backtester_live_compact.py::test_live_backtester_compact - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_live_compact_realtime.py::test_live_compact_realtime_backtester - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_live_graph.py::test_live_graph_backtester - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_live_graph_stats.py::test_live_graph_stats_backtester - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_live_graph_stats_conf.py::test_live_graph_stats_backtester - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_live_monitor.py::test_backtester_live_monitor - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\test_backtester_live_monitor_pytest.csv'
+FAILED tests/backtester/test_backtester_live_realtime.py::test_live_realtime_backtester - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_live_stats.py::test_live_stats_backtester - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\data.csv'
+FAILED tests/backtester/test_backtester_sma.py::test_backtester_runs - FileNotFoundError: [Errno 2] No such file or directory: 'D:\\LavrGPT\\LavrGPT05\\tests\\data\\test_backtester_sma_data.csv'
+FAILED tests/unit/test_risk_manager.py::test_trade_2 - AssertionError: Take profit calculation mismatch for Trade 2
+assert 425 == 475
+FAILED tests/unit/test_risk_manager.py::test_trade_3 - AssertionError: Balance not updated correctly after Trade 3
+assert 9800 == 9840
+ +  where 9800 = <core.risk_manager.RiskManager object at 0x0000029217E7CD60>.balance
+FAILED tests/unit/test_risk_manager.py::test_trade_4_blocked_due_to_max_trades - AssertionError: Trade 4 should be blocked due to max trades per day
+assert not True
+FAILED tests/unit/test_token_manager.py::test_save_and_load_tokens - AssertionError: assert False
+ +  where False = <built-in function _path_exists>('test_tokens.json')
+ +    where <built-in function _path_exists> = <module 'ntpath' (frozen)>.exists
+ +      where <module 'ntpath' (frozen)> = os.path
+FAILED tests/unit/test_token_manager.py::test_refresh_if_needed_no_file - AssertionError: assert {'access_token': 'test_access', 'refresh_token': 'test_refresh', 'expires_in': 3600, 'expires_at': 1761215610, '_comment': '\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u043d\u043e \u0437\u0433\u0435\u043d\u0435\u0440\u043e\u0432\u0430\u043d\u0438\u0439 tokens.json. \u041d\u0435 \u0437\u0431\u0435\u0440\u0456\u0433\u0430\u0442\u0438 \u0432 \u0440\u0435\u043f\u043e\u0437\u0438\u0442\u043e\u0440\u0456\u0457.'} is None
+================= 14 failed, 27 passed, 4 warnings in 10.51s ==================
+
+Disconnected: [Failure instance: Traceback (failure with no frames): <class 'twisted.internet.error.ConnectionLost'>: Connection to the other side was lost in a non-clean fashion: Connection lost.
+]
+✅ Завершено за 13.921 сек. 
+---------------------------------------- 
+======================================== 
+✅ CI-перевірка завершена о 12:33:32,16 
+======================================== 

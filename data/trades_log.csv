@@ -1,0 +1,3 @@
+timestamp,symbol,side,entry,size,SL,TP,status,balance
+2025-09-30 16:06:25,TEST,short,117.0,85.470085,118.17,114.66,OPEN,10000
+2025-09-30 16:06:26,TEST,short,117.0,85.470085,118.17,114.66,CLOSED,10256.41

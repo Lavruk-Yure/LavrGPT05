@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LGE05StyleTester</class>
+ <widget class="QWidget" name="LGE05StyleTester">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>LGE05 Style Tester</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget#LGE05StyleTester {
+    background-image: url(:/icons/robot_600x400.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content;
+}
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="styleSheet">
+      <string notr="true">color: #2E7EF9;
+font: bold 14pt &quot;Segoe UI&quot;;
+background-color: transparent;</string>
+     </property>
+     <property name="text">
+      <string>LGE05 Style Test</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="editSample">
+     <property name="styleSheet">
+      <string notr="true">QLineEdit {
+    border: 1px solid #AAAAAA;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 10pt;
+    background-color: white;
+}
+QLineEdit:focus {
+    border: 1px solid #2E7EF9;
+}</string>
+     </property>
+     <property name="placeholderText">
+      <string>Type something...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnTest">
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    background-color: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2E7EF9, stop:1 #1E5FD0);
+    color: white;
+    border-radius: 8px;
+    font: bold 11pt &quot;Segoe UI&quot;;
+    padding: 6px;
+}
+QPushButton:hover { background-color: #558CFF; }
+QPushButton:pressed { background-color: #244FC0; }</string>
+     </property>
+     <property name="text">
+      <string>Test Button</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/eye_open.svg</normaloff>:/icons/eye_open.svg</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboSample">
+     <property name="styleSheet">
+      <string notr="true">QComboBox {
+    border: 1px solid #AAAAAA;
+    border-radius: 4px;
+    padding: 3px;
+    font-size: 10pt;
+    background-color: white;
+}
+QComboBox:focus {
+    border: 1px solid #2E7EF9;
+}</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>Option 1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Option 2</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableSample">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTableWidget {
+    background-color: #101820;
+    alternate-background-color: #182030;
+    color: #E0E0E0;
+    gridline-color: #2E7EF9;
+    selection-background-color: #2E7EF9;
+    selection-color: #FFFFFF;
+}</string>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="rowCount">
+      <number>3</number>
+     </property>
+     <property name="columnCount">
+      <number>3</number>
+     </property>
+     <row/>
+     <row/>
+     <row/>
+     <column/>
+     <column/>
+     <column/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QProgressBar" name="progressSample">
+     <property name="styleSheet">
+      <string notr="true">QProgressBar {
+    border: 1px solid #2E7EF9;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 30);
+    height: 12px;
+}
+QProgressBar::chunk {
+    background-color: #2E7EF9;
+    border-radius: 5px;
+}</string>
+     </property>
+     <property name="value">
+      <number>50</number>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

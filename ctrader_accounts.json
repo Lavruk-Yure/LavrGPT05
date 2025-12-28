@@ -1,0 +1,41 @@
+{
+  "cTraderId": {
+    "data": {
+      "userId": 10079334,
+      "nickname": null,
+      "email": null
+    }
+  },
+  "accounts": {
+    "data": [
+      {
+        "accountId": 44361399,
+        "accountNumber": 9565209,
+        "live": false,
+        "brokerName": "icmarketssc",
+        "brokerTitle": "Raw Trading Ltd",
+        "depositCurrency": "USD",
+        "traderRegistrationTimestamp": 1755525934862,
+        "traderAccountType": "HEDGED",
+        "leverage": 500,
+        "balance": 20000,
+        "accountStatus": "ACTIVE",
+        "moneyDigits": 2
+      },
+      {
+        "accountId": 44361403,
+        "accountNumber": 9565210,
+        "live": false,
+        "brokerName": "icmarketssc",
+        "brokerTitle": "Raw Trading  Ltd",
+        "depositCurrency": "USD",
+        "traderRegistrationTimestamp": 1755525949023,
+        "traderAccountType": "HEDGED",
+        "leverage": 500,
+        "balance": 20000,
+        "accountStatus": "ACTIVE",
+        "moneyDigits": 2
+      }
+    ]
+  }
+}

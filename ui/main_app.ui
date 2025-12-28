@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainAppWindow</class>
+ <widget class="QMainWindow" name="MainAppWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>[MainAppWindow.windowTitle]</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/icons/lge_perplexity2_24x24.png</normaloff>:/icons/lge_perplexity2_24x24.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background: qlineargradient(
+    x1:0, y1:0, x2:0, y2:1,
+    stop:0 #1F4F5F, stop:1 #0E2F3A);
+color: #E9F6F7;
+QMainWindow {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1F4F5F, stop:1 #0E2F3A);
+    color: #E9F6F7;
+    font: 10pt &quot;Segoe UI&quot;;
+}
+
+QToolButton {
+    background-color: #2C7A8C;
+    border: none;
+    color: white;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+QToolButton:hover {
+    background-color: #1E5FD0;
+}
+
+</string>
+  </property>
+  <widget class="QWidget" name="centralArea"/>
+  <widget class="QMenuBar" name="toolBarMain">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>33</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusBarMain"/>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

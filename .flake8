@@ -1,0 +1,31 @@
+[flake8]
+# Ігнорувати помилки, пов'язані з import * та можливими undefined іменами
+ignore = F403,F405,F401,F821,F822,F823,F824,D100,D101,D102,E203,W503
+
+# Довжина рядка (Black форматує до 88)
+max-line-length = 88
+
+# Вимкнути попередження про пробіли у коментарях
+inline-quotes = single
+
+# Пропускати перевірку в певних папках, наприклад OpenApiPy/samples
+exclude =
+    .git,
+    __pycache__,
+    venv313,
+    venv*,
+    build,
+    dist,
+    OpenApiPy/samples,
+    __init__.py,
+    */__init__.py,
+    */*/__init__.py,
+    brokers/__init__.py,
+    utils/__init__.py,
+    ui/*,
+    resources_rc.py,
+    tests/__pycache__,
+    ui/ui_*.py,
+    */resources_rc.py
+    per-file-ignores =
+    __init__.py:F401

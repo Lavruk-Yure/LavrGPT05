@@ -1,0 +1,21 @@
+{
+  "app": "LGE05",
+  "version": "0.1.0",
+  "email": "lavrhome@gmail.com",
+  "language": "bg",
+  "password_sha256": "dcbb40d2261a4725cdc50a2b45314e0ffd3658074a8126c26a0f3478015aa549",
+  "created_at": "2025-12-26T10:34:46.090013+00:00",
+  "updated_at": "2025-12-26T10:34:46.090157+00:00",
+  "multi_language": false,
+  "translator": {
+    "provider": "off",
+    "deepl_key_1": "",
+    "deepl_key_2": ""
+  },
+  "machine": {
+    "username": "Lavruk",
+    "platform": "Windows-11-10.0.26100-SP0",
+    "node": "LAVRUK-YURE",
+    "mac": "0x901b0e029d62"
+  }
+}

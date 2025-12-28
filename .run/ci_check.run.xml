@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="ci_check" type="CompoundRunConfigurationType">
+        <toRun name="black" type="PythonConfigurationType"/>
+        <toRun name="flake8.exe" type="PythonConfigurationType"/>
+        <toRun name="isort" type="PythonConfigurationType"/>
+        <toRun name="pytest" type="PythonConfigurationType"/>
+        <method v="2"/>
+    </configuration>
+</component>

@@ -1,0 +1,54 @@
+gitignore
+# Python
+__pycache__/
+.mypy_cache/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+venv*/
+.venv*/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs & temp
+*.log
+*.tmp
+*.swp
+
+# Secrets
+tokens.json
+*.env
+.env.*
+secrets.json
+*.pem
+*.crt
+*.key
+
+# OS
+.DS_Store
+
+# auto-py-to-exe
+*.exe
+/dist/
+/dist_auto/
+/build/
+*.spec
+*.msi
+
+# runtime конфіги
+*.conf
+*.conf.bad
+LGE05.conf
+LGE05.conf.bad
+tokens*.json
+Session/
+
+

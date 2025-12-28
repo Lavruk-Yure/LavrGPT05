@@ -1,0 +1,8 @@
+[tool.isort]
+atomic = true
+overwrite_in_place = true
+skip = ["venv313"]
+profile = "black"
+line_length = 88
+[tool.black]
+line-length = 88

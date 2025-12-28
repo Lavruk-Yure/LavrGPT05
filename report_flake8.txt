@@ -1,0 +1,103 @@
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:5:1: E266 too many leading '#' for block comment
+## Form generated from reading UI file 'configdialogKlJbAo.ui'
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:7:1: E266 too many leading '#' for block comment
+## Created by: Qt User Interface Compiler version 6.9.1
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:9:1: E266 too many leading '#' for block comment
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QDate' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QDateTime' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QLocale' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QObject' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QPoint' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QSize' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.Qt' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QTime' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:12:1: F401 'PySide6.QtCore.QUrl' imported but unused
+from PySide6.QtCore import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QBrush' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QColor' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QConicalGradient' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QCursor' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QFont' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QFontDatabase' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QGradient' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QIcon' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QImage' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QKeySequence' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QLinearGradient' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QPainter' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QPalette' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QPixmap' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QRadialGradient' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:26:1: F401 'PySide6.QtGui.QTransform' imported but unused
+from PySide6.QtGui import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:44:1: F401 'PySide6.QtWidgets.QApplication' imported but unused
+from PySide6.QtWidgets import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:44:1: F401 'PySide6.QtWidgets.QDialog' imported but unused
+from PySide6.QtWidgets import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:44:1: F401 'PySide6.QtWidgets.QSizePolicy' imported but unused
+from PySide6.QtWidgets import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:44:1: F401 'PySide6.QtWidgets.QWidget' imported but unused
+from PySide6.QtWidgets import (
+^
+D:\LavrGPT\LavrGPT05\ui\ui_configdialog.py:101:89: E501 line too long (105 > 88 characters)
+                "\u0456\u043c'\u044f \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430",
+                                                                                        ^
+3     E266 too many leading '#' for block comment
+1     E501 line too long (105 > 88 characters)
+29    F401 'PySide6.QtCore.QDate' imported but unused
+33

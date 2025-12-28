@@ -1,0 +1,17 @@
+# Ігноруємо непотрібні або двійкові файли
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+venv*/
+.venv*/
+*.log
+*.tmp
+*.swp
+*.env
+tokens.json
+OpenApiPy/samples/*

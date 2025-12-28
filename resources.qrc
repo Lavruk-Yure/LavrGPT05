@@ -1,0 +1,48 @@
+<RCC>
+  <qresource prefix="/">
+    <!-- icons -->
+    <file>icons/eye_closed.svg</file>
+    <file>icons/eye_open.svg</file>
+    <file>icons/lge_perplexity2_24x24.png</file>
+    <file>icons/robot_400x400.png</file>
+    <file>icons/robot_600x400.png</file>
+    <file>icons/robot_600x600.png</file>
+
+    <!-- language data -->
+    <file>lang/strings_fallback.json</file>
+
+    <!-- flags (24px, sorted by language code) -->
+    <file>lang/flags/ar_24.png</file>
+    <file>lang/flags/bg_24.png</file>
+    <file>lang/flags/cs_24.png</file>
+    <file>lang/flags/da_24.png</file>
+    <file>lang/flags/de_24.png</file>
+    <file>lang/flags/el_24.png</file>
+    <file>lang/flags/en_24.png</file>
+    <file>lang/flags/es_24.png</file>
+    <file>lang/flags/fi_24.png</file>
+    <file>lang/flags/fr_24.png</file>
+    <file>lang/flags/hi_24.png</file>
+    <file>lang/flags/hr_24.png</file>
+    <file>lang/flags/hu_24.png</file>
+    <file>lang/flags/it_24.png</file>
+    <file>lang/flags/ja_24.png</file>
+    <file>lang/flags/ko_24.png</file>
+    <file>lang/flags/mk_24.png</file>
+    <file>lang/flags/nl_24.png</file>
+    <file>lang/flags/no_24.png</file>
+    <file>lang/flags/pl_24.png</file>
+    <file>lang/flags/pt_24.png</file>
+    <file>lang/flags/ro_24.png</file>
+    <file>lang/flags/sk_24.png</file>
+    <file>lang/flags/sl_24.png</file>
+    <file>lang/flags/sq_24.png</file>
+    <file>lang/flags/sv_24.png</file>
+    <file>lang/flags/tr_24.png</file>
+    <file>lang/flags/uk_24.png</file>
+    <file>lang/flags/zh_24.png</file>
+
+    <!-- fallback -->
+    <file>lang/flags/no_flag_24.png</file>
+  </qresource>
+</RCC>

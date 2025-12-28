@@ -1,0 +1,8 @@
+# For IDE inspections only
+pycryptodome  # provides module Crypto
+pyAesCrypt>=6.1.1
+pytest>=8.3.2
+black>=25.9.0
+flake8>=7.3.0
+isort>=6.0.1
+
