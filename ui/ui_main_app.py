@@ -16,7 +16,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMenuBar, QSizePolicy,
-    QStatusBar, QWidget)
+    QStatusBar, QToolBar, QWidget)
 import resources_rc
 
 class Ui_MainAppWindow(object):
@@ -54,13 +54,16 @@ class Ui_MainAppWindow(object):
         self.centralArea = QWidget(MainAppWindow)
         self.centralArea.setObjectName(u"centralArea")
         MainAppWindow.setCentralWidget(self.centralArea)
-        self.toolBarMain = QMenuBar(MainAppWindow)
-        self.toolBarMain.setObjectName(u"toolBarMain")
-        self.toolBarMain.setGeometry(QRect(0, 0, 800, 33))
-        MainAppWindow.setMenuBar(self.toolBarMain)
+        self.menuBarMain = QMenuBar(MainAppWindow)
+        self.menuBarMain.setObjectName(u"menuBarMain")
+        self.menuBarMain.setGeometry(QRect(0, 0, 800, 33))
+        MainAppWindow.setMenuBar(self.menuBarMain)
         self.statusBarMain = QStatusBar(MainAppWindow)
         self.statusBarMain.setObjectName(u"statusBarMain")
         MainAppWindow.setStatusBar(self.statusBarMain)
+        self.toolBarMain = QToolBar(MainAppWindow)
+        self.toolBarMain.setObjectName(u"toolBarMain")
+        MainAppWindow.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.toolBarMain)
 
         self.retranslateUi(MainAppWindow)
 
@@ -69,5 +72,6 @@ class Ui_MainAppWindow(object):
 
     def retranslateUi(self, MainAppWindow):
         MainAppWindow.setWindowTitle(QCoreApplication.translate("MainAppWindow", u"[MainAppWindow.windowTitle]", None))
+        self.toolBarMain.setWindowTitle(QCoreApplication.translate("MainAppWindow", u"toolBar", None))
     # retranslateUi
 

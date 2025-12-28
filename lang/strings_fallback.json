@@ -888,6 +888,40 @@
     "zh": "重新启动程序，重新注册。",
     "ja": "プログラムを再起動して再登録する。"
   },
+  "MainAppWindow.btnAbout": {
+    "uk": "Про програму",
+    "en": "About"
+  },
+  "MainAppWindow.actionAbout": {
+    "uk": "Про програму",
+    "en": "About"
+  },
+  "MainAppWindow.btnExit": {
+    "uk": "Вихід",
+    "en": "Exit"
+  },
+
+  "AboutDialog.windowTitle": {
+    "uk": "Про програму",
+    "en": "About"
+  },
+  "AboutDialog.title": {
+    "uk": "LGE05 — ATS",
+    "en": "LGE05 — ATS"
+  },
+  "AboutDialog.info": {
+    "uk": "Інформація про версію, автора і середовище виконання.",
+    "en": "Version, author and runtime environment."
+  },
+  "AboutDialog.testedOs": {
+    "uk": "Перевірено на: Windows 11. Очікується: Windows 10.",
+    "en": "Tested: Windows 11. Expected: Windows 10."
+  },
+  "AboutDialog.comment": {
+    "uk": "Принцип: контрольована система, мінімум сміття, максимум прозорості.",
+    "en": "Principle: controlled system, minimal clutter, maximum clarity."
+  },
+
   "translated_languages": [
     "bg",
     "de",

@@ -1,13 +1,16 @@
 # main_logic.py
 """
-MainAppWindow — головне робоче вікно LGE05 (Patch 16.4)
+core/main_logic.py — головне робоче вікно LGE05.
 
 Функції:
-    - ліва панель навігації (Monitoring / Orders / Settings)
-    - центральна область зі сторінками (поки плейсхолдери)
-    - toolbar (ті самі дії)
-    - statusBar (показує назву активної сторінки)
-    - UITranslator + глобальний LANG
+- ліва панель навігації (Моніторинг / Ордери / Налаштування / Про програму) +
+    Вихід внизу
+- центральна область зі сторінками (поки плейсхолдери)
+- toolbar (ті самі дії)
+- statusBar (показує назву активної сторінки)
+- UITranslator + глобальний LANG
+
+Patch: toolbar hover + правильний порядок меню
 """
 
 from __future__ import annotations
@@ -26,6 +29,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core.about_dialog import AboutDialog
 from core.lang_manager import LANG
 from core.settings_center import SettingsCenter
 from core.ui_translator import UITranslator
@@ -35,9 +39,10 @@ DEBUG_MAIN = False
 
 
 def log_cp(name: str, **kw: Any) -> None:
+    """Локальний debug-логер модуля."""
     if not DEBUG_MAIN:
         return
-    msg = f"[MAIN_CP:{name}] " + ", ".join(f"{k}={v!r}" for k, v in kw.items())
+    msg = f"[MAIN:{name}] " + ", ".join(f"{k}={v!r}" for k, v in kw.items())
     print(msg)
 
 
@@ -59,9 +64,9 @@ class MainAppWindow(QMainWindow):
         main_layout = QHBoxLayout(self.ui.centralArea)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # ---------------------------------------------------------
+        # =========================================================
         # LEFT PANEL
-        # ---------------------------------------------------------
+        # =========================================================
         self.left_panel = QFrame(self.ui.centralArea)
         self.left_panel.setFixedWidth(180)
         self.left_panel.setStyleSheet(
@@ -78,7 +83,7 @@ class MainAppWindow(QMainWindow):
         self.lbl_title_left.setStyleSheet("color:white; font:bold 13pt 'Segoe UI';")
         v_left.addWidget(self.lbl_title_left)
 
-        # Navigation buttons
+        # Buttons
         self.btn_monitoring = QToolButton()
         self.btn_monitoring.setObjectName("btnMonitoring")
         self.btn_monitoring.setText("[MainAppWindow.btnMonitoring]")
@@ -91,20 +96,43 @@ class MainAppWindow(QMainWindow):
         self.btn_settings.setObjectName("btnSettings")
         self.btn_settings.setText("[MainAppWindow.btnSettings]")
 
-        for b in (self.btn_monitoring, self.btn_orders, self.btn_settings):
+        self.btn_about = QToolButton()
+        self.btn_about.setObjectName("btnAbout")
+        self.btn_about.setText("[MainAppWindow.btnAbout]")
+
+        nav_style = (
+            "QToolButton {background-color:#227685; color:white;"
+            "border-radius:6px; padding:6px;} "
+            "QToolButton:hover {background-color:#1E5FD0;}"
+        )
+
+        for b in (
+            self.btn_monitoring,
+            self.btn_orders,
+            self.btn_settings,
+            self.btn_about,
+        ):
             b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.setStyleSheet(
-                "QToolButton {background-color:#227685; color:white;"
-                "border-radius:6px; padding:6px;} "
-                "QToolButton:hover {background-color:#1E5FD0;}"
-            )
+            b.setStyleSheet(nav_style)
             v_left.addWidget(b)
 
         v_left.addStretch()
 
-        # ---------------------------------------------------------
+        # Exit — внизу
+        self.btn_exit = QToolButton()
+        self.btn_exit.setObjectName("btnExit")
+        self.btn_exit.setText("[MainAppWindow.btnExit]")
+        self.btn_exit.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_exit.setStyleSheet(
+            "QToolButton {background-color:#2d3b42; color:white;"
+            "border-radius:6px; padding:6px;} "
+            "QToolButton:hover {background-color:#b00020;}"
+        )
+        v_left.addWidget(self.btn_exit)
+
+        # =========================================================
         # CENTRAL STACK
-        # ---------------------------------------------------------
+        # =========================================================
         self.stacked = QStackedWidget(self.ui.centralArea)
 
         self.page_monitoring = QLabel("[MainAppWindow.pageMonitoring]")
@@ -126,11 +154,54 @@ class MainAppWindow(QMainWindow):
         main_layout.addWidget(self.left_panel)
         main_layout.addWidget(self.stacked)
 
-        # ---------------------------------------------------------
-        # TOOLBAR
-        # ---------------------------------------------------------
+        # =========================================================
+        # TOOLBAR (QToolBar)
+        # =========================================================
         tb = self.ui.toolBarMain
         tb.clear()
+
+        # Текстові кнопки
+        tb.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
+
+        # Весь hover робимо стилем тулбара (а не findChildren)
+        tb.setStyleSheet(
+            """
+QToolBar {
+    background-color: #173A47;
+    border: none;
+    spacing: 6px;
+    padding: 4px;
+}
+QToolButton {
+    background: transparent;
+    color: white;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+QToolButton:hover {
+    background-color: #1E5FD0;
+    border-color: #1E5FD0;
+}
+QToolButton:pressed {
+    background-color: #164aa3;
+}
+QToolBar::separator {
+    background-color: #0f2a34;
+    width: 1px;
+    margin: 2px 6px;
+}
+
+/* Exit — червоний hover (кнопці дамо objectName tbExit) */
+QToolButton#tbExit:hover {
+    background-color: #b00020;
+    border-color: #b00020;
+}
+QToolButton#tbExit:pressed {
+    background-color: #7a0016;
+}
+"""
+        )
 
         self.action_monitor = tb.addAction("[MainAppWindow.actionMonitoring]")
         self.action_monitor.setObjectName("actionMonitoring")
@@ -141,20 +212,29 @@ class MainAppWindow(QMainWindow):
         self.action_settings = tb.addAction("[MainAppWindow.actionSettings]")
         self.action_settings.setObjectName("actionSettings")
 
+        self.action_about = tb.addAction("[MainAppWindow.actionAbout]")
+        self.action_about.setObjectName("actionAbout")
+
         tb.addSeparator()
 
         self.action_exit = tb.addAction("[MainAppWindow.actionExit]")
         self.action_exit.setObjectName("actionExit")
 
-        # ---------------------------------------------------------
+        # Позначаємо кнопку Exit в toolbar, щоб працював QToolButton#tbExit
+        exit_btn = tb.widgetForAction(self.action_exit)
+        if exit_btn is not None:
+            exit_btn.setObjectName("tbExit")
+
+        # =========================================================
         # Connections
-        # ---------------------------------------------------------
+        # =========================================================
         self.btn_monitoring.clicked.connect(
             lambda: self._switch_page(self.page_monitoring)
         )
         self.btn_orders.clicked.connect(lambda: self._switch_page(self.page_orders))
-        # Settings → діалог
         self.btn_settings.clicked.connect(self._open_settings_dialog)
+        self.btn_about.clicked.connect(self._open_about_dialog)
+        self.btn_exit.clicked.connect(self.close)
 
         self.action_monitor.triggered.connect(
             lambda: self._switch_page(self.page_monitoring)
@@ -163,14 +243,17 @@ class MainAppWindow(QMainWindow):
             lambda: self._switch_page(self.page_orders)
         )
         self.action_settings.triggered.connect(self._open_settings_dialog)
-
+        self.action_about.triggered.connect(self._open_about_dialog)
         self.action_exit.triggered.connect(self.close)
 
-        # ---------------------------------------------------------
+        # =========================================================
         # APPLY TRANSLATION (початковий)
-        # ---------------------------------------------------------
+        # =========================================================
         self._ui_translator.apply(self)
         log_cp("init_done", lang=self._lang_mgr.current_language)
+
+        # Стартова сторінка
+        self._switch_page(self.page_monitoring)
 
     # ------------------------------------------------------------------
     def _switch_page(self, page_widget: QWidget) -> None:
@@ -178,8 +261,6 @@ class MainAppWindow(QMainWindow):
         self.stacked.setCurrentWidget(page_widget)
 
         title = ""
-
-        # Для QLabel–сторінок
         if hasattr(page_widget, "text"):
             try:
                 text = page_widget.text()
@@ -199,6 +280,10 @@ class MainAppWindow(QMainWindow):
     # ------------------------------------------------------------------
     def _open_settings_dialog(self) -> None:
         """Відкрити діалог налаштувань."""
-
         dlg = SettingsCenter(self)
+        dlg.exec()
+
+    def _open_about_dialog(self) -> None:
+        """Відкрити діалог 'Про програму'."""
+        dlg = AboutDialog(self)
         dlg.exec()
