@@ -15,9 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout,
+    QLabel, QPushButton, QSizePolicy, QTextBrowser,
+    QVBoxLayout, QWidget)
+import resources_rc
 
 class Ui_AboutDialog(object):
     def setupUi(self, AboutDialog):
@@ -31,24 +32,33 @@ class Ui_AboutDialog(object):
         self.hlTop.setObjectName(u"hlTop")
         self.lblIcon = QLabel(AboutDialog)
         self.lblIcon.setObjectName(u"lblIcon")
-        self.lblIcon.setMinimumSize(QSize(64, 64))
-        self.lblIcon.setMaximumSize(QSize(64, 64))
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.lblIcon.sizePolicy().hasHeightForWidth())
+        self.lblIcon.setSizePolicy(sizePolicy)
+        self.lblIcon.setMinimumSize(QSize(96, 96))
+        self.lblIcon.setMaximumSize(QSize(96, 96))
+        self.lblIcon.setPixmap(QPixmap(u":/icons/LGE/about_96.png"))
+        self.lblIcon.setScaledContents(True)
+        self.lblIcon.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.hlTop.addWidget(self.lblIcon)
 
         self.vlText = QVBoxLayout()
         self.vlText.setObjectName(u"vlText")
+        self.vlText.setContentsMargins(0, -1, -1, -1)
         self.lblTitle = QLabel(AboutDialog)
         self.lblTitle.setObjectName(u"lblTitle")
         self.lblTitle.setWordWrap(True)
 
         self.vlText.addWidget(self.lblTitle)
 
-        self.lblInfo = QLabel(AboutDialog)
-        self.lblInfo.setObjectName(u"lblInfo")
-        self.lblInfo.setWordWrap(True)
+        self.textInfo = QTextBrowser(AboutDialog)
+        self.textInfo.setObjectName(u"textInfo")
+        self.textInfo.setFrameShape(QFrame.Shape.NoFrame)
 
-        self.vlText.addWidget(self.lblInfo)
+        self.vlText.addWidget(self.textInfo)
 
         self.lblOs = QLabel(AboutDialog)
         self.lblOs.setObjectName(u"lblOs")
@@ -62,17 +72,23 @@ class Ui_AboutDialog(object):
 
         self.vlText.addWidget(self.lblComment)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.btnOk = QPushButton(AboutDialog)
+        self.btnOk.setObjectName(u"btnOk")
+        self.btnOk.setMinimumSize(QSize(50, 0))
+        self.btnOk.setMaximumSize(QSize(100, 16777215))
+
+        self.horizontalLayout.addWidget(self.btnOk)
+
+
+        self.vlText.addLayout(self.horizontalLayout)
+
 
         self.hlTop.addLayout(self.vlText)
 
 
         self.verticalLayout.addLayout(self.hlTop)
-
-        self.buttonBox = QDialogButtonBox(AboutDialog)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.NoButton)
-
-        self.verticalLayout.addWidget(self.buttonBox)
 
 
         self.retranslateUi(AboutDialog)
@@ -84,8 +100,8 @@ class Ui_AboutDialog(object):
         AboutDialog.setWindowTitle(QCoreApplication.translate("AboutDialog", u"[AboutDialog.windowTitle]", None))
         self.lblIcon.setText("")
         self.lblTitle.setText(QCoreApplication.translate("AboutDialog", u"[AboutDialog.title]", None))
-        self.lblInfo.setText(QCoreApplication.translate("AboutDialog", u"[AboutDialog.info]", None))
         self.lblOs.setText(QCoreApplication.translate("AboutDialog", u"[AboutDialog.testedOs]", None))
         self.lblComment.setText(QCoreApplication.translate("AboutDialog", u"[AboutDialog.comment]", None))
+        self.btnOk.setText(QCoreApplication.translate("AboutDialog", u"[AboutDialog.btnOk]", None))
     # retranslateUi
 

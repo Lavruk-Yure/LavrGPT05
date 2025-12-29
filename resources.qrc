@@ -7,7 +7,7 @@
     <file>icons/robot_400x400.png</file>
     <file>icons/robot_600x400.png</file>
     <file>icons/robot_600x600.png</file>
-
+    <file>icons/LGE/about_96.png</file>
     <!-- language data -->
     <file>lang/strings_fallback.json</file>
 

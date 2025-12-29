@@ -193,6 +193,11 @@ class SettingsCenter(QDialog):
         except Exception:  # noqa
             log_cp("nav.page.invalid", reason="cannot int(page)", page=page)
             return
+        # --- спеціальні дії (без сторінок) ---
+        if action == "exit":
+            log_cp("nav.action", action="exit")
+            self.reject()  # або self.close()
+            return
 
         if 0 <= page_i < self.ui.stackPages.count():
             self.ui.stackPages.setCurrentIndex(page_i)

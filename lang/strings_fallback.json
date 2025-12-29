@@ -39,7 +39,8 @@
     "es": "Cargando...",
     "bg": "Зареждане...",
     "zh": "正在加载...",
-    "ja": "読み込み中..."
+    "ja": "読み込み中...",
+    "cs": "Načítání..."
   },
   "SplashWindow.lblTitle": {
     "en": "Starting LGE05",
@@ -50,7 +51,8 @@
     "es": "Inicio LGE05",
     "bg": "Започване на LGE05",
     "zh": "开始 LGE05",
-    "ja": "LGE05スタート"
+    "ja": "LGE05スタート",
+    "cs": "Zahájení LGE05"
   },
   "SplashWindow.lblStatus": {
     "en": "Initializing…",
@@ -61,7 +63,8 @@
     "es": "Inicializando...",
     "bg": "Иницииране...",
     "zh": "初始化...",
-    "ja": "初期化中..."
+    "ja": "初期化中...",
+    "cs": "Inicializace..."
   },
   "Splash.check_dirs": {
     "en": "Checking directories…",
@@ -72,7 +75,8 @@
     "es": "Comprobando directorios...",
     "bg": "Проверка на директориите...",
     "zh": "检查目录...",
-    "ja": "ディレクトリのチェック..."
+    "ja": "ディレクトリのチェック...",
+    "cs": "Kontrola adresářů..."
   },
   "Splash.init_env": {
     "en": "Initializing environment…",
@@ -83,7 +87,8 @@
     "es": "Inicializando entorno...",
     "bg": "Иницииране на средата...",
     "zh": "初始化环境...",
-    "ja": "環境の初期化..."
+    "ja": "環境の初期化...",
+    "cs": "Inicializace prostředí..."
   },
   "Splash.check_conf": {
     "en": "Checking configuration…",
@@ -94,7 +99,8 @@
     "es": "Comprobando configuración...",
     "bg": "Проверка на конфигурацията...",
     "zh": "检查配置...",
-    "ja": "コンフィギュレーションのチェック"
+    "ja": "コンフィギュレーションのチェック",
+    "cs": "Kontrola konfigurace..."
   },
   "Splash.prep_ui": {
     "en": "Preparing UI…",
@@ -105,7 +111,8 @@
     "es": "Preparar la IU...",
     "bg": "Подготовка на потребителския интерфейс...",
     "zh": "准备用户界面...",
-    "ja": "UIの準備..."
+    "ja": "UIの準備...",
+    "cs": "Příprava uživatelského rozhraní..."
   },
   "Splash.done": {
     "en": "Ready",
@@ -116,7 +123,8 @@
     "es": "Listo",
     "bg": "Готов",
     "zh": "准备就绪",
-    "ja": "準備完了"
+    "ja": "準備完了",
+    "cs": "Připraveno"
   },
   "RegistrationWindow.windowTitle": {
     "en": "Registration",
@@ -127,7 +135,8 @@
     "es": "Inscripción",
     "bg": "Регистрация",
     "zh": "注册",
-    "ja": "参加登録"
+    "ja": "参加登録",
+    "cs": "Registrace"
   },
   "RegistrationWindow.lblTitle": {
     "en": "Welcome to LGE05",
@@ -138,7 +147,8 @@
     "es": "Bienvenido a LGE05",
     "bg": "Добре дошли в LGE05",
     "zh": "欢迎来到 LGE05",
-    "ja": "LGE05へようこそ"
+    "ja": "LGE05へようこそ",
+    "cs": "Vítejte v LGE05"
   },
   "RegistrationWindow.lblHeader": {
     "en": "Create your account",
@@ -149,7 +159,8 @@
     "es": "Cree su cuenta",
     "bg": "Създаване на акаунт",
     "zh": "创建账户",
-    "ja": "アカウントの作成"
+    "ja": "アカウントの作成",
+    "cs": "Vytvoření účtu"
   },
   "RegistrationWindow.lblLanguage": {
     "en": "Language:",
@@ -160,7 +171,8 @@
     "es": "Idioma:",
     "bg": "Език:",
     "zh": "语言",
-    "ja": "言語："
+    "ja": "言語：",
+    "cs": "Jazyk:"
   },
   "RegistrationWindow.lblEmail": {
     "en": "Email:",
@@ -171,7 +183,8 @@
     "es": "Correo electrónico:",
     "bg": "Имейл:",
     "zh": "电子邮件：",
-    "ja": "Eメール"
+    "ja": "Eメール",
+    "cs": "E-mail:"
   },
   "RegistrationWindow.lblPassword": {
     "en": "Password:",
@@ -182,7 +195,8 @@
     "es": "Contraseña:",
     "bg": "Парола:",
     "zh": "密码",
-    "ja": "パスワード"
+    "ja": "パスワード",
+    "cs": "Heslo:"
   },
   "RegistrationWindow.lblPasswordConfirm": {
     "en": "Confirm password:",
@@ -193,7 +207,8 @@
     "es": "Confirma la contraseña:",
     "bg": "Потвърдете паролата:",
     "zh": "确认密码：",
-    "ja": "パスワードの確認"
+    "ja": "パスワードの確認",
+    "cs": "Potvrzení hesla:"
   },
   "RegistrationWindow.lblError": {
     "en": "",
@@ -204,7 +219,8 @@
     "pl": "",
     "es": "",
     "zh": "",
-    "ja": ""
+    "ja": "",
+    "cs": ""
   },
   "RegistrationWindow.btnRegister": {
     "en": "Register",
@@ -215,7 +231,8 @@
     "es": "Regístrese en",
     "bg": "Регистрация",
     "zh": "注册",
-    "ja": "登録"
+    "ja": "登録",
+    "cs": "Registrace"
   },
   "RegistrationWindow.btnExit": {
     "en": "Exit",
@@ -226,7 +243,8 @@
     "es": "Salida",
     "bg": "Изход",
     "zh": "退出",
-    "ja": "出口"
+    "ja": "出口",
+    "cs": "Exit"
   },
   "RegistrationWindow.editEmail": {
     "en": "Enter email",
@@ -237,7 +255,8 @@
     "es": "Introducir correo electrónico",
     "bg": "Въведете имейл",
     "zh": "输入电子邮件",
-    "ja": "Eメールを入力"
+    "ja": "Eメールを入力",
+    "cs": "Zadejte e-mail"
   },
   "RegistrationWindow.editPassword": {
     "en": "Enter password",
@@ -248,7 +267,8 @@
     "es": "Introduzca la contraseña",
     "bg": "Въведете парола",
     "zh": "输入密码",
-    "ja": "パスワードを入力"
+    "ja": "パスワードを入力",
+    "cs": "Zadejte heslo"
   },
   "RegistrationWindow.editPasswordConfirm": {
     "en": "Repeat password",
@@ -259,7 +279,8 @@
     "es": "Repetir contraseña",
     "bg": "Повтаряне на паролата",
     "zh": "重复密码",
-    "ja": "リピートパスワード"
+    "ja": "リピートパスワード",
+    "cs": "Opakování hesla"
   },
   "LoginWindow.windowTitle": {
     "en": "Login",
@@ -270,7 +291,8 @@
     "bg": "Вход",
     "pl": "Login",
     "zh": "登录",
-    "ja": "ログイン"
+    "ja": "ログイン",
+    "cs": "Přihlášení"
   },
   "LoginWindow.lblTitle": {
     "en": "Welcome back",
@@ -281,7 +303,8 @@
     "es": "Bienvenido de nuevo",
     "bg": "Добре дошли обратно",
     "zh": "欢迎回来",
-    "ja": "おかえりなさい"
+    "ja": "おかえりなさい",
+    "cs": "Vítejte zpět"
   },
   "LoginWindow.lblHeader": {
     "en": "Enter your password",
@@ -292,7 +315,8 @@
     "es": "Introduzca su contraseña",
     "bg": "Въведете паролата си",
     "zh": "输入密码",
-    "ja": "パスワードを入力してください"
+    "ja": "パスワードを入力してください",
+    "cs": "Zadejte své heslo"
   },
   "LoginWindow.lblPassword": {
     "en": "Password:",
@@ -303,7 +327,8 @@
     "es": "Contraseña:",
     "bg": "Парола:",
     "zh": "密码",
-    "ja": "パスワード"
+    "ja": "パスワード",
+    "cs": "Heslo:"
   },
   "LoginWindow.lblError": {
     "en": " ",
@@ -314,7 +339,8 @@
     "pl": " ",
     "es": " ",
     "zh": " ",
-    "ja": " "
+    "ja": " ",
+    "cs": " "
   },
   "LoginWindow.btnLogin": {
     "en": "Login",
@@ -325,7 +351,8 @@
     "bg": "Вход",
     "pl": "Login",
     "zh": "登录",
-    "ja": "ログイン"
+    "ja": "ログイン",
+    "cs": "Přihlášení"
   },
   "LoginWindow.btnExit": {
     "en": "Exit",
@@ -336,7 +363,8 @@
     "es": "Salida",
     "bg": "Изход",
     "zh": "退出",
-    "ja": "出口"
+    "ja": "出口",
+    "cs": "Exit"
   },
   "LoginWindow.lineEdit": {
     "en": "Enter password",
@@ -347,7 +375,8 @@
     "es": "Introduzca la contraseña",
     "bg": "Въведете парола",
     "zh": "输入密码",
-    "ja": "パスワードを入力"
+    "ja": "パスワードを入力",
+    "cs": "Zadejte heslo"
   },
   "MainAppWindow.windowTitle": {
     "en": "LGE05 — Main Window",
@@ -358,7 +387,8 @@
     "es": "LGE05 - Ventana principal",
     "bg": "LGE05 - Основен прозорец",
     "zh": "LGE05 - 主窗口",
-    "ja": "LGE05 - メイン・ウィンドウ"
+    "ja": "LGE05 - メイン・ウィンドウ",
+    "cs": "LGE05 - Hlavní okno"
   },
   "RegistrationWindow.error.email_invalid": {
     "en": "Invalid email.",
@@ -369,7 +399,8 @@
     "es": "Correo electrónico no válido.",
     "bg": "Невалиден имейл.",
     "zh": "电子邮件无效。",
-    "ja": "無効なメールです。"
+    "ja": "無効なメールです。",
+    "cs": "Neplatný e-mail."
   },
   "RegistrationWindow.error.pw_short": {
     "en": "Password must contain at least 8 characters.",
@@ -380,7 +411,8 @@
     "es": "La contraseña debe contener al menos 8 caracteres.",
     "bg": "Паролата трябва да съдържа поне 8 символа.",
     "zh": "密码必须至少包含 8 个字符。",
-    "ja": "パスワードは8文字以上でなければなりません。"
+    "ja": "パスワードは8文字以上でなければなりません。",
+    "cs": "Heslo musí obsahovat alespoň 8 znaků."
   },
   "RegistrationWindow.error.pw_lower": {
     "en": "A lowercase letter is required.",
@@ -391,7 +423,8 @@
     "es": "Se requiere una letra minúscula.",
     "bg": "Изисква се малка буква.",
     "zh": "必须使用小写字母。",
-    "ja": "小文字は必須。"
+    "ja": "小文字は必須。",
+    "cs": "Vyžaduje se malé písmeno."
   },
   "RegistrationWindow.error.pw_upper": {
     "en": "An uppercase letter is required.",
@@ -402,7 +435,8 @@
     "es": "Se requiere una letra mayúscula.",
     "bg": "Задължително е да се изписва главна буква.",
     "zh": "必须使用大写字母。",
-    "ja": "大文字が必要。"
+    "ja": "大文字が必要。",
+    "cs": "Je vyžadováno velké písmeno."
   },
   "RegistrationWindow.error.pw_digit": {
     "en": "A digit is required.",
@@ -413,7 +447,8 @@
     "es": "Se necesita un dígito.",
     "bg": "Изисква се цифра.",
     "zh": "需要一位数。",
-    "ja": "桁が必要である。"
+    "ja": "桁が必要である。",
+    "cs": "Je vyžadována číslice."
   },
   "RegistrationWindow.error.pw_special": {
     "en": "A special character is required.",
@@ -424,7 +459,8 @@
     "es": "Se requiere un carácter especial.",
     "bg": "Изисква се специален символ.",
     "zh": "需要一个特殊字符。",
-    "ja": "特殊文字が必要です。"
+    "ja": "特殊文字が必要です。",
+    "cs": "Je vyžadován speciální znak."
   },
   "RegistrationWindow.error.pw_mismatch": {
     "en": "Passwords do not match.",
@@ -435,7 +471,8 @@
     "es": "Las contraseñas no coinciden.",
     "bg": "Паролите не съвпадат.",
     "zh": "密码不匹配。",
-    "ja": "パスワードが一致しない。"
+    "ja": "パスワードが一致しない。",
+    "cs": "Hesla se neshodují."
   },
   "RegistrationWindow.registerSuccess": {
     "en": "Registration successful.\nThe file has been created:\n{path}\n\nRestart the application.",
@@ -446,7 +483,8 @@
     "es": "Registro realizado con éxito.\nEl archivo ha sido creado:\n{ruta}\n\nReinicie la aplicación.",
     "bg": "Регистрацията е успешна.\nФайлът е създаден:\n{път}\n\nРестартирайте приложението.",
     "zh": "注册成功。\n文件已创建：\n{path}\n\n重新启动应用程序。",
-    "ja": "登録に成功しました。\nファイルが作成されました：\nパス\n\nアプリケーションを再起動してください。"
+    "ja": "登録に成功しました。\nファイルが作成されました：\nパス\n\nアプリケーションを再起動してください。",
+    "cs": "Registrace proběhla úspěšně.\nSoubor byl vytvořen:\n{cesta}\n\nRestartujte aplikaci."
   },
   "LoginWindow.errorInvalidPassword": {
     "en": "Invalid password. Attempts left: {left}",
@@ -457,7 +495,8 @@
     "es": "Contraseña inválida. Quedan intentos: {izquierda}",
     "bg": "Невалидна парола. Остават опити: {лево}",
     "zh": "密码无效。已尝试：{left}",
-    "ja": "パスワードが無効です。試行回数が残っています：左"
+    "ja": "パスワードが無効です。試行回数が残っています：左",
+    "cs": "Nesprávné heslo. Zbývají pokusy: {left}"
   },
   "LoginWindow.errorTooMany": {
     "en": "Too many invalid attempts. Access denied.",
@@ -468,7 +507,8 @@
     "es": "Demasiados intentos no válidos. Acceso denegado.",
     "bg": "Твърде много невалидни опити. Достъпът е отказан.",
     "zh": "尝试无效次数过多。拒绝访问。",
-    "ja": "無効な試行が多すぎます。アクセスが拒否されました。"
+    "ja": "無効な試行が多すぎます。アクセスが拒否されました。",
+    "cs": "Příliš mnoho neplatných pokusů. Přístup byl odepřen."
   },
   "LoginWindow.errorMachineMismatch": {
     "en": "This LGE05.conf was created on another device.\nAccess denied.",
@@ -479,7 +519,8 @@
     "es": "Este LGE05.conf fue creado en otro dispositivo.\nAcceso denegado.",
     "bg": "Този файл LGE05.conf е създаден на друго устройство.\nДостъпът е отказан.",
     "zh": "此 LGE05.conf 在其他设备上创建。\n拒绝访问。",
-    "ja": "このLGE05.confは別のデバイスで作成されました。\nアクセスが拒否されました。"
+    "ja": "このLGE05.confは別のデバイスで作成されました。\nアクセスが拒否されました。",
+    "cs": "Tento soubor LGE05.conf byl vytvořen na jiném zařízení.\nPřístup byl odepřen."
   },
   "MainAppWindow.lblTitleLeft": {
     "en": "LGE05 — ATS",
@@ -490,7 +531,8 @@
     "es": "LGE05 - ATS",
     "bg": "LGE05 - ATS",
     "zh": "LGE05 - ATS",
-    "ja": "LGE05 - ATS"
+    "ja": "LGE05 - ATS",
+    "cs": "LGE05 - ATS"
   },
   "MainAppWindow.btnMonitoring": {
     "en": "Monitoring",
@@ -501,7 +543,8 @@
     "es": "Supervisión",
     "bg": "Мониторинг",
     "zh": "监测",
-    "ja": "モニタリング"
+    "ja": "モニタリング",
+    "cs": "Monitorování"
   },
   "MainAppWindow.btnOrders": {
     "en": "Orders",
@@ -512,7 +555,8 @@
     "es": "Pedidos",
     "bg": "Поръчки",
     "zh": "订单",
-    "ja": "受注状況"
+    "ja": "受注状況",
+    "cs": "Objednávky"
   },
   "MainAppWindow.btnSettings": {
     "en": "Settings",
@@ -523,7 +567,8 @@
     "es": "Ajustes",
     "bg": "Настройки",
     "zh": "设置",
-    "ja": "設定"
+    "ja": "設定",
+    "cs": "Nastavení"
   },
   "MainAppWindow.actionExit": {
     "en": "Exit",
@@ -534,7 +579,8 @@
     "es": "Salida",
     "bg": "Изход",
     "zh": "退出",
-    "ja": "出口"
+    "ja": "出口",
+    "cs": "Exit"
   },
   "MainAppWindow.pageMonitoring": {
     "en": "Monitoring page (TODO)",
@@ -545,7 +591,8 @@
     "es": "Página de seguimiento (TODO)",
     "bg": "Страница за наблюдение (TODO)",
     "zh": "监测页面（TODO）",
-    "ja": "モニタリング・ページ（TODO）"
+    "ja": "モニタリング・ページ（TODO）",
+    "cs": "Monitorovací stránka (TODO)"
   },
   "MainAppWindow.pageOrders": {
     "en": "Orders page (TODO)",
@@ -556,7 +603,8 @@
     "es": "Página de pedidos (TODO)",
     "bg": "Страница за поръчки (TODO)",
     "zh": "订单页面（TODO）",
-    "ja": "注文ページ（TODO）"
+    "ja": "注文ページ（TODO）",
+    "cs": "Stránka s objednávkami (TODO)"
   },
   "MainAppWindow.pageSettings": {
     "en": "Settings page (TODO)",
@@ -567,7 +615,8 @@
     "es": "Página de configuración (TODO)",
     "bg": "Страница с настройки (TODO)",
     "zh": "设置页面（TODO）",
-    "ja": "設定ページ（TODO）"
+    "ja": "設定ページ（TODO）",
+    "cs": "Stránka nastavení (TODO)"
   },
   "MainAppWindow.statusReady": {
     "en": "Ready",
@@ -578,7 +627,8 @@
     "es": "Listo",
     "bg": "Готов",
     "zh": "准备就绪",
-    "ja": "準備完了"
+    "ja": "準備完了",
+    "cs": "Připraveno"
   },
   "MainAppWindow.actionMonitoring": {
     "en": "Monitoring",
@@ -589,7 +639,8 @@
     "es": "Supervisión",
     "bg": "Мониторинг",
     "zh": "监测",
-    "ja": "モニタリング"
+    "ja": "モニタリング",
+    "cs": "Monitorování"
   },
   "MainAppWindow.actionOrders": {
     "en": "Orders",
@@ -600,7 +651,8 @@
     "es": "Pedidos",
     "bg": "Поръчки",
     "zh": "订单",
-    "ja": "受注状況"
+    "ja": "受注状況",
+    "cs": "Objednávky"
   },
   "MainAppWindow.actionSettings": {
     "en": "Settings",
@@ -611,7 +663,8 @@
     "es": "Ajustes",
     "bg": "Настройки",
     "zh": "设置",
-    "ja": "設定"
+    "ja": "設定",
+    "cs": "Nastavení"
   },
   "SettingsCenter.windowTitle": {
     "en": "Settings",
@@ -622,7 +675,8 @@
     "es": "Ajustes",
     "bg": "Настройки",
     "zh": "设置",
-    "ja": "設定"
+    "ja": "設定",
+    "cs": "Nastavení"
   },
   "SettingsCenter.tree.language": {
     "en": "Language",
@@ -633,7 +687,8 @@
     "es": "Idioma",
     "bg": "Език",
     "zh": "语言",
-    "ja": "言語"
+    "ja": "言語",
+    "cs": "Jazyk"
   },
   "SettingsCenter.tree.ib": {
     "en": "IB Trader",
@@ -644,7 +699,8 @@
     "es": "Comerciante IB",
     "bg": "IB Trader",
     "zh": "IB 交易员",
-    "ja": "IBトレーダー"
+    "ja": "IBトレーダー",
+    "cs": "IB Trader"
   },
   "SettingsCenter.tree.ctrader": {
     "en": "cTrader",
@@ -655,7 +711,8 @@
     "pl": "cTrader",
     "es": "cTrader",
     "zh": "cTrader",
-    "ja": "cトレーダー"
+    "ja": "cトレーダー",
+    "cs": "cTrader"
   },
   "SettingsCenter.tree.exit": {
     "en": "Exit",
@@ -666,7 +723,8 @@
     "es": "Salida",
     "bg": "Изход",
     "zh": "退出",
-    "ja": "出口"
+    "ja": "出口",
+    "cs": "Exit"
   },
   "SettingsPageLanguage.header": {
     "en": "Interface language",
@@ -677,7 +735,8 @@
     "es": "Lenguaje de interfaz",
     "bg": "Език на интерфейса",
     "zh": "界面语言",
-    "ja": "インターフェース言語"
+    "ja": "インターフェース言語",
+    "cs": "Jazyk rozhraní"
   },
   "SettingsPageLanguage.btnOK": {
     "en": "OK",
@@ -688,7 +747,8 @@
     "pl": "OK",
     "es": "OK",
     "zh": "好的",
-    "ja": "OK"
+    "ja": "OK",
+    "cs": "OK"
   },
   "SettingsPageLanguage.btnApply": {
     "en": "Apply",
@@ -699,7 +759,8 @@
     "es": "Solicitar",
     "bg": "Направете заявка на",
     "zh": "申请",
-    "ja": "応募する"
+    "ja": "応募する",
+    "cs": "Použít"
   },
   "SettingsPageLanguage.btnCancel": {
     "en": "Cancel",
@@ -710,7 +771,8 @@
     "es": "Cancelar",
     "bg": "Отмяна на",
     "zh": "取消",
-    "ja": "キャンセル"
+    "ja": "キャンセル",
+    "cs": "Zrušit"
   },
   "SettingsPageIB.header": {
     "en": "IB Trader settings (TODO)",
@@ -721,7 +783,8 @@
     "es": "Configuración de IB Trader (TODO)",
     "bg": "Настройки на IB Trader (TODO)",
     "zh": "IB 交易设置（待办事项）",
-    "ja": "IBトレーダーの設定（TODO）"
+    "ja": "IBトレーダーの設定（TODO）",
+    "cs": "Nastavení IB Trader (TODO)"
   },
   "SettingsPageCTrader.header": {
     "en": "cTrader settings (TODO)",
@@ -732,7 +795,8 @@
     "es": "Configuración de cTrader (TODO)",
     "bg": "Настройки на cTrader (TODO)",
     "zh": "cTrader 设置（TODO）",
-    "ja": "cTraderの設定 (TODO)"
+    "ja": "cTraderの設定 (TODO)",
+    "cs": "Nastavení cTrader (TODO)"
   },
   "SettingsCenter.tree.translator": {
     "en": "Translator",
@@ -743,7 +807,8 @@
     "es": "Traductor",
     "bg": "Преводач",
     "zh": "翻译员",
-    "ja": "翻訳者"
+    "ja": "翻訳者",
+    "cs": "Překladatel"
   },
   "SettingsPageTranslator.header": {
     "en": "Translation settings",
@@ -754,7 +819,8 @@
     "es": "Ajustes de traducción",
     "bg": "Настройки за превод",
     "zh": "翻译设置",
-    "ja": "翻訳設定"
+    "ja": "翻訳設定",
+    "cs": "Nastavení překladu"
   },
   "SettingsPageTranslator.lblProvider": {
     "en": "Provider",
@@ -765,7 +831,8 @@
     "es": "Proveedor",
     "bg": "Доставчик",
     "zh": "提供商",
-    "ja": "プロバイダー"
+    "ja": "プロバイダー",
+    "cs": "Poskytovatel"
   },
   "SettingsPageTranslator.lblDeeplKey1": {
     "en": "DeepL key #1",
@@ -776,7 +843,8 @@
     "es": "DeepL llave #1",
     "bg": "Ключ DeepL #1",
     "zh": "DeepL 钥匙 #1",
-    "ja": "DeepLキー#1"
+    "ja": "DeepLキー#1",
+    "cs": "DeepL key #1"
   },
   "SettingsPageTranslator.lblDeeplKey2": {
     "en": "DeepL key #2",
@@ -787,7 +855,8 @@
     "es": "DeepL llave #2",
     "bg": "Ключ DeepL #2",
     "zh": "DeepL 钥匙 #2",
-    "ja": "DeepLキー#2"
+    "ja": "DeepLキー#2",
+    "cs": "DeepL key #2"
   },
   "SettingsPageTranslator.lblLibreUrl": {
     "en": "LibreTranslate URL",
@@ -798,7 +867,8 @@
     "es": "URL de LibreTranslate",
     "bg": "URL адрес на LibreTranslate",
     "zh": "LibreTranslate URL",
-    "ja": "LibreTranslate URL"
+    "ja": "LibreTranslate URL",
+    "cs": "LibreTranslate URL"
   },
   "SettingsPageTranslator.btnOK": {
     "en": "OK",
@@ -809,7 +879,8 @@
     "pl": "OK",
     "es": "OK",
     "zh": "好的",
-    "ja": "OK"
+    "ja": "OK",
+    "cs": "OK"
   },
   "SettingsPageTranslator.btnApply": {
     "en": "Apply",
@@ -820,7 +891,8 @@
     "es": "Solicitar",
     "bg": "Направете заявка на",
     "zh": "申请",
-    "ja": "応募する"
+    "ja": "応募する",
+    "cs": "Apply"
   },
   "SettingsPageTranslator.btnCancel": {
     "en": "Cancel",
@@ -831,7 +903,8 @@
     "es": "Cancelar",
     "bg": "Отмяна на",
     "zh": "取消",
-    "ja": "キャンセル"
+    "ja": "キャンセル",
+    "cs": "Cancel"
   },
   "LGE05.msg.bad_conf.title": {
     "en": "LGE05 — Corrupted configuration",
@@ -842,7 +915,8 @@
     "es": "LGE05 - Configuración dañada",
     "bg": "LGE05 - Повредена конфигурация",
     "zh": "LGE05 - 配置已损坏",
-    "ja": "LGE05 - 構成が壊れています"
+    "ja": "LGE05 - 構成が壊れています",
+    "cs": "LGE05 — Corrupted configuration"
   },
   "LGE05.msg.bad_conf.text_pre": {
     "en": "The configuration file LGE05.conf is corrupted.",
@@ -853,7 +927,8 @@
     "es": "El archivo de configuración LGE05.conf está dañado.",
     "bg": "Конфигурационният файл LGE05.conf е повреден.",
     "zh": "配置文件 LGE05.conf 已损坏。",
-    "ja": "設定ファイルLGE05.confが壊れています。"
+    "ja": "設定ファイルLGE05.confが壊れています。",
+    "cs": "The configuration file LGE05.conf is corrupted."
   },
   "LGE05.msg.bad_conf.text_moved": {
     "en": "It was moved to:",
@@ -864,7 +939,8 @@
     "es": "Se trasladó a:",
     "bg": "То беше преместено в:",
     "zh": "移至",
-    "ja": "に移った："
+    "ja": "に移った：",
+    "cs": "It was moved to:"
   },
   "LGE05.msg.bad_conf.text_restart_finish": {
     "en": "Restart the program to complete registration.",
@@ -875,7 +951,8 @@
     "es": "Reinicie el programa para completar el registro.",
     "bg": "Рестартирайте програмата, за да завършите регистрацията.",
     "zh": "重新启动程序以完成注册。",
-    "ja": "プログラムを再起動すると登録が完了します。"
+    "ja": "プログラムを再起動すると登録が完了します。",
+    "cs": "Restart the program to complete registration."
   },
   "LGE05.msg.bad_conf.text_restart_reregister": {
     "en": "Restart the program to re-register.",
@@ -886,44 +963,60 @@
     "bg": "Restart the program to re-register.",
     "es": "Restart the program to re-register.",
     "zh": "重新启动程序，重新注册。",
-    "ja": "プログラムを再起動して再登録する。"
+    "ja": "プログラムを再起動して再登録する。",
+    "cs": "Restart the program to re-register."
   },
   "MainAppWindow.btnAbout": {
     "uk": "Про програму",
-    "en": "About"
+    "en": "About",
+    "ja": "About",
+    "zh": "About",
+    "bg": "About",
+    "es": "About",
+    "cs": "About",
+    "de": "About",
+    "fr": "About",
+    "pl": "About"
   },
   "MainAppWindow.actionAbout": {
     "uk": "Про програму",
-    "en": "About"
+    "en": "About",
+    "ja": "About",
+    "zh": "About",
+    "bg": "About",
+    "es": "About",
+    "cs": "About",
+    "de": "About",
+    "fr": "About",
+    "pl": "About"
   },
   "MainAppWindow.btnExit": {
     "uk": "Вихід",
-    "en": "Exit"
+    "en": "Exit",
+    "de": "Ausfahrt",
+    "pl": "Wyjście",
+    "ja": "Exit",
+    "zh": "Exit",
+    "bg": "Exit",
+    "es": "Exit",
+    "cs": "Exit",
+    "fr": "Exit"
   },
-
-  "AboutDialog.windowTitle": {
-    "uk": "Про програму",
-    "en": "About"
+  "AboutDialog.btnOk": {
+    "uk": "OK",
+    "en": "OK",
+    "ja": "OK",
+    "zh": "OK",
+    "bg": "OK",
+    "es": "OK",
+    "cs": "OK",
+    "de": "OK",
+    "fr": "OK",
+    "pl": "OK"
   },
-  "AboutDialog.title": {
-    "uk": "LGE05 — ATS",
-    "en": "LGE05 — ATS"
-  },
-  "AboutDialog.info": {
-    "uk": "Інформація про версію, автора і середовище виконання.",
-    "en": "Version, author and runtime environment."
-  },
-  "AboutDialog.testedOs": {
-    "uk": "Перевірено на: Windows 11. Очікується: Windows 10.",
-    "en": "Tested: Windows 11. Expected: Windows 10."
-  },
-  "AboutDialog.comment": {
-    "uk": "Принцип: контрольована система, мінімум сміття, максимум прозорості.",
-    "en": "Principle: controlled system, minimal clutter, maximum clarity."
-  },
-
   "translated_languages": [
     "bg",
+    "cs",
     "de",
     "en",
     "es",

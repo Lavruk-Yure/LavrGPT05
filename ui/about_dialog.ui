@@ -24,25 +24,43 @@
     <layout class="QHBoxLayout" name="hlTop">
      <item>
       <widget class="QLabel" name="lblIcon">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>64</width>
-         <height>64</height>
+         <width>96</width>
+         <height>96</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>64</width>
-         <height>64</height>
+         <width>96</width>
+         <height>96</height>
         </size>
        </property>
        <property name="text">
         <string/>
        </property>
+       <property name="pixmap">
+        <pixmap resource="../resources.qrc">:/icons/LGE/about_96.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
       </widget>
      </item>
      <item>
       <layout class="QVBoxLayout" name="vlText">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="lblTitle">
          <property name="text">
@@ -54,12 +72,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="lblInfo">
-         <property name="text">
-          <string>[AboutDialog.info]</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
+        <widget class="QTextBrowser" name="textInfo">
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
          </property>
         </widget>
        </item>
@@ -83,19 +98,37 @@
          </property>
         </widget>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="btnOk">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>[AboutDialog.btnOk]</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::NoButton</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
