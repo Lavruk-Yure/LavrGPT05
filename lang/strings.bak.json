@@ -1,0 +1,239 @@
+{
+  "lang_active": {
+    "code": "da"
+  },
+  "SplashWindow.windowTitle": {
+    "da": "Indlæser..."
+  },
+  "SplashWindow.lblTitle": {
+    "da": "Start af LGE05"
+  },
+  "SplashWindow.lblStatus": {
+    "da": "Initialisering..."
+  },
+  "Splash.check_dirs": {
+    "da": "Tjekker mapper..."
+  },
+  "Splash.init_env": {
+    "da": "Initialisering af miljø..."
+  },
+  "Splash.check_conf": {
+    "da": "Tjekker konfigurationen..."
+  },
+  "Splash.prep_ui": {
+    "da": "Forbereder UI..."
+  },
+  "Splash.done": {
+    "da": "Klar"
+  },
+  "RegistrationWindow.windowTitle": {
+    "da": "Registrering"
+  },
+  "RegistrationWindow.lblTitle": {
+    "da": "Velkommen til LGE05"
+  },
+  "RegistrationWindow.lblHeader": {
+    "da": "Opret din konto"
+  },
+  "RegistrationWindow.lblLanguage": {
+    "da": "Sprog:"
+  },
+  "RegistrationWindow.lblEmail": {
+    "da": "E-mail:"
+  },
+  "RegistrationWindow.lblPassword": {
+    "da": "Adgangskode:"
+  },
+  "RegistrationWindow.lblPasswordConfirm": {
+    "da": "Bekræft adgangskoden:"
+  },
+  "RegistrationWindow.btnRegister": {
+    "da": "Registrer dig"
+  },
+  "RegistrationWindow.btnExit": {
+    "da": "Udgang"
+  },
+  "RegistrationWindow.editEmail": {
+    "da": "Indtast e-mail"
+  },
+  "RegistrationWindow.editPassword": {
+    "da": "Indtast adgangskode"
+  },
+  "RegistrationWindow.editPasswordConfirm": {
+    "da": "Gentag adgangskode"
+  },
+  "LoginWindow.lblTitle": {
+    "da": "Velkommen tilbage"
+  },
+  "LoginWindow.lblHeader": {
+    "da": "Indtast din adgangskode"
+  },
+  "LoginWindow.lblPassword": {
+    "da": "Adgangskode:"
+  },
+  "LoginWindow.btnExit": {
+    "da": "Udgang"
+  },
+  "LoginWindow.lineEdit": {
+    "da": "Indtast adgangskode"
+  },
+  "MainAppWindow.windowTitle": {
+    "da": "LGE05 - Hovedvindue"
+  },
+  "RegistrationWindow.error.email_invalid": {
+    "da": "Ugyldig e-mail."
+  },
+  "RegistrationWindow.error.pw_short": {
+    "da": "Adgangskoden skal indeholde mindst 8 tegn."
+  },
+  "RegistrationWindow.error.pw_lower": {
+    "da": "Et lille bogstav er påkrævet."
+  },
+  "RegistrationWindow.error.pw_upper": {
+    "da": "Et stort bogstav er påkrævet."
+  },
+  "RegistrationWindow.error.pw_digit": {
+    "da": "Et ciffer er påkrævet."
+  },
+  "RegistrationWindow.error.pw_special": {
+    "da": "Et specialtegn er påkrævet."
+  },
+  "RegistrationWindow.error.pw_mismatch": {
+    "da": "Adgangskoderne stemmer ikke overens."
+  },
+  "RegistrationWindow.registerSuccess": {
+    "da": "Registrering vellykket.\nFilen er blevet oprettet:\n{sti}\n\nGenstart programmet."
+  },
+  "LoginWindow.errorInvalidPassword": {
+    "da": "Ugyldig adgangskode. Forsøg tilbage: {left}"
+  },
+  "LoginWindow.errorTooMany": {
+    "da": "For mange ugyldige forsøg. Adgang nægtet."
+  },
+  "LoginWindow.errorMachineMismatch": {
+    "da": "Denne LGE05.conf blev oprettet på en anden enhed.\nAdgang nægtet."
+  },
+  "MainAppWindow.lblTitleLeft": {
+    "da": "LGE05 - ATS"
+  },
+  "MainAppWindow.btnMonitoring": {
+    "da": "Overvågning"
+  },
+  "MainAppWindow.btnOrders": {
+    "da": "Bestillinger"
+  },
+  "MainAppWindow.btnSettings": {
+    "da": "Indstillinger"
+  },
+  "MainAppWindow.actionExit": {
+    "da": "Udgang"
+  },
+  "MainAppWindow.pageMonitoring": {
+    "da": "Overvågningsside (TODO)"
+  },
+  "MainAppWindow.pageOrders": {
+    "da": "Bestillingsside (TODO)"
+  },
+  "MainAppWindow.pageSettings": {
+    "da": "Side med indstillinger (TODO)"
+  },
+  "MainAppWindow.statusReady": {
+    "da": "Klar"
+  },
+  "MainAppWindow.actionMonitoring": {
+    "da": "Overvågning"
+  },
+  "MainAppWindow.actionOrders": {
+    "da": "Bestillinger"
+  },
+  "MainAppWindow.actionSettings": {
+    "da": "Indstillinger"
+  },
+  "SettingsCenter.windowTitle": {
+    "da": "Indstillinger"
+  },
+  "SettingsCenter.tree.language": {
+    "da": "Sprog"
+  },
+  "SettingsCenter.tree.ib": {
+    "da": "IB-handler"
+  },
+  "SettingsCenter.tree.exit": {
+    "da": "Udgang"
+  },
+  "SettingsPageLanguage.header": {
+    "da": "Interface-sprog"
+  },
+  "SettingsPageLanguage.btnApply": {
+    "da": "Ansøg"
+  },
+  "SettingsPageLanguage.btnCancel": {
+    "da": "Annuller"
+  },
+  "SettingsPageIB.header": {
+    "da": "IB Trader-indstillinger (TODO)"
+  },
+  "SettingsPageCTrader.header": {
+    "da": "cTrader-indstillinger (TODO)"
+  },
+  "SettingsCenter.tree.translator": {
+    "da": "Oversætter"
+  },
+  "SettingsPageTranslator.header": {
+    "da": "Indstillinger for oversættelse"
+  },
+  "SettingsPageTranslator.lblProvider": {
+    "da": "Udbyder"
+  },
+  "SettingsPageTranslator.lblDeeplKey1": {
+    "da": "DeepL nøgle #1"
+  },
+  "SettingsPageTranslator.lblDeeplKey2": {
+    "da": "DeepL nøgle #2"
+  },
+  "SettingsPageTranslator.btnApply": {
+    "da": "Ansøg"
+  },
+  "SettingsPageTranslator.btnCancel": {
+    "da": "Annuller"
+  },
+  "LGE05.msg.bad_conf.title": {
+    "da": "LGE05 - Beskadiget konfiguration"
+  },
+  "LGE05.msg.bad_conf.text_pre": {
+    "da": "Konfigurationsfilen LGE05.conf er beskadiget."
+  },
+  "LGE05.msg.bad_conf.text_moved": {
+    "da": "Det blev flyttet til:"
+  },
+  "LGE05.msg.bad_conf.text_restart_finish": {
+    "da": "Genstart programmet for at afslutte registreringen."
+  },
+  "LGE05.msg.bad_conf.text_restart_reregister": {
+    "da": "Genstart programmet for at genregistrere."
+  },
+  "MainAppWindow.btnAbout": {
+    "da": "Omkring"
+  },
+  "MainAppWindow.actionAbout": {
+    "da": "Omkring"
+  },
+  "MainAppWindow.btnExit": {
+    "da": "Udgang"
+  },
+  "AboutDialog.windowTitle": {
+    "da": "Omkring"
+  },
+  "AboutDialog.title": {
+    "da": "LGE05 - ATS"
+  },
+  "AboutDialog.testedOs": {
+    "da": "Windows 11 (testet) / Windows 10 (forventet)"
+  },
+  "AboutDialog.comment": {
+    "da": "Projektet udvikler sig trin for trin. Kerneprincip: kontrolleret system, minimalt rod, maksimal klarhed."
+  },
+  "AboutDialog.mode": {
+    "da": "Tilstand"
+  }
+}

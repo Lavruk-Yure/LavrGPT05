@@ -23,8 +23,12 @@ import argparse
 import json
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Iterable
+
+DELETE_UNUSED = False  # True = видаляти ключі з fallback, яких нема у проекті
+
 
 META_KEYS = {"languages", "translated_languages", "lang_active"}
 
@@ -45,6 +49,23 @@ def write_json(path: Path, data: dict) -> None:
         json.dumps(data, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+
+
+def backup_json(path: Path, backup_name: str) -> None:
+    """
+    Робить простий backup поруч із файлом.
+    Приклад:
+      strings.json -> strings.bak.json
+      strings_fallback.json -> strings_fallback.bak.json
+    """
+    try:
+        if not path.exists():
+            return
+        backup_path = path.with_name(backup_name)
+        backup_path.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+    except Exception:  # noqa
+        # Backup не має валити rebuild.
+        return
 
 
 def detect_root() -> Path:
@@ -111,6 +132,13 @@ def format_translations(trans: dict, langs: Iterable[str] | None = None) -> str:
     return "; ".join(parts)
 
 
+def normalize_key(s: str) -> str:
+    s = s.strip()
+    if s.startswith("[") and s.endswith("]") and len(s) > 2:
+        s = s[1:-1].strip()
+    return s
+
+
 def collect_used_keys(root: Path) -> set[str]:
     """
     Збір ключів, які реально згадуються у коді/UI.
@@ -128,6 +156,33 @@ def collect_used_keys(root: Path) -> set[str]:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except Exception:  # noqa
             continue
+        # LANG.resolve("Key") / LANG.resolve('Key')
+        marker = "LANG.resolve("
+        if marker in text:
+            # Проста, але надійна витяжка по лапках
+            for q in ('"', "'"):
+                parts = text.split(marker)
+                for part in parts[1:]:
+                    # part починається з: "Key")...
+                    if part.startswith(q):
+                        end = part.find(q, 1)
+                        if end > 1:
+                            key = part[1:end].strip()
+                            if "." in key:
+                                used.add(normalize_key(key))
+        # _lang_mgr.resolve("Key") / .resolve("Key") (узагальнено)
+        for marker in (".resolve(", "_t(", "self._t("):
+            if marker not in text:
+                continue
+            for q in ('"', "'"):
+                parts = text.split(marker)
+                for part in parts[1:]:
+                    if part.startswith(q):
+                        end = part.find(q, 1)
+                        if end > 1:
+                            key = part[1:end].strip()
+                            if "." in key:
+                                used.add(normalize_key(key))
 
         # [Key]
         parts = text.split("[")
@@ -136,7 +191,7 @@ def collect_used_keys(root: Path) -> set[str]:
                 continue
             key = part.split("]", 1)[0].strip()
             if "." in key:
-                used.add(key)
+                used.add(normalize_key(key))
 
         # lang.t("Key") / lang.t('Key')
         # простий парсер без regex (щоб не тягнути зайве)
@@ -158,8 +213,21 @@ def collect_used_keys(root: Path) -> set[str]:
                 break
             key = text[start + 1 : end].strip()  # noqa
             if "." in key:
-                used.add(key)
+                used.add(normalize_key(key))
+
             pos = end + 1
+        # --- ГЛОБАЛЬНИЙ збір для Python: усі "...." та '....' з фільтром по крапці
+        for q in ('"', "'"):
+            segs = text.split(q)
+            for i in range(1, len(segs), 2):
+                s = segs[i].strip()
+                if (
+                    "." in s
+                    and "://" not in s
+                    and not s.endswith((".json", ".py", ".ui", ".qrc"))
+                ):
+                    if 3 <= len(s) <= 200 and s[0].isalpha():
+                        used.add(normalize_key(s))
 
     # ---- 2) UI: *.ui (XML). Шукаємо ключі як "[Key]" та як "Key" у лапках.
     for path in root.rglob("*.ui"):
@@ -175,17 +243,22 @@ def collect_used_keys(root: Path) -> set[str]:
                 continue
             key = part.split("]", 1)[0].strip()
             if "." in key:
-                used.add(key)
+                used.add(normalize_key(key))
 
         # Витягнути всі "...." та '....' і фільтрувати по крапці
-        # (просто щоб не ловити купу сміття)
+        # (мінімальний захист від сміття)
         for q in ('"', "'"):
             segs = text.split(q)
             # парні сегменти між лапками: 1,3,5...
             for i in range(1, len(segs), 2):
                 s = segs[i].strip()
-                if "." in s and 3 <= len(s) <= 200:
-                    used.add(s)
+                if (
+                    "." in s
+                    and "://" not in s
+                    and not s.endswith((".json", ".py", ".ui", ".qrc"))
+                ):
+                    if 3 <= len(s) <= 200 and s[0].isalpha():
+                        used.add(normalize_key(s))
 
     return used
 
@@ -201,12 +274,14 @@ def main() -> None:
     lang_dir = root / "lang"
     strings_path = lang_dir / "strings.json"
     fallback_path = lang_dir / "strings_fallback.json"
+    delete_log_path = root / "lang" / "delete_fallback.log"
+
     qrc_path = root / "resources.qrc"
 
     print(f"[ШЛЯХ] ROOT     = {root}")
     print(f"[ШЛЯХ] STRINGS  = {strings_path}")
     print(f"[ШЛЯХ] FALLBACK = {fallback_path}")
-
+    print(f"[ШЛЯХ] DELETE_LOG = {delete_log_path}")
     # ------------------------------------------------------------------
     # 1/6 Читання strings.json
     # ------------------------------------------------------------------
@@ -306,29 +381,64 @@ def main() -> None:
     # ------------------------------------------------------------------
     # 5/6 Очищення strings.json (тільки lang_active)
     # ------------------------------------------------------------------
+    backup_json(strings_path, "strings.bak.json")
+
     write_json(strings_path, {"lang_active": {"code": active_lang}})
     print("[5/6] strings.json очищено (залишено тільки lang_active)")
 
     # ------------------------------------------------------------------
-    # 5.5 Контроль якості: ключі у fallback, яких нема у коді/UI
+    # 5.5 Контроль якості + автовидалення: ключі у fallback, яких нема у проекті
     # ------------------------------------------------------------------
     used_keys = collect_used_keys(root)
 
-    unused = 0
+    to_delete: list[tuple[str, dict[str, str]]] = []
+
     for key, value in fallback.items():
         if key in META_KEYS:
             continue
         if not is_translation_map(value):
             continue
-        if key not in used_keys:
-            unused += 1
-            trans: dict[str, str] = value  # type: ignore[assignment]
-            print(
-                f"ПОПЕРЕДЖЕННЯ: ключ у fallback не знайдено у коді/UI → {key} | "
-                f"{format_translations(trans)}"
-            )
 
-    print(f"[QC] Ключів у fallback, яких нема у коді/UI: {unused}")
+        if key not in used_keys:
+            trans: dict[str, str] = value  # type: ignore[assignment]
+            to_delete.append((key, trans))
+
+    # --- ДРУК кандидатів завжди (навіть коли DELETE_UNUSED=False)
+    print(f"[QC] Кандидатів на видалення (нема у проекті): {len(to_delete)}")
+    if to_delete:
+        for k, tr in to_delete:
+            print(f"[QC?] {k} | {format_translations(tr, langs=('uk', 'en', 'da'))}")
+
+    # --- Видалення тільки якщо перемикач увімкнено
+    if DELETE_UNUSED and to_delete:
+        backup_json(fallback_path, "strings_fallback.bak.json")
+
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        lines_out: list[str] = []
+        for k, tr in to_delete:
+            langs = ",".join(sorted(tr.keys()))
+            lines_out.append(
+                f"{ts} | DELETE | {k} | langs={langs} | "
+                f"reason=not_found_in_project_scan"
+            )
+            fallback.pop(k, None)
+
+        try:
+            delete_log_path.parent.mkdir(parents=True, exist_ok=True)
+            old = ""
+            if delete_log_path.exists():
+                old = delete_log_path.read_text(encoding="utf-8", errors="ignore")
+                if old and not old.endswith("\n"):
+                    old += "\n"
+            delete_log_path.write_text(
+                old + "\n".join(lines_out) + "\n", encoding="utf-8"
+            )
+        except Exception:  # noqa
+            pass
+
+        print(f"[QC] Видалено ключів із fallback (нема у проекті): {len(to_delete)}")
+    else:
+        print(f"[QC] Автовидалення вимкнено (DELETE_UNUSED = {DELETE_UNUSED})")
 
     # ------------------------------------------------------------------
     # 6/6 Запис fallback + компіляція ресурсу (опційно)

@@ -1,3 +1,4 @@
+# core/register_logic.py
 """
 RegisterWindow — вікно реєстрації LGE05 (Patch 14.2, глобальний LANG)
 

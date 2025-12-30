@@ -1,3 +1,4 @@
+# core/login_logic.py
 """
 LoginWindow — вікно входу LGE05 (Patch 14.1)
 

@@ -72,10 +72,12 @@ class AboutDialog(QDialog):
         assistant = getattr(app_meta, "__assistant__", "")
         year = getattr(app_meta, "__year__", "")
 
-        # Режим (ASCII, без “дивних” тире)
-        mode = (
+        # Режим
+        mode_label = LANG.resolve("AboutDialog.mode") or "Mode"
+        mode_value = (
             "PyInstaller (frozen)" if getattr(sys, "frozen", False) else "dev (sources)"
         )
+        mode_line = f"{mode_label}: {mode_value}"
 
         lines = [
             author,
@@ -83,7 +85,7 @@ class AboutDialog(QDialog):
             f"{assistant}, {year}".strip(", "),
             f"OS: {os_line}",
             f"Python: {py_line}",
-            f"Mode: {mode}",
+            mode_line,
         ]
         text = "\n".join([x for x in lines if isinstance(x, str) and x.strip()])
 
