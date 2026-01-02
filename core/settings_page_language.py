@@ -37,6 +37,23 @@ def log_cp(name: str, **kw: object) -> None:
     )
 
 
+class LanguageComboBox(QComboBox):
+    """ComboBox, який при відкритті прокручує список до поточного елемента."""
+
+    def showPopup(self) -> None:
+        super().showPopup()
+        view = self.view()
+        model = self.model()
+        if view is None or model is None:
+            return
+        idx = self.currentIndex()
+        if idx < 0:
+            return
+        mi = model.index(idx, self.modelColumn(), self.rootModelIndex())
+        if mi.isValid():
+            view.scrollTo(mi, view.ScrollHint.PositionAtCenter)
+
+
 @dataclass
 class LanguageSnapshot:
     code: str = "en"
@@ -73,6 +90,19 @@ class SettingsPageLanguage(QWidget):
 
         self._lang_mgr = lang_mgr
         self._snapshot = LanguageSnapshot(code=self._lang_mgr.current_language)
+
+        old = self.ui.comboLanguage
+        new = LanguageComboBox(self)
+        new.setObjectName(old.objectName())
+        new.setSizePolicy(old.sizePolicy())
+        new.setMinimumSize(old.minimumSize())
+        new.setMaximumSize(old.maximumSize())
+
+        layout = old.parentWidget().layout()
+        if layout is not None:
+            layout.replaceWidget(old, new)
+        old.deleteLater()
+        self.ui.comboLanguage = new
 
         self._setup_combo_view()
         self.reload_combo()

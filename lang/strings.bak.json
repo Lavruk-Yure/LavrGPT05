@@ -1,239 +1,239 @@
 {
   "lang_active": {
-    "code": "da"
+    "code": "sq"
   },
   "SplashWindow.windowTitle": {
-    "da": "Indlæser..."
+    "sq": "Po ngarkohet…"
   },
   "SplashWindow.lblTitle": {
-    "da": "Start af LGE05"
+    "sq": "Duke filluar nga LGE05"
   },
   "SplashWindow.lblStatus": {
-    "da": "Initialisering..."
+    "sq": "Po inicializohet…"
   },
   "Splash.check_dirs": {
-    "da": "Tjekker mapper..."
+    "sq": "Kontrollon direktoritë…"
   },
   "Splash.init_env": {
-    "da": "Initialisering af miljø..."
+    "sq": "Po inicializon mjedisin…"
   },
   "Splash.check_conf": {
-    "da": "Tjekker konfigurationen..."
+    "sq": "Kontrollimi i konfigurimit…"
   },
   "Splash.prep_ui": {
-    "da": "Forbereder UI..."
+    "sq": "Po përgatitet UI…"
   },
   "Splash.done": {
-    "da": "Klar"
+    "sq": "Gati"
   },
   "RegistrationWindow.windowTitle": {
-    "da": "Registrering"
+    "sq": "Regjistrimi"
   },
   "RegistrationWindow.lblTitle": {
-    "da": "Velkommen til LGE05"
+    "sq": "Mirë se vini në LGE05"
   },
   "RegistrationWindow.lblHeader": {
-    "da": "Opret din konto"
+    "sq": "Krijoni llogarinë tuaj"
   },
   "RegistrationWindow.lblLanguage": {
-    "da": "Sprog:"
-  },
-  "RegistrationWindow.lblEmail": {
-    "da": "E-mail:"
+    "sq": "Gjuha:"
   },
   "RegistrationWindow.lblPassword": {
-    "da": "Adgangskode:"
+    "sq": "Fjalëkalimi:"
   },
   "RegistrationWindow.lblPasswordConfirm": {
-    "da": "Bekræft adgangskoden:"
+    "sq": "Konfirmo fjalëkalimin:"
   },
   "RegistrationWindow.btnRegister": {
-    "da": "Registrer dig"
+    "sq": "Regjistrohu"
   },
   "RegistrationWindow.btnExit": {
-    "da": "Udgang"
+    "sq": "Dalje"
   },
   "RegistrationWindow.editEmail": {
-    "da": "Indtast e-mail"
+    "sq": "Futni emailin"
   },
   "RegistrationWindow.editPassword": {
-    "da": "Indtast adgangskode"
+    "sq": "Hyrni fjalëkalimin"
   },
   "RegistrationWindow.editPasswordConfirm": {
-    "da": "Gentag adgangskode"
+    "sq": "Përsërit fjalëkalimin"
+  },
+  "LoginWindow.windowTitle": {
+    "sq": "Hyje"
   },
   "LoginWindow.lblTitle": {
-    "da": "Velkommen tilbage"
+    "sq": "Mirë se keni ardhur përsëri"
   },
   "LoginWindow.lblHeader": {
-    "da": "Indtast din adgangskode"
+    "sq": "Futni fjalëkalimin tuaj"
   },
   "LoginWindow.lblPassword": {
-    "da": "Adgangskode:"
+    "sq": "Fjalëkalimi:"
+  },
+  "LoginWindow.btnLogin": {
+    "sq": "Hyje"
   },
   "LoginWindow.btnExit": {
-    "da": "Udgang"
+    "sq": "Dalje"
   },
   "LoginWindow.lineEdit": {
-    "da": "Indtast adgangskode"
+    "sq": "Hyrni fjalëkalimin"
   },
   "MainAppWindow.windowTitle": {
-    "da": "LGE05 - Hovedvindue"
+    "sq": "LGE05 — Dritare kryesore"
   },
   "RegistrationWindow.error.email_invalid": {
-    "da": "Ugyldig e-mail."
+    "sq": "Email i pavlefshëm."
   },
   "RegistrationWindow.error.pw_short": {
-    "da": "Adgangskoden skal indeholde mindst 8 tegn."
+    "sq": "Fjalëkalimi duhet të përmbajë të paktën 8 karaktere."
   },
   "RegistrationWindow.error.pw_lower": {
-    "da": "Et lille bogstav er påkrævet."
+    "sq": "Kërkohet një shkronjë e vogël."
   },
   "RegistrationWindow.error.pw_upper": {
-    "da": "Et stort bogstav er påkrævet."
+    "sq": "Kërkohet një shkronjë e madhe."
   },
   "RegistrationWindow.error.pw_digit": {
-    "da": "Et ciffer er påkrævet."
+    "sq": "Një shifër është e nevojshme."
   },
   "RegistrationWindow.error.pw_special": {
-    "da": "Et specialtegn er påkrævet."
+    "sq": "Kërkohet një karakter i veçantë."
   },
   "RegistrationWindow.error.pw_mismatch": {
-    "da": "Adgangskoderne stemmer ikke overens."
+    "sq": "Fjalëkalimet nuk përputhen."
   },
   "RegistrationWindow.registerSuccess": {
-    "da": "Registrering vellykket.\nFilen er blevet oprettet:\n{sti}\n\nGenstart programmet."
+    "sq": "Regjistrimi u krye me sukses. Skedari është krijuar: {path} Rinisni aplikacionin."
   },
   "LoginWindow.errorInvalidPassword": {
-    "da": "Ugyldig adgangskode. Forsøg tilbage: {left}"
+    "sq": "Fjalëkalim i pavlefshëm. Përpjekje të mbetura: {left}"
   },
   "LoginWindow.errorTooMany": {
-    "da": "For mange ugyldige forsøg. Adgang nægtet."
+    "sq": "Shumë përpjekje të pavlefshme. Aksesi i refuzuar."
   },
   "LoginWindow.errorMachineMismatch": {
-    "da": "Denne LGE05.conf blev oprettet på en anden enhed.\nAdgang nægtet."
-  },
-  "MainAppWindow.lblTitleLeft": {
-    "da": "LGE05 - ATS"
+    "sq": "Ky LGE05.conf u krijua në një pajisje tjetër. Qasja e refuzuar."
   },
   "MainAppWindow.btnMonitoring": {
-    "da": "Overvågning"
+    "sq": "Monitorimi"
   },
   "MainAppWindow.btnOrders": {
-    "da": "Bestillinger"
+    "sq": "Porositë"
   },
   "MainAppWindow.btnSettings": {
-    "da": "Indstillinger"
+    "sq": "Cilat janë cilësimet?"
   },
   "MainAppWindow.actionExit": {
-    "da": "Udgang"
+    "sq": "Dalje"
   },
   "MainAppWindow.pageMonitoring": {
-    "da": "Overvågningsside (TODO)"
+    "sq": "Faqja e monitorimit (Të bëhet)"
   },
   "MainAppWindow.pageOrders": {
-    "da": "Bestillingsside (TODO)"
+    "sq": "Faqja e porosive (Të bëhet)"
   },
   "MainAppWindow.pageSettings": {
-    "da": "Side med indstillinger (TODO)"
-  },
-  "MainAppWindow.statusReady": {
-    "da": "Klar"
+    "sq": "Faqja e cilësimeve (Për t'u bërë)"
   },
   "MainAppWindow.actionMonitoring": {
-    "da": "Overvågning"
+    "sq": "Monitorimi"
   },
   "MainAppWindow.actionOrders": {
-    "da": "Bestillinger"
+    "sq": "Porositë"
   },
   "MainAppWindow.actionSettings": {
-    "da": "Indstillinger"
+    "sq": "Cilat janë cilësimet?"
   },
   "SettingsCenter.windowTitle": {
-    "da": "Indstillinger"
+    "sq": "Cilat janë cilësimet?"
   },
   "SettingsCenter.tree.language": {
-    "da": "Sprog"
-  },
-  "SettingsCenter.tree.ib": {
-    "da": "IB-handler"
+    "sq": "Gjuha"
   },
   "SettingsCenter.tree.exit": {
-    "da": "Udgang"
+    "sq": "Dalje"
   },
   "SettingsPageLanguage.header": {
-    "da": "Interface-sprog"
+    "sq": "Gjuha e ndërfaqes"
+  },
+  "SettingsPageLanguage.btnOK": {
+    "sq": "Mirë"
   },
   "SettingsPageLanguage.btnApply": {
-    "da": "Ansøg"
+    "sq": "Aplikoni"
   },
   "SettingsPageLanguage.btnCancel": {
-    "da": "Annuller"
+    "sq": "Shfuqizo"
   },
   "SettingsPageIB.header": {
-    "da": "IB Trader-indstillinger (TODO)"
+    "sq": "Caktimet e IB Trader (Të bëhet)"
   },
   "SettingsPageCTrader.header": {
-    "da": "cTrader-indstillinger (TODO)"
+    "sq": "Caktimet e cTrader (Të bëhet)"
   },
   "SettingsCenter.tree.translator": {
-    "da": "Oversætter"
+    "sq": "Përkthyesi"
   },
   "SettingsPageTranslator.header": {
-    "da": "Indstillinger for oversættelse"
+    "sq": "Cilat janë cilësimet e përkthimit?"
   },
   "SettingsPageTranslator.lblProvider": {
-    "da": "Udbyder"
+    "sq": "Ofrues"
   },
   "SettingsPageTranslator.lblDeeplKey1": {
-    "da": "DeepL nøgle #1"
+    "sq": "DeepL çelësi #1"
   },
   "SettingsPageTranslator.lblDeeplKey2": {
-    "da": "DeepL nøgle #2"
+    "sq": "DeepL çelësi #2"
+  },
+  "SettingsPageTranslator.btnOK": {
+    "sq": "Mirë"
   },
   "SettingsPageTranslator.btnApply": {
-    "da": "Ansøg"
+    "sq": "Aplikoni"
   },
   "SettingsPageTranslator.btnCancel": {
-    "da": "Annuller"
+    "sq": "Shfuqizo"
   },
   "LGE05.msg.bad_conf.title": {
-    "da": "LGE05 - Beskadiget konfiguration"
+    "sq": "LGE05 — Konfigurim i korruptuar"
   },
   "LGE05.msg.bad_conf.text_pre": {
-    "da": "Konfigurationsfilen LGE05.conf er beskadiget."
+    "sq": "Skedari i konfigurimit LGE05.conf është i korruptuar."
   },
   "LGE05.msg.bad_conf.text_moved": {
-    "da": "Det blev flyttet til:"
+    "sq": "U zhvendos në:"
   },
   "LGE05.msg.bad_conf.text_restart_finish": {
-    "da": "Genstart programmet for at afslutte registreringen."
+    "sq": "Rinisni programin për të përfunduar regjistrimin."
   },
   "LGE05.msg.bad_conf.text_restart_reregister": {
-    "da": "Genstart programmet for at genregistrere."
+    "sq": "Rinisni programin për t'u regjistruar përsëri."
   },
   "MainAppWindow.btnAbout": {
-    "da": "Omkring"
+    "sq": "Rreth"
   },
   "MainAppWindow.actionAbout": {
-    "da": "Omkring"
+    "sq": "Rreth"
   },
   "MainAppWindow.btnExit": {
-    "da": "Udgang"
+    "sq": "Dalje"
   },
   "AboutDialog.windowTitle": {
-    "da": "Omkring"
+    "sq": "Rreth"
   },
-  "AboutDialog.title": {
-    "da": "LGE05 - ATS"
+  "AboutDialog.btnOk": {
+    "sq": "Mirë"
   },
   "AboutDialog.testedOs": {
-    "da": "Windows 11 (testet) / Windows 10 (forventet)"
+    "sq": "Windows 11 (të provuar) / Windows 10 (të pritur)"
   },
   "AboutDialog.comment": {
-    "da": "Projektet udvikler sig trin for trin. Kerneprincip: kontrolleret system, minimalt rod, maksimal klarhed."
+    "sq": "Projekti zhvillohet hap pas hapi. Parimi themelor: sistem i kontrolluar, rrëmujë minimale, qartësi maksimale."
   },
   "AboutDialog.mode": {
-    "da": "Tilstand"
+    "sq": "Modë"
   }
 }
