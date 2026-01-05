@@ -2511,12 +2511,9 @@
     "sq": "LGE05 — ATS"
   },
   "AboutDialog.btnOk": {
-    "uk": "ГАРАЗД.",
-    "en": "OK",
+    "en": "Ok",
     "de": "OK",
     "fr": "OK",
-    "bg": "OK",
-    "pl": "OK",
     "da": "OK",
     "ar": "OK",
     "zh": "好的",
@@ -2530,16 +2527,19 @@
     "ko": "확인",
     "nl": "OK",
     "hr": "U redu",
-    "mk": "ОК",
     "nb": "OK",
-    "hi": "ठीक है",
     "pt": "OK",
     "sl": "V REDU",
     "ro": "OK",
     "sk": "OK",
     "tr": "TAMAM.",
     "sv": "OK",
-    "sq": "Mirë"
+    "sq": "Mirë",
+    "bg": "Добре",
+    "pl": "Ok",
+    "uk": "Гаразд",
+    "hi": "ठीक है",
+    "mk": "Океј"
   },
   "AboutDialog.testedOs": {
     "uk": "Windows 11 (перевірено) / Windows 10 (очікується)",
