@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QLineEdit,
     QMainWindow,
+    QMessageBox,
 )
 
 from core import session_state
@@ -31,6 +32,7 @@ from core.config_manager import (
     make_machine_stub,
 )
 from core.lang_manager import LANG  # <-- глобальний
+from core.license_manager import LicenseManager
 from core.main_logic import MainAppWindow  # <-- окремий модуль
 from core.ui_translator import UITranslator
 from ui.ui_login import Ui_LoginWindow
@@ -170,8 +172,39 @@ class LoginWindow(QMainWindow):
                 )
                 self._set_error_and_lock(msg)
                 return
+        # --- 5. License check/update (Patch 19.3) ---
+        app_version = str(raw_data.get("version") or "0.0.0")
 
-        # --- 5. Login OK ---
+        res = LicenseManager.compute_and_update(
+            raw_data,
+            app_version=app_version,
+        )
+
+        # Fatal policy: tampered / clock rollback for pro/pro_plus
+        if res.fatal:
+            msg = (
+                self._lang_mgr.resolve("License.errorFatal")
+                or f"License error: {res.fatal_reason}"
+            )
+            QMessageBox.critical(self, "LGE05 — License", msg)
+            QApplication.instance().quit()
+            return
+
+        # Save license timestamps/status back to encrypted conf
+        try:
+            cfg_mgr.save(raw_data, pwd)
+        except Exception as e:  # noqa
+            # Якщо не зберегли — це не привід пускати в live, але поки не блокуємо.
+            log_cp("license_save_failed", err=str(e))
+
+        log_cp(
+            "license_status",
+            status=res.status,
+            edition=res.edition,
+            days_used=res.days_used,
+        )
+
+        # --- 6. Login OK ---
         session_state.CURRENT_CONFIG = ConfigCollection(raw_data)
         session_state.CURRENT_PASSWORD = pwd
         USER_PASSWORD.value = pwd

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'register.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.3
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -338,8 +338,8 @@ class Ui_RegistrationWindow(object):
         self.lblTitle.setText(QCoreApplication.translate("RegistrationWindow", u"[RegistrationWindow.lblTitle]", None))
         self.lblHeader.setText(QCoreApplication.translate("RegistrationWindow", u"[RegistrationWindow.lblHeader]", None))
         self.comboLanguage.setItemText(0, QCoreApplication.translate("RegistrationWindow", u"ua \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430", u"ua \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"))
-        self.comboLanguage.setItemText(1, QCoreApplication.translate("RegistrationWindow", u"\U0001f1ec\U0001f1e7 English", None))
-        self.comboLanguage.setItemText(2, QCoreApplication.translate("RegistrationWindow", u"\U0001f1e9\U0001f1ea Deutsch", None))
+        self.comboLanguage.setItemText(1, QCoreApplication.translate("RegistrationWindow", u"\ud83c\uddec\ud83c\udde7 English", None))
+        self.comboLanguage.setItemText(2, QCoreApplication.translate("RegistrationWindow", u"\ud83c\udde9\ud83c\uddea Deutsch", None))
 
 #if QT_CONFIG(tooltip)
         self.comboLanguage.setToolTip("")

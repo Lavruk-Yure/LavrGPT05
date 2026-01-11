@@ -22,6 +22,7 @@ from PySide6.QtWidgets import QDialog, QLabel, QTreeWidgetItem, QVBoxLayout, QWi
 
 from core.lang_manager import LANG
 from core.settings_page_language import SettingsPageLanguage
+from core.settings_page_license import SettingsPageLicense
 from core.settings_page_translator import SettingsPageTranslator
 from core.ui_translator import UITranslator
 from ui.ui_settings_center import Ui_SettingsCenter
@@ -123,6 +124,9 @@ class SettingsCenter(QDialog):
         stack.addWidget(self._page_translator)
         # index = 1 (якщо перед IB)
 
+        self._page_license = SettingsPageLicense(stack, self._lang_mgr)
+        stack.addWidget(self._page_license)  # index = 2
+
         stack.addWidget(self._make_stub_page("[SettingsPageIB.header]"))
 
         stack.addWidget(self._make_stub_page("[SettingsPageCTrader.header]"))
@@ -151,8 +155,9 @@ class SettingsCenter(QDialog):
         entries = [
             NavEntry("[SettingsCenter.tree.language]", page_index=0),
             NavEntry("[SettingsCenter.tree.translator]", page_index=1),
-            NavEntry("[SettingsCenter.tree.ib]", page_index=2),
-            NavEntry("[SettingsCenter.tree.ctrader]", page_index=3),
+            NavEntry("[SettingsCenter.tree.license]", page_index=2),
+            NavEntry("[SettingsCenter.tree.ib]", page_index=3),
+            NavEntry("[SettingsCenter.tree.ctrader]", page_index=4),
             NavEntry("[SettingsCenter.tree.exit]", action="exit"),
         ]
 
@@ -201,9 +206,21 @@ class SettingsCenter(QDialog):
 
         if 0 <= page_i < self.ui.stackPages.count():
             self.ui.stackPages.setCurrentIndex(page_i)
-            log_cp("nav.page", page=page_i)
-        else:
-            log_cp("nav.page.invalid", reason="out of range", page=page_i)
+
+            log_cp(
+                "nav.page",
+                page=page_i,
+                page_count=self.ui.stackPages.count(),
+                text=current.text(0),
+            )
+
+            # License page: refresh on enter
+            if page_i == 2 and hasattr(self, "_page_license"):
+                try:
+                    log_cp("license.refresh.enter")
+                    self._page_license.refresh()
+                except Exception as e:  # noqa
+                    log_cp("license.refresh.error", err=str(e))
 
     def _reload_languages_combo(self) -> None:
         self._page_language.reload_combo()

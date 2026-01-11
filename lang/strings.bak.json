@@ -1,10 +1,41 @@
 {
   "lang_active": {
-    "code": "mk"
+    "code": "uk"
   },
-  "AboutDialog.btnOk": {
-    "uk": "Гаразд",
-    "hi": "ठीक है",
-    "mk": "Океј"
+  "SettingsCenter.tree.license": {
+    "hi": "लाइसेंस"
+  },
+  "SettingsPageLicense.lblHeader": {
+    "hi": "लाइसेंस"
+  },
+  "SettingsPageLicense.lblStatusTitle": {
+    "hi": "स्थिति:"
+  },
+  "SettingsPageLicense.lblEditionTitle": {
+    "hi": "संस्करण:"
+  },
+  "SettingsPageLicense.lblDaysTitle": {
+    "hi": "उपयोग किए गए दिन:"
+  },
+  "SettingsPageLicense.lblMachineTitle": {
+    "hi": "मशीन:"
+  },
+  "SettingsPageLicense.lblSourceTitle": {
+    "hi": "स्रोत:"
+  },
+  "SettingsPageLicense.lblActivatedTitle": {
+    "hi": "सक्रिय:"
+  },
+  "SettingsPageLicense.lblKeyTitle": {
+    "hi": "लाइसेंस कुंजी:"
+  },
+  "SettingsPageLicense.editLicenseKey.placeholder": {
+    "hi": "लाइसेंस कुंजी चिपकाएँ"
+  },
+  "SettingsPageLicense.btnActivate": {
+    "hi": "सक्रिय करें"
+  },
+  "SettingsPageLicense.btnCopyDiag": {
+    "hi": "निदान की प्रतिलिपि"
   }
 }

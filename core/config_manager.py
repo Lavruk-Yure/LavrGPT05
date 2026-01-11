@@ -192,6 +192,58 @@ class ConfigManager:
                 "deepl_key_2": "",
             },
             "machine": machine,
+            "license": {
+                # --- базове ---
+                "edition": "free",  # free | pro | pro_plus
+                "status": "NO_LICENSE",  # computed, але зберігаємо
+                "machine_id": None,
+                # --- підписаний ключ ---
+                "payload_b64": None,
+                "signature_b64": None,
+                # --- дати ---
+                "activated_at": None,  # перший запуск / активація
+                "issued_at": None,  # з payload
+                "expires_at": None,  # з payload або null
+                "version_min": None,  # з payload або null
+                # --- службове ---
+                "last_check_at": None,
+                "last_run_at": None,
+                # --- аналітика / підтримка ---
+                "source": None,  # gumroad | ctrader_store | manual
+                "note": None,
+                # --- політика часу (НЕ міняти в рантаймі) ---
+                "trial_policy": {
+                    "free_preview_days": 90,  # Free demo
+                    "auto_preview_days": 90,  # Auto demo
+                    "pro_full_days": 180,  # Pro повний
+                    "proplus_full_days": None,  # Pro+ без ліміту
+                },
+            },
+        }
+
+    @staticmethod
+    def _default_license_block() -> Dict[str, Any]:
+        """Дефолтний блок license для міграції старих конфігів."""
+        return {
+            "edition": "free",  # free | pro | pro_plus
+            "status": "NO_LICENSE",  # computed, але зберігаємо
+            "machine_id": None,
+            "payload_b64": None,
+            "signature_b64": None,
+            "activated_at": None,
+            "issued_at": None,
+            "expires_at": None,
+            "version_min": None,
+            "last_check_at": None,
+            "last_run_at": None,
+            "source": None,  # gumroad | ctrader_store | manual
+            "note": None,
+            "trial_policy": {
+                "free_preview_days": 90,
+                "auto_preview_days": 90,
+                "pro_full_days": 180,
+                "proplus_full_days": None,
+            },
         }
 
     # ----------------------------------------------------------------------
@@ -291,6 +343,30 @@ class ConfigManager:
             if key not in data["machine"]:
                 data["machine"][key] = ""
                 changed = True
+        # license (canonical keys)
+        defaults_lic = self._default_license_block()
+
+        lic = data.get("license")
+        if not isinstance(lic, dict):
+            data["license"] = defaults_lic
+            changed = True
+        else:
+            # докинути відсутні ключі верхнього рівня
+            for k, v in defaults_lic.items():
+                if k not in lic:
+                    lic[k] = v
+                    changed = True
+
+            # trial_policy окремо (вкладений dict)
+            tp = lic.get("trial_policy")
+            if not isinstance(tp, dict):
+                lic["trial_policy"] = defaults_lic["trial_policy"]
+                changed = True
+            else:
+                for k, v in defaults_lic["trial_policy"].items():
+                    if k not in tp:
+                        tp[k] = v
+                        changed = True
 
         # created_at / updated_at
         now = datetime.now(UTC).isoformat()
