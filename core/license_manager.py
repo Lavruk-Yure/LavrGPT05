@@ -26,6 +26,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Dict, Optional
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
 DEBUG_LICENSE_MANAGER = True
 
 logger = logging.getLogger(__name__)
@@ -96,6 +98,7 @@ class LicenseManager:
 
     # SALT (вшитий; потім можна винести у build-time)
     _SALT = "LGE05::LICENSE::SALT::v1"
+    PUBLIC_KEY_B64 = "nPbiv6R5pfK4GHvpxmMgNc3Tt56gEIir/qPIXq6yadA="
 
     @classmethod
     def compute_and_update(
@@ -251,9 +254,9 @@ class LicenseManager:
             if dt_exp and now > dt_exp:
                 return False, "License expired"
 
-        # TODO: verify signature using embedded public key
-        # if not cls._verify_signature(payload_b64, signature_b64):
-        #     return False, "Invalid signature"
+        # verify signature using embedded public key
+        if not cls._verify_signature(payload_b64, signature_b64):
+            return False, "Invalid signature"
 
         # write conf
         lic["edition"] = edition
@@ -406,8 +409,17 @@ class LicenseManager:
         # Pro/Pro+: validate stored signature/payload (stub now)
         # NOTE: real signature check will be added in Patch 19.2b
         parsed = cls._parse_payload_from_conf(lic)
+
         if parsed is None:
-            # conf зламано -> tampered -> fatal
+            return cls.ST_TAMPERED, 0, True, cls.ST_TAMPERED
+
+        payload_b64 = lic.get("payload_b64")
+        signature_b64 = lic.get("signature_b64")
+
+        if not isinstance(payload_b64, str) or not isinstance(signature_b64, str):
+            return cls.ST_TAMPERED, 0, True, cls.ST_TAMPERED
+
+        if not cls._verify_signature(payload_b64, signature_b64):
             return cls.ST_TAMPERED, 0, True, cls.ST_TAMPERED
 
         payload = parsed
@@ -648,6 +660,21 @@ class LicenseManager:
         pad = "=" * ((4 - len(s) % 4) % 4)
         return base64.urlsafe_b64decode(s + pad)
 
+    @classmethod
+    def _verify_signature(cls, payload_b64: str, signature_b64: str) -> bool:
+        try:
+            payload_bytes = cls._b64url_decode(payload_b64)
+            sig_bytes = cls._b64url_decode(signature_b64)
+
+            pub_bytes = base64.b64decode(cls.PUBLIC_KEY_B64)
+            pub = Ed25519PublicKey.from_public_bytes(pub_bytes)
+
+            pub.verify(sig_bytes, payload_bytes)
+            return True
+        except Exception as e:  # noqa
+            log_lp("sig.verify.fail", err=str(e))
+            return False
+
     @staticmethod
     def _version_lt(a: str, b: str) -> bool:
         """
@@ -657,7 +684,7 @@ class LicenseManager:
 
         def parse(v: str) -> tuple[int, int, int]:
             parts = (v or "").strip().split(".")
-            nums = []
+            nums: list[int] = []
             for i in range(3):
                 try:
                     nums.append(int(parts[i]))

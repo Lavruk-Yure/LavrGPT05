@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>485</width>
-    <height>301</height>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,8 +118,20 @@
        </property>
       </widget>
      </item>
-     <item row="11" column="0" colspan="2">
-      <widget class="QLineEdit" name="editLicenseKey">
+     <item row="10" column="0" colspan="2">
+      <widget class="QPlainTextEdit" name="editLicenseKey">
+       <property name="minimumSize">
+        <size>
+         <width>70</width>
+         <height>90</height>
+        </size>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+       </property>
        <property name="placeholderText">
         <string>[SettingsPageLicense.editLicenseKey.placeholder]</string>
        </property>

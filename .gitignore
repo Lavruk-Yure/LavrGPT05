@@ -51,4 +51,9 @@ LGE05.conf.bad
 tokens*.json
 Session/
 
+#private key
+dev_tools/_private_ed25519.key
+dev_tools/_private_ed25519.key.*
+
+
 

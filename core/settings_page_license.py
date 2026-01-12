@@ -10,14 +10,17 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Any
 
 from PySide6.QtWidgets import QApplication, QMessageBox, QWidget
 
-from core.app_paths import ROOT_CONF_PATH
+from core import session_state
+from core.app_paths import ROOT_CONF_PATH, ROOT_INIT_PATH
 from core.config_manager import ConfigManager
 from core.license_manager import LicenseManager
-from core.session_state import CURRENT_CONFIG, CURRENT_PASSWORD
+
+# from core.session_state import CURRENT_CONFIG, CURRENT_PASSWORD
 from ui.ui_settings_page_license import Ui_pageLicense
 
 DEBUG_LICENSE_PAGE = False
@@ -48,14 +51,15 @@ class SettingsPageLicense(QWidget):
         self.refresh()
 
     def refresh(self) -> None:
-        if CURRENT_CONFIG is None:
+        if session_state.CURRENT_CONFIG is None:
             self._set_values("-", "-", "-", "-", "-", "-")
             return
 
-        conf = CURRENT_CONFIG.to_dict()
+        conf = session_state.CURRENT_CONFIG.to_dict()
         lic = conf.get("license", {}) if isinstance(conf, dict) else {}
 
-        app_version = str(conf.get("version") or "0.0.0")
+        app_version = self._read_app_version()
+
         res = LicenseManager.compute_and_update(conf, app_version=app_version)
 
         status = str(res.status)
@@ -98,17 +102,22 @@ class SettingsPageLicense(QWidget):
         return f"{s[:10]}...{s[-6:]}"
 
     def _on_activate(self) -> None:
-        if CURRENT_CONFIG is None or CURRENT_PASSWORD is None:
+        if (
+            session_state.CURRENT_CONFIG is None
+            or session_state.CURRENT_PASSWORD is None
+        ):
             QMessageBox.warning(self, "LGE05 — License", "Not logged in.")
             return
 
-        key = self.ui.editLicenseKey.text().strip()
+        key = self.ui.editLicenseKey.toPlainText().strip()
+        key = "".join(key.split())
+
         if not key:
             QMessageBox.warning(self, "LGE05 — License", "Empty license key.")
             return
 
-        conf = CURRENT_CONFIG.to_dict()
-        app_version = str(conf.get("version") or "0.0.0")
+        conf = session_state.CURRENT_CONFIG.to_dict()
+        app_version = self._read_app_version()
 
         ok, msg = LicenseManager.activate_key(
             conf, license_key=key, app_version=app_version
@@ -125,7 +134,7 @@ class SettingsPageLicense(QWidget):
 
         try:
             cfg_mgr = ConfigManager(ROOT_CONF_PATH)
-            cfg_mgr.save(conf, CURRENT_PASSWORD)
+            cfg_mgr.save(conf, session_state.CURRENT_PASSWORD)
         except Exception as e:  # noqa
             logger.exception("Failed to save config after activation: %s", e)
             QMessageBox.warning(
@@ -133,19 +142,20 @@ class SettingsPageLicense(QWidget):
             )
             return
 
-        self.ui.editLicenseKey.setText("")
+        self.ui.editLicenseKey.setPlainText("")
+
         QMessageBox.information(self, "LGE05 — License", "Activated.")
         self.refresh()
 
     def _on_copy_diag(self) -> None:
-        if CURRENT_CONFIG is None:
+        if session_state.CURRENT_CONFIG is None:
             return
 
-        conf = CURRENT_CONFIG.to_dict()
+        conf = session_state.CURRENT_CONFIG.to_dict()
         lic = conf.get("license", {})
         payload = {
             "app": conf.get("app"),
-            "version": conf.get("version"),
+            "version": self._read_app_version(),
             "email": conf.get("email"),
             "license": {
                 "edition": lic.get("edition"),
@@ -164,3 +174,19 @@ class SettingsPageLicense(QWidget):
         QMessageBox.information(
             self, "LGE05 — License", "Diagnostics copied to clipboard."
         )
+
+    @staticmethod
+    def _read_app_version() -> str:
+        """
+        Читає __version__ з ROOT_INIT_PATH.
+        Без імпорту пакета (щоб уникнути циклічних імпортів).
+        """
+        try:
+            text = ROOT_INIT_PATH.read_text(encoding="utf-8", errors="ignore")
+        except Exception:  # noqa
+            return "0.0.0"
+
+        m = re.search(r'__version__\s*=\s*"([^"]+)"', text)
+        if not m:
+            m = re.search(r"__version__\s*=\s*'([^']+)'", text)
+        return m.group(1).strip() if m else "0.0.0"

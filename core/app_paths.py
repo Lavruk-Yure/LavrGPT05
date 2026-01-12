@@ -28,6 +28,7 @@ ROOT_CONF_PATH = BASE_DIR / "LGE05.conf"
 SESSION_DIR = BASE_DIR / "Session"
 LANG_DIR = BASE_DIR / "lang"
 STRINGS_JSON = LANG_DIR / "strings.json"
+ROOT_INIT_PATH = BASE_DIR / "__init__.py"
 
 
 def ensure_session_dir() -> None:

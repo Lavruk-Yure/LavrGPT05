@@ -5,7 +5,7 @@
   "language": "uk",
   "password_sha256": "dcbb40d2261a4725cdc50a2b45314e0ffd3658074a8126c26a0f3478015aa549",
   "created_at": "2025-12-28T11:10:50.729504+00:00",
-  "updated_at": "2026-01-11T17:04:41.535543+00:00",
+  "updated_at": "2026-01-12T18:32:56.490329+00:00",
   "multi_language": false,
   "translator": {
     "provider": "deepl",
@@ -28,8 +28,8 @@
     "issued_at": null,
     "expires_at": null,
     "version_min": null,
-    "last_check_at": "2026-01-11T17:04:31.734211+00:00",
-    "last_run_at": "2026-01-11T17:04:31.734211+00:00",
+    "last_check_at": "2026-01-12T18:32:54.535588+00:00",
+    "last_run_at": "2026-01-12T18:32:54.535588+00:00",
     "source": null,
     "note": null,
     "trial_policy": {

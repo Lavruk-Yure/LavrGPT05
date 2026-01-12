@@ -16,7 +16,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFormLayout, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QVBoxLayout,
+    QPlainTextEdit, QPushButton, QSizePolicy, QVBoxLayout,
     QWidget)
 import resources_rc
 
@@ -24,7 +24,7 @@ class Ui_pageLicense(object):
     def setupUi(self, pageLicense):
         if not pageLicense.objectName():
             pageLicense.setObjectName(u"pageLicense")
-        pageLicense.resize(485, 301)
+        pageLicense.resize(485, 360)
         icon = QIcon()
         icon.addFile(u":/icons/lge_perplexity2_24x24.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         pageLicense.setWindowIcon(icon)
@@ -102,10 +102,13 @@ class Ui_pageLicense(object):
 
         self.formLayout.setWidget(8, QFormLayout.ItemRole.LabelRole, self.lblKeyTitle)
 
-        self.editLicenseKey = QLineEdit(pageLicense)
+        self.editLicenseKey = QPlainTextEdit(pageLicense)
         self.editLicenseKey.setObjectName(u"editLicenseKey")
+        self.editLicenseKey.setMinimumSize(QSize(70, 90))
+        self.editLicenseKey.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.editLicenseKey.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        self.formLayout.setWidget(11, QFormLayout.ItemRole.SpanningRole, self.editLicenseKey)
+        self.formLayout.setWidget(10, QFormLayout.ItemRole.SpanningRole, self.editLicenseKey)
 
 
         self.verticalLayout.addLayout(self.formLayout)
