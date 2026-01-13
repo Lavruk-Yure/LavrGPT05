@@ -24,7 +24,7 @@ class Ui_pageLicense(object):
     def setupUi(self, pageLicense):
         if not pageLicense.objectName():
             pageLicense.setObjectName(u"pageLicense")
-        pageLicense.resize(485, 360)
+        pageLicense.resize(539, 388)
         icon = QIcon()
         icon.addFile(u":/icons/lge_perplexity2_24x24.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         pageLicense.setWindowIcon(icon)
@@ -113,6 +113,13 @@ class Ui_pageLicense(object):
 
         self.verticalLayout.addLayout(self.formLayout)
 
+        self.lblActivationInfo = QLabel(pageLicense)
+        self.lblActivationInfo.setObjectName(u"lblActivationInfo")
+        self.lblActivationInfo.setStyleSheet(u"color: lightgray;")
+        self.lblActivationInfo.setWordWrap(True)
+
+        self.verticalLayout.addWidget(self.lblActivationInfo)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.btnActivate = QPushButton(pageLicense)
@@ -124,6 +131,11 @@ class Ui_pageLicense(object):
         self.btnCopyDiag.setObjectName(u"btnCopyDiag")
 
         self.horizontalLayout.addWidget(self.btnCopyDiag)
+
+        self.btnCancel = QPushButton(pageLicense)
+        self.btnCancel.setObjectName(u"btnCancel")
+
+        self.horizontalLayout.addWidget(self.btnCancel)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -151,7 +163,9 @@ class Ui_pageLicense(object):
         self.lblActivatedValue.setText(QCoreApplication.translate("pageLicense", u"TextLabel", None))
         self.lblKeyTitle.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.lblKeyTitle]", None))
         self.editLicenseKey.setPlaceholderText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.editLicenseKey.placeholder]", None))
+        self.lblActivationInfo.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.lblActivationInfo]", None))
         self.btnActivate.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.btnActivate]", None))
         self.btnCopyDiag.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.btnCopyDiag]", None))
+        self.btnCancel.setText(QCoreApplication.translate("pageLicense", u"[Common.btnCancel]", None))
     # retranslateUi
 

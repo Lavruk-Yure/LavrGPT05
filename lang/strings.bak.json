@@ -1,41 +1,32 @@
 {
   "lang_active": {
-    "code": "uk"
-  },
-  "SettingsCenter.tree.license": {
-    "hi": "लाइसेंस"
-  },
-  "SettingsPageLicense.lblHeader": {
-    "hi": "लाइसेंस"
-  },
-  "SettingsPageLicense.lblStatusTitle": {
-    "hi": "स्थिति:"
+    "code": "pl"
   },
   "SettingsPageLicense.lblEditionTitle": {
-    "hi": "संस्करण:"
+    "pl": "Wydanie:"
   },
   "SettingsPageLicense.lblDaysTitle": {
-    "hi": "उपयोग किए गए दिन:"
+    "pl": "Wykorzystane dni:"
   },
   "SettingsPageLicense.lblMachineTitle": {
-    "hi": "मशीन:"
+    "pl": "Maszyna:"
   },
   "SettingsPageLicense.lblSourceTitle": {
-    "hi": "स्रोत:"
+    "pl": "Źródło:"
   },
   "SettingsPageLicense.lblActivatedTitle": {
-    "hi": "सक्रिय:"
+    "pl": "Aktywowany:"
   },
   "SettingsPageLicense.lblKeyTitle": {
-    "hi": "लाइसेंस कुंजी:"
+    "pl": "Klucz licencyjny:"
   },
   "SettingsPageLicense.editLicenseKey.placeholder": {
-    "hi": "लाइसेंस कुंजी चिपकाएँ"
+    "pl": "Wklej LICENSE_KEY"
   },
   "SettingsPageLicense.btnActivate": {
-    "hi": "सक्रिय करें"
+    "pl": "Aktywuj"
   },
   "SettingsPageLicense.btnCopyDiag": {
-    "hi": "निदान की प्रतिलिपि"
+    "pl": "Diagnostyka kopiowania"
   }
 }

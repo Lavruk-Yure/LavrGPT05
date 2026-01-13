@@ -13,15 +13,25 @@ import logging
 import re
 from typing import Any
 
-from PySide6.QtWidgets import QApplication, QMessageBox, QWidget
+from PySide6.QtWidgets import QApplication, QWidget
 
 from core import session_state
 from core.app_paths import ROOT_CONF_PATH, ROOT_INIT_PATH
 from core.config_manager import ConfigManager
 from core.license_manager import LicenseManager
-
-# from core.session_state import CURRENT_CONFIG, CURRENT_PASSWORD
 from ui.ui_settings_page_license import Ui_pageLicense
+
+_STATUS_I18N = {
+    "TRIAL_OK": "SettingsPageLicense.statusTrialOk",
+    "TRIAL_EXPIRED": "SettingsPageLicense.statusTrialExpired",
+    "PRO_OK": "SettingsPageLicense.statusProOk",
+    "PRO_LIMITED": "SettingsPageLicense.statusProLimited",
+    "UPDATE_REQUIRED": "SettingsPageLicense.statusUpdateRequired",
+    "EXPIRED": "SettingsPageLicense.statusExpired",
+    "OTHER_MACHINE": "SettingsPageLicense.statusOtherMachine",
+    "TAMPERED": "SettingsPageLicense.statusTampered",
+}
+
 
 DEBUG_LICENSE_PAGE = False
 
@@ -45,25 +55,36 @@ class SettingsPageLicense(QWidget):
         self.ui = Ui_pageLicense()
         self.ui.setupUi(self)
 
+        # UI повідомлення замість QMessageBox
+        self.ui.lblActivationInfo.setWordWrap(True)
+        self.ui.lblActivationInfo.setStyleSheet("color: lightgray;")
+        self._set_info("")
+
         self.ui.btnActivate.clicked.connect(self._on_activate)
         self.ui.btnCopyDiag.clicked.connect(self._on_copy_diag)
+        self.ui.btnCancel.clicked.connect(self._on_cancel)
 
         self.refresh()
 
     def refresh(self) -> None:
         if session_state.CURRENT_CONFIG is None:
             self._set_values("-", "-", "-", "-", "-", "-")
+            self._set_info("")
             return
 
         conf = session_state.CURRENT_CONFIG.to_dict()
         lic = conf.get("license", {}) if isinstance(conf, dict) else {}
 
-        app_version = self._read_app_version()
-
+        app_version = str(conf.get("version") or "0.0.0")
         res = LicenseManager.compute_and_update(conf, app_version=app_version)
 
-        status = str(res.status)
-        edition = str(res.edition)
+        # --- RAW для логіки ---
+        status_raw = str(res.status)
+        edition_raw = str(res.edition)
+
+        # --- UI тексти (перекладені) ---
+        status_ui = self._status_text(status_raw)
+        edition_ui = edition_raw  # поки без перекладу
         days_used = str(res.days_used)
 
         machine_id = str(lic.get("machine_id") or "")
@@ -73,8 +94,40 @@ class SettingsPageLicense(QWidget):
         activated_at = str(lic.get("activated_at") or "-")
 
         self._set_values(
-            status, edition, days_used, machine_short, source, activated_at
+            status_ui,
+            edition_ui,
+            days_used,
+            machine_short,
+            source,
+            activated_at,
         )
+
+        # Нижній рядок (lblActivationInfo) — одноманітні повідомлення
+        if status_raw == "PRO_OK":
+            self._set_info(
+                self._tr("SettingsPageLicense.msgActivated", "Activated."),
+                kind="ok",
+            )
+        elif status_raw == "UPDATE_REQUIRED":
+            self._set_info(
+                self._tr("SettingsPageLicense.statusUpdateRequired", "Update required"),
+                kind="err",
+            )
+        elif status_raw == "TRIAL_EXPIRED":
+            self._set_info(
+                self._tr("SettingsPageLicense.statusTrialExpired", "Trial expired"),
+                kind="err",
+            )
+        elif status_raw == "OTHER_MACHINE":
+            self._set_info(
+                self._tr("SettingsPageLicense.statusOtherMachine", "Other machine"),
+                kind="err",
+            )
+        elif status_raw in ("TAMPERED", "CLOCK_ROLLBACK"):
+            # це вже серйозно, але хоча б покажемо людині
+            self._set_info(status_raw, kind="err")
+        else:
+            self._set_info("")
 
     def _set_values(
         self,
@@ -106,56 +159,70 @@ class SettingsPageLicense(QWidget):
             session_state.CURRENT_CONFIG is None
             or session_state.CURRENT_PASSWORD is None
         ):
-            QMessageBox.warning(self, "LGE05 — License", "Not logged in.")
+            self._set_info(
+                self._tr("SettingsPageLicense.msgNotLoggedIn", "Not logged in."),
+                kind="err",
+            )
             return
 
         key = self.ui.editLicenseKey.toPlainText().strip()
         key = "".join(key.split())
-
         if not key:
-            QMessageBox.warning(self, "LGE05 — License", "Empty license key.")
+            self._set_info(
+                self._tr("SettingsPageLicense.msgEmptyKey", "Empty license key."),
+                kind="err",
+            )
             return
 
         conf = session_state.CURRENT_CONFIG.to_dict()
-        app_version = self._read_app_version()
+        app_version = str(conf.get("version") or "0.0.0")
 
         ok, msg = LicenseManager.activate_key(
             conf, license_key=key, app_version=app_version
         )
         if not ok:
-            QMessageBox.warning(self, "LGE05 — License", msg)
+            # msg зараз англійський з LicenseManager — можна лишити,
+            # або потім замапити на ключі
+            self._set_info(str(msg), kind="err")
             return
 
         res = LicenseManager.compute_and_update(conf, app_version=app_version)
         if res.fatal:
-            QMessageBox.critical(self, "LGE05 — License", f"Fatal: {res.fatal_reason}")
+            self._set_info(f"Fatal: {res.fatal_reason}", kind="err")
             QApplication.instance().quit()
             return
 
         try:
-            cfg_mgr = ConfigManager(ROOT_CONF_PATH)
-            cfg_mgr.save(conf, session_state.CURRENT_PASSWORD)
-        except Exception as e:  # noqa
-            logger.exception("Failed to save config after activation: %s", e)
-            QMessageBox.warning(
-                self, "LGE05 — License", "Activated, but failed to save config."
+            ConfigManager(ROOT_CONF_PATH).save(conf, session_state.CURRENT_PASSWORD)
+        except Exception:  # noqa
+            self._set_info(
+                self._tr(
+                    "SettingsPageLicense.msgSaveFailed",
+                    "Activated, but failed to save config.",
+                ),
+                kind="err",
             )
             return
 
         self.ui.editLicenseKey.setPlainText("")
-
-        QMessageBox.information(self, "LGE05 — License", "Activated.")
+        self._set_info(
+            self._tr("SettingsPageLicense.msgActivated", "Activated."), kind="ok"
+        )
         self.refresh()
 
     def _on_copy_diag(self) -> None:
         if session_state.CURRENT_CONFIG is None:
+            self._set_info(
+                self._tr("SettingsPageLicense.msgNotLoggedIn", "Not logged in."),
+                kind="err",
+            )
             return
 
         conf = session_state.CURRENT_CONFIG.to_dict()
         lic = conf.get("license", {})
         payload = {
             "app": conf.get("app"),
-            "version": self._read_app_version(),
+            "version": conf.get("version"),
             "email": conf.get("email"),
             "license": {
                 "edition": lic.get("edition"),
@@ -171,8 +238,11 @@ class SettingsPageLicense(QWidget):
 
         text = json.dumps(payload, ensure_ascii=False, indent=2)
         QApplication.clipboard().setText(text)
-        QMessageBox.information(
-            self, "LGE05 — License", "Diagnostics copied to clipboard."
+        self._set_info(
+            self._tr(
+                "SettingsPageLicense.msgDiagCopied", "Diagnostics copied to clipboard."
+            ),
+            kind="ok",
         )
 
     @staticmethod
@@ -190,3 +260,31 @@ class SettingsPageLicense(QWidget):
         if not m:
             m = re.search(r"__version__\s*=\s*'([^']+)'", text)
         return m.group(1).strip() if m else "0.0.0"
+
+    def _tr(self, key: str, fallback: str) -> str:
+        try:
+            s = self._lang_mgr.resolve(key)
+        except Exception:  # noqa
+            return fallback
+        return s if isinstance(s, str) and s else fallback
+
+    def _set_info(self, text: str, *, kind: str = "info") -> None:
+        # kind: info / ok / err
+        if kind == "ok":
+            self.ui.lblActivationInfo.setStyleSheet("color: lightgreen;")
+        elif kind == "err":
+            self.ui.lblActivationInfo.setStyleSheet("color: salmon;")
+        else:
+            self.ui.lblActivationInfo.setStyleSheet("color: lightgray;")
+        self.ui.lblActivationInfo.setText(text)
+
+    def _on_cancel(self) -> None:
+        self.ui.editLicenseKey.setPlainText("")
+        self._set_info("")
+        self.window().close()
+
+    def _status_text(self, status_raw: str) -> str:
+        key = _STATUS_I18N.get(status_raw)
+        if not key:
+            return status_raw
+        return self._tr(key, status_raw)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>485</width>
-    <height>360</height>
+    <width>539</width>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,6 +140,19 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="lblActivationInfo">
+     <property name="styleSheet">
+      <string notr="true">color: lightgray;</string>
+     </property>
+     <property name="text">
+      <string>[SettingsPageLicense.lblActivationInfo]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btnActivate">
@@ -152,6 +165,13 @@
       <widget class="QPushButton" name="btnCopyDiag">
        <property name="text">
         <string>[SettingsPageLicense.btnCopyDiag]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>[Common.btnCancel]</string>
        </property>
       </widget>
      </item>
