@@ -58,7 +58,8 @@ class SettingsPageLicense(QWidget):
         # UI повідомлення замість QMessageBox
         self.ui.lblActivationInfo.setWordWrap(True)
         self.ui.lblActivationInfo.setStyleSheet("color: lightgray;")
-        self._set_info("")
+        self._set_info("", kind="info")
+        self._set_info_neutral_if_needed()
 
         self.ui.btnActivate.clicked.connect(self._on_activate)
         self.ui.btnCopyDiag.clicked.connect(self._on_copy_diag)
@@ -69,7 +70,7 @@ class SettingsPageLicense(QWidget):
     def refresh(self) -> None:
         if session_state.CURRENT_CONFIG is None:
             self._set_values("-", "-", "-", "-", "-", "-")
-            self._set_info("")
+            self._set_info_neutral_if_needed()
             return
 
         conf = session_state.CURRENT_CONFIG.to_dict()
@@ -78,13 +79,11 @@ class SettingsPageLicense(QWidget):
         app_version = str(conf.get("version") or "0.0.0")
         res = LicenseManager.compute_and_update(conf, app_version=app_version)
 
-        # --- RAW для логіки ---
         status_raw = str(res.status)
         edition_raw = str(res.edition)
 
-        # --- UI тексти (перекладені) ---
         status_ui = self._status_text(status_raw)
-        edition_ui = edition_raw  # поки без перекладу
+        edition_ui = edition_raw
         days_used = str(res.days_used)
 
         machine_id = str(lic.get("machine_id") or "")
@@ -94,19 +93,13 @@ class SettingsPageLicense(QWidget):
         activated_at = str(lic.get("activated_at") or "-")
 
         self._set_values(
-            status_ui,
-            edition_ui,
-            days_used,
-            machine_short,
-            source,
-            activated_at,
+            status_ui, edition_ui, days_used, machine_short, source, activated_at
         )
 
-        # Нижній рядок (lblActivationInfo) — одноманітні повідомлення
+        # нижній рядок — тільки за статусом, або нейтральне
         if status_raw == "PRO_OK":
             self._set_info(
-                self._tr("SettingsPageLicense.msgActivated", "Activated."),
-                kind="ok",
+                self._tr("SettingsPageLicense.msgActivated", "Activated."), kind="ok"
             )
         elif status_raw == "UPDATE_REQUIRED":
             self._set_info(
@@ -124,10 +117,9 @@ class SettingsPageLicense(QWidget):
                 kind="err",
             )
         elif status_raw in ("TAMPERED", "CLOCK_ROLLBACK"):
-            # це вже серйозно, але хоча б покажемо людині
             self._set_info(status_raw, kind="err")
         else:
-            self._set_info("")
+            self._set_info_neutral_if_needed()
 
     def _set_values(
         self,
@@ -181,9 +173,24 @@ class SettingsPageLicense(QWidget):
             conf, license_key=key, app_version=app_version
         )
         if not ok:
-            # msg зараз англійський з LicenseManager — можна лишити,
-            # або потім замапити на ключі
-            self._set_info(str(msg), kind="err")
+            msg_s = str(msg)
+
+            msg_key_map = {
+                "Update required": "SettingsPageLicense.statusUpdateRequired",
+                "Invalid license key format": "SettingsPageLicense.msgInvalidKeyFormat",
+                "Invalid signature": "SettingsPageLicense.msgInvalidSignature",
+                "Invalid product": "SettingsPageLicense.msgInvalidProduct",
+                "Invalid edition": "SettingsPageLicense.msgInvalidEdition",
+                "License expired": "SettingsPageLicense.statusTrialExpired",
+                # або окремий ключ
+            }
+
+            key = msg_key_map.get(msg_s)
+            if key:
+                self._set_info(self._tr(key, msg_s), kind="err")
+            else:
+                self._set_info(msg_s, kind="err")
+
             return
 
         res = LicenseManager.compute_and_update(conf, app_version=app_version)
@@ -276,6 +283,12 @@ class SettingsPageLicense(QWidget):
             self.ui.lblActivationInfo.setStyleSheet("color: salmon;")
         else:
             self.ui.lblActivationInfo.setStyleSheet("color: lightgray;")
+
+        # якщо прилетів ключ у форматі [Key] — перекладаємо
+        s = text.strip()
+        if s.startswith("[") and s.endswith("]") and len(s) > 2:
+            key = s[1:-1].strip()
+            text = self._tr(key, "")  # у тебе в fallback для lblActivationInfo якраз ""
         self.ui.lblActivationInfo.setText(text)
 
     def _on_cancel(self) -> None:
@@ -288,3 +301,26 @@ class SettingsPageLicense(QWidget):
         if not key:
             return status_raw
         return self._tr(key, status_raw)
+
+    def _set_info_neutral_if_needed(self) -> None:
+        """
+        Показує нейтральну підказку лише тоді, коли:
+        - поле ключа порожнє
+        - і ми не показуємо ok/err повідомлення
+        """
+        # якщо вже є повідомлення — не чіпаємо
+        current = (self.ui.lblActivationInfo.text() or "").strip()
+        if current:
+            return
+
+        key_text = (self.ui.editLicenseKey.toPlainText() or "").strip()
+        if key_text:
+            return
+
+        self._set_info(
+            self._tr(
+                "SettingsPageLicense.msgHintPasteAndActivate",
+                "Введіть ключ і натисніть Активувати",
+            ),
+            kind="info",
+        )

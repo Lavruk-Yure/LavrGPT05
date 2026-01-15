@@ -55,6 +55,17 @@ def make_machine_stub() -> Dict[str, str]:
     }
 
 
+def _read_version_from_root_init() -> str:
+    # core/.. -> корінь проєкту
+    root_init = Path(__file__).resolve().parents[1] / "__init__.py"
+    if not root_init.exists():
+        return "0.0.0"
+
+    text = root_init.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r'^__version__\s*=\s*"([^"]+)"\s*$', text, re.MULTILINE)
+    return m.group(1).strip() if m else "0.0.0"
+
+
 class ConfigCollection:
     """
     Обгортка над dict для зручного доступу:
@@ -177,9 +188,10 @@ class ConfigManager:
         machine: Dict[str, str],
     ) -> Dict[str, Any]:
         now = datetime.now(UTC).isoformat()
+
         return {
             "app": "LGE05",
-            "version": "0.1.0",
+            "version": _read_version_from_root_init(),
             "email": email,
             "language": self._normalize_lang(lang),
             "password_sha256": pwd_hash,
@@ -302,6 +314,18 @@ class ConfigManager:
         # multi_language
         if "multi_language" not in data:
             data["multi_language"] = False
+            changed = True
+        try:
+            from LavrGPT05 import __version__ as app_version  # type: ignore
+        except Exception:  # noqa
+            app_version = None
+
+        if (
+            "version" not in data
+            or not isinstance(data.get("version"), str)
+            or not data["version"].strip()
+        ):
+            data["version"] = str(app_version or "0.0.0")
             changed = True
 
         # translator (canonical only) — DeepL/Off only

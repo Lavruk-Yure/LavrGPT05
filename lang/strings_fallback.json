@@ -3200,46 +3200,62 @@
     "en": "Cancel"
   },
 
-  "SettingsPageLicense.statusUpdateRequired": {
-    "uk": "Потрібне оновлення",
-    "pl": "Wymagana aktualizacja",
-    "en": "Update required"
-  },
-  "SettingsPageLicense.statusProOk": {
-    "uk": "Ліцензія активна",
-    "pl": "Licencja aktywna",
-    "en": "Active"
-  },
   "SettingsPageLicense.statusTrialOk": {
     "uk": "Пробний період активний",
+    "en": "Trial active",
     "pl": "Okres próbny aktywny",
-    "en": "Trial active"
+    "de": "Testzeit aktiv"
   },
   "SettingsPageLicense.statusTrialExpired": {
     "uk": "Пробний період завершено",
+    "en": "Trial expired",
     "pl": "Okres próbny zakończony",
-    "en": "Trial expired"
+    "de": "Testzeit abgelaufen"
+  },
+  "SettingsPageLicense.statusProOk": {
+    "uk": "Ліцензія активна",
+    "en": "License active",
+    "pl": "Licencja aktywna",
+    "de": "Lizenz aktiv"
   },
   "SettingsPageLicense.statusProLimited": {
     "uk": "Ліцензія обмежена",
+    "en": "License limited",
     "pl": "Licencja ograniczona",
-    "en": "Limited"
+    "de": "Lizenz eingeschränkt"
+  },
+  "SettingsPageLicense.statusUpdateRequired": {
+    "uk": "Потрібне оновлення",
+    "en": "Update required",
+    "pl": "Wymagana aktualizacja",
+    "de": "Update erforderlich"
   },
   "SettingsPageLicense.statusExpired": {
-    "uk": "Ліцензія завершилась",
+    "uk": "Ліцензія прострочена",
+    "en": "License expired",
     "pl": "Licencja wygasła",
-    "en": "Expired"
+    "de": "Lizenz abgelaufen"
   },
   "SettingsPageLicense.statusOtherMachine": {
     "uk": "Інша машина",
+    "en": "Other machine",
     "pl": "Inny komputer",
-    "en": "Other machine"
+    "de": "Anderer Rechner"
   },
   "SettingsPageLicense.statusTampered": {
-    "uk": "Пошкоджено ліцензію",
-    "pl": "Uszkodzona licencja",
-    "en": "Tampered"
+    "uk": "Пошкоджено або підроблено",
+    "en": "Tampered",
+    "pl": "Naruszona / podrobiona",
+    "de": "Manipuliert"
   },
+
+  "SettingsPageLicense.msgHintPasteAndActivate": {
+    "uk": "Вставте ліцензійний ключ і натисніть «Активувати».",
+    "en": "Paste the license key and click “Activate”.",
+    "pl": "Wklej klucz licencyjny i kliknij „Aktywuj”."
+  },
+
+
 
   "translated_languages": [
     "ar",
