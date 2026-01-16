@@ -49,6 +49,7 @@ secrets.json
 LGE05.conf
 LGE05.conf.bad
 tokens*.json
+LGE05_plain.json
 Session/
 
 #private key

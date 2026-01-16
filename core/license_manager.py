@@ -28,7 +28,7 @@ from typing import Any, Dict, Optional
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-DEBUG_LICENSE_MANAGER = True
+DEBUG_LICENSE_MANAGER = False
 
 logger = logging.getLogger(__name__)
 if not logger.handlers:

@@ -49,7 +49,7 @@ class AITranslator:
         global DEBUG_AI_TRANSLATOR
         env_dbg = (os.getenv("LGE05_AI_TRANSLATOR_DEBUG") or "").strip()
         if env_dbg in ("1", "true", "True", "yes", "YES"):
-            DEBUG_AI_TRANSLATOR = True
+            DEBUG_AI_TRANSLATOR = False
 
         tr_conf = conf.get("translator", {}) if isinstance(conf, dict) else {}
         if not isinstance(tr_conf, dict):

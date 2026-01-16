@@ -3255,7 +3255,50 @@
     "pl": "Wklej klucz licencyjny i kliknij „Aktywuj”."
   },
 
+  "StatusBar.full": {
+    "uk": "Повний",
+    "en": "Full" },
+  "StatusBar.orders": {
+    "uk": "Ордера",
+    "en": "Orders" },
+  "StatusBar.daysShort": {
+    "uk": "дн",
+    "en": "d" },
+  "StatusBar.infinity":
+  { "uk": "∞",
+    "en": "∞" },
 
+  "StatusBar.active": {
+    "uk": "активна",
+    "en": "active" },
+  "StatusBar.limited": {
+    "uk": "обмежено",
+    "en": "limited" },
+  "StatusBar.updateRequired": {
+    "uk": "Потрібне оновлення",
+    "en": "UPDATE REQUIRED" },
+  "StatusBar.noLicense": {
+    "uk": "Ліцензії немає",
+    "en": "NO LICENSE" },
+
+  "StatusBar.orderModeAuto": {
+    "uk": "АВТО",
+    "en": "AUTO" },
+  "StatusBar.orderModeManual": {
+    "uk": "РУЧНИЙ",
+    "en": "MANUAL" },
+  "StatusBar.orderModeSemi": {
+    "uk": "НАПІВАВТО",
+    "en": "SEMI-AUTO" },
+  "StatusBar.versionPrefix": {
+    "uk": "V",
+    "en": "V"},
+  "StatusBar.otherMachine": {
+    "uk": "ІНШИЙ ПК",
+    "en": "OTHER PC"},
+  "StatusBar.notAvailable": {
+    "uk": "—",
+    "en": "—"},
 
   "translated_languages": [
     "ar",

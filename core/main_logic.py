@@ -1,4 +1,5 @@
 # main_logic.py
+# -*- coding: utf-8 -*-
 """
 core/main_logic.py — головне робоче вікно LGE05.
 
@@ -7,10 +8,12 @@ core/main_logic.py — головне робоче вікно LGE05.
     Вихід внизу
 - центральна область зі сторінками (поки плейсхолдери)
 - toolbar (ті самі дії)
-- statusBar (показує назву активної сторінки)
+- statusBar:
+    - зліва: назва активної сторінки
+    - справа: LGE vX.Y.Z | ліцензія | Full | Orders (кольори)
 - UITranslator + глобальний LANG
 
-Patch: toolbar hover + правильний порядок меню
+Patch: statusbar segments + license summary (RoadMap20)
 """
 
 from __future__ import annotations
@@ -29,8 +32,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core import session_state
 from core.about_dialog import AboutDialog
 from core.lang_manager import LANG
+from core.license_manager import LicenseManager
 from core.settings_center import SettingsCenter
 from core.ui_translator import UITranslator
 from ui.ui_main_app import Ui_MainAppWindow
@@ -252,6 +257,10 @@ QToolButton#tbExit:pressed {
         self._ui_translator.apply(self)
         log_cp("init_done", lang=self._lang_mgr.current_language)
 
+        # Statusbar widgets (праворуч)
+        self._init_statusbar()
+        self._update_statusbar()
+
         # Стартова сторінка
         self._switch_page(self.page_monitoring)
 
@@ -268,13 +277,18 @@ QToolButton#tbExit:pressed {
             except Exception:  # noqa
                 title = ""
 
+        # ліва частина statusbar
         self.ui.statusBarMain.showMessage(title or " ")
+        # права частина statusbar
+        self._update_statusbar()
+
         log_cp("switch", title=title)
 
     # ------------------------------------------------------------------
     def apply_translation(self) -> None:
         """Повторно застосувати переклад до цього вікна."""
         self._ui_translator.apply(self)
+        self._update_statusbar()
         log_cp("retranslated", lang=self._lang_mgr.current_language)
 
     # ------------------------------------------------------------------
@@ -282,8 +296,229 @@ QToolButton#tbExit:pressed {
         """Відкрити діалог налаштувань."""
         dlg = SettingsCenter(self)
         dlg.exec()
+        # після закриття налаштувань ліцензія/режими могли змінитись
+        self._update_statusbar()
 
     def _open_about_dialog(self) -> None:
         """Відкрити діалог 'Про програму'."""
         dlg = AboutDialog(self)
         dlg.exec()
+
+    # =========================================================
+    # STATUSBAR (right side)
+    # =========================================================
+    def _tr(self, key: str, fallback: str) -> str:
+        try:
+            s = self._lang_mgr.resolve(key)
+        except Exception:  # noqa
+            return fallback
+        return s if isinstance(s, str) and s else fallback
+
+    def _init_statusbar(self) -> None:
+        sb = self.ui.statusBarMain
+        sb.clearMessage()
+
+        self._sb_app = QLabel("")
+        self._sb_lic = QLabel("")
+        self._sb_full = QLabel("")
+        self._sb_orders = QLabel("")
+
+        self._sb_sep1 = QLabel(" | ")
+        self._sb_sep2 = QLabel(" | ")
+        self._sb_sep3 = QLabel(" | ")
+
+        # базово сірий, але далі будемо фарбувати сегменти
+        grey = "lightgray"
+        for w in (
+            self._sb_app,
+            self._sb_sep1,
+            self._sb_lic,
+            self._sb_sep2,
+            self._sb_full,
+            self._sb_sep3,
+            self._sb_orders,
+        ):
+            w.setStyleSheet(f"color: {grey};")
+
+        sb.addPermanentWidget(self._sb_app)
+        sb.addPermanentWidget(self._sb_sep1)
+        sb.addPermanentWidget(self._sb_lic)
+        sb.addPermanentWidget(self._sb_sep2)
+        sb.addPermanentWidget(self._sb_full)
+        sb.addPermanentWidget(self._sb_sep3)
+        sb.addPermanentWidget(self._sb_orders)
+
+    def _update_statusbar(self) -> None:
+        # --- defaults ---
+        version = "0.0.0"
+        status = "NO_LICENSE"
+        edition = "free"
+
+        days_left_num: int | None = None
+        days_left_text = "?"
+
+        order_mode_key = "StatusBar.orderModeManual"
+
+        conf_obj = session_state.CURRENT_CONFIG
+        if conf_obj is not None:
+            conf = conf_obj.to_dict()
+            version = str(conf.get("version") or "0.0.0")
+
+            # compute -> щоб конфіг був актуальний (але показ читаємо з conf)
+
+            try:
+                days_used = int(
+                    LicenseManager.compute_and_update(
+                        conf, app_version=version
+                    ).days_used
+                )
+            except Exception:  # noqa
+                days_used = 0
+
+            lic = conf.get("license", {}) if isinstance(conf, dict) else {}
+            if isinstance(lic, dict):
+                status = str(lic.get("status") or status)
+                edition = str(lic.get("edition") or edition)
+                policy = lic.get("trial_policy") or {}
+            else:
+                policy = {}
+
+            # orders mode (поки умовно)
+            if status == "PRO_OK":
+                order_mode_key = "StatusBar.orderModeAuto"
+            else:
+                order_mode_key = "StatusBar.orderModeManual"
+
+            # limits
+            auto_days = policy.get("auto_preview_days")
+            pro_days = policy.get("pro_full_days")
+            proplus_days = policy.get("proplus_full_days")  # None => безліміт
+
+            # days_left (AUTO = full)
+            if status in ("UPDATE_REQUIRED", "TAMPERED", "EXPIRED"):
+                days_left_text = "?"
+                days_left_num = None
+            elif status == "OTHER_MACHINE":
+                days_left_text = self._tr("StatusBar.notAvailable", "—")
+                days_left_num = None
+            elif edition == "pro_plus" or (
+                edition.upper() in ("PRO+", "PRO_PLUS") and proplus_days is None
+            ):
+                days_left_text = self._tr("StatusBar.infinity", "∞")
+                days_left_num = None
+            elif edition == "pro":
+                if isinstance(pro_days, int):
+                    days_left_num = max(0, int(pro_days) - days_used)
+                    days_left_text = str(days_left_num)
+                else:
+                    days_left_text = "?"
+                    days_left_num = None
+            else:
+                # free/trial
+                if isinstance(auto_days, int):
+                    days_left_num = max(0, int(auto_days) - days_used)
+                    days_left_text = str(days_left_num)
+                else:
+                    days_left_text = "?"
+                    days_left_num = None
+
+        # --- texts ---
+        # App/version
+        v_prefix = self._tr("StatusBar.versionPrefix", "V")  # ти хотів велике V
+        self._sb_app.setText(f"LGE {v_prefix}{version}")
+
+        # License
+        self._sb_lic.setText(self._statusbar_license_text(status, edition))
+
+        # Full
+        full_label = self._tr("StatusBar.full", "Full")
+        days_short = self._tr("StatusBar.daysShort", "d")
+
+        if days_left_text.isdigit():
+            full_text = f"{full_label}: {days_left_text}{days_short}"
+        else:
+            full_text = f"{full_label}: {days_left_text}"
+
+        self._sb_full.setText(full_text)
+
+        # Orders
+        orders_label = self._tr("StatusBar.orders", "Orders")
+        orders_mode = self._tr(order_mode_key, "MANUAL")
+        self._sb_orders.setText(f"{orders_label}: {orders_mode}")
+
+        # --- colors ---
+        self._apply_statusbar_colors(
+            status=status,
+            days_left_num=days_left_num,
+            days_left_text=days_left_text,
+            order_mode_key=order_mode_key,
+        )
+
+    def _statusbar_license_text(self, status: str, edition: str) -> str:
+        # edition label (як у твоїх прикладах)
+        if edition == "pro_plus":
+            ed = "PRO+"
+        elif edition == "pro":
+            ed = "PRO"
+        elif edition == "free":
+            ed = "TRIAL"
+        else:
+            ed = edition.upper() if edition else "TRIAL"
+
+        if status in ("PRO_OK", "TRIAL_OK"):
+            st = self._tr("StatusBar.active", "active")
+            return f"{ed} {st}"
+
+        if status == "PRO_LIMITED":
+            st = self._tr("StatusBar.limited", "limited")
+            return f"{ed} {st}"
+
+        if status == "UPDATE_REQUIRED":
+            return self._tr("StatusBar.updateRequired", "UPDATE REQUIRED")
+
+        if status == "OTHER_MACHINE":
+            return self._tr("StatusBar.otherMachine", "OTHER PC")
+
+        if status == "NO_LICENSE":
+            return self._tr("StatusBar.noLicense", "NO LICENSE")
+
+        # fallback
+        return status or self._tr("StatusBar.noLicense", "NO LICENSE")
+
+    def _apply_statusbar_colors(
+        self,
+        *,
+        status: str,
+        days_left_num: int | None,
+        days_left_text: str,
+        order_mode_key: str,
+    ) -> None:
+        # base
+        self._sb_app.setStyleSheet("color: lightgray;")
+        self._sb_lic.setStyleSheet("color: lightgray;")
+        self._sb_full.setStyleSheet("color: lightgray;")
+        self._sb_orders.setStyleSheet("color: orange;")
+
+        # License state highlight
+        if status in ("UPDATE_REQUIRED", "OTHER_MACHINE", "TAMPERED", "EXPIRED"):
+            self._sb_lic.setStyleSheet("color: salmon;")
+        elif status in ("PRO_OK", "TRIAL_OK"):
+            self._sb_lic.setStyleSheet("color: lightgreen;")
+
+        # Full highlight
+        inf = self._tr("StatusBar.infinity", "∞")
+        if days_left_text == inf:
+            self._sb_full.setStyleSheet("color: lightgreen;")
+        elif days_left_num is not None:
+            self._sb_full.setStyleSheet(
+                "color: lightgreen;" if days_left_num > 0 else "color: salmon;"
+            )
+        else:
+            # "?" або "—"
+            self._sb_full.setStyleSheet("color: lightgray;")
+
+        # Orders: AUTO green, others orange
+        if order_mode_key == "StatusBar.orderModeAuto":
+            self._sb_orders.setStyleSheet("color: lightgreen;")
+        else:
+            self._sb_orders.setStyleSheet("color: orange;")
