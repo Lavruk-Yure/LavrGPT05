@@ -213,9 +213,12 @@ class Ui_LoginWindow(object):
 
         self.lblError = QLabel(self.rightPanel)
         self.lblError.setObjectName(u"lblError")
-        sizePolicy.setHeightForWidth(self.lblError.sizePolicy().hasHeightForWidth())
-        self.lblError.setSizePolicy(sizePolicy)
-        self.lblError.setMaximumSize(QSize(600, 20))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.lblError.sizePolicy().hasHeightForWidth())
+        self.lblError.setSizePolicy(sizePolicy1)
+        self.lblError.setMaximumSize(QSize(600, 40))
         font2 = QFont()
         font2.setFamilies([u"Segoe UI"])
         font2.setPointSize(10)
@@ -223,6 +226,7 @@ class Ui_LoginWindow(object):
         font2.setItalic(False)
         self.lblError.setFont(font2)
         self.lblError.setStyleSheet(u"font: 10pt \"Segoe UI\";")
+        self.lblError.setWordWrap(True)
 
         self.verticalLayout_2.addWidget(self.lblError)
 

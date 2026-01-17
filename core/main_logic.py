@@ -289,6 +289,10 @@ QToolButton#tbExit:pressed {
         """Повторно застосувати переклад до цього вікна."""
         self._ui_translator.apply(self)
         self._update_statusbar()
+        cur = self.stacked.currentWidget()
+        if cur is not None:
+            self._switch_page(cur)
+
         log_cp("retranslated", lang=self._lang_mgr.current_language)
 
     # ------------------------------------------------------------------
@@ -347,6 +351,8 @@ QToolButton#tbExit:pressed {
         sb.addPermanentWidget(self._sb_full)
         sb.addPermanentWidget(self._sb_sep3)
         sb.addPermanentWidget(self._sb_orders)
+
+        self.ui.statusBarMain.setStyleSheet("QStatusBar::item { border: none; }")
 
     def _update_statusbar(self) -> None:
         # --- defaults ---

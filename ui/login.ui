@@ -396,7 +396,7 @@ QLabel#lblError {
          <item>
           <widget class="QLabel" name="lblError">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -404,7 +404,7 @@ QLabel#lblError {
            <property name="maximumSize">
             <size>
              <width>600</width>
-             <height>20</height>
+             <height>40</height>
             </size>
            </property>
            <property name="font">
@@ -420,6 +420,9 @@ QLabel#lblError {
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

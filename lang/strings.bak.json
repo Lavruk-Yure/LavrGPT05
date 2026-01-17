@@ -1,32 +1,8 @@
 {
   "lang_active": {
-    "code": "pl"
+    "code": "hi"
   },
-  "SettingsPageLicense.lblEditionTitle": {
-    "pl": "Wydanie:"
-  },
-  "SettingsPageLicense.lblDaysTitle": {
-    "pl": "Wykorzystane dni:"
-  },
-  "SettingsPageLicense.lblMachineTitle": {
-    "pl": "Maszyna:"
-  },
-  "SettingsPageLicense.lblSourceTitle": {
-    "pl": "Źródło:"
-  },
-  "SettingsPageLicense.lblActivatedTitle": {
-    "pl": "Aktywowany:"
-  },
-  "SettingsPageLicense.lblKeyTitle": {
-    "pl": "Klucz licencyjny:"
-  },
-  "SettingsPageLicense.editLicenseKey.placeholder": {
-    "pl": "Wklej LICENSE_KEY"
-  },
-  "SettingsPageLicense.btnActivate": {
-    "pl": "Aktywuj"
-  },
-  "SettingsPageLicense.btnCopyDiag": {
-    "pl": "Diagnostyka kopiowania"
+  "Common.btnCancel": {
+    "hi": "रद्द करें"
   }
 }

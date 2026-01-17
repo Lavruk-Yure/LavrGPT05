@@ -27,7 +27,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
-DELETE_UNUSED = False  # True = видаляти ключі з fallback, яких нема у проекті
+# ВАЖЛИВО:
+# - fallback не має “роздуватися” копіями en у всі мови.
+# - старі «автозаповнені» значення (lang -> те саме, що en) чистимо.
+# - ключі, яких нема у проекті (py + ui), видаляємо ЗАВЖДИ.
+DELETE_UNUSED = True
 
 
 META_KEYS = {"languages", "translated_languages", "lang_active"}
@@ -104,6 +108,45 @@ def is_translation_map(value: object) -> bool:
     return True
 
 
+def clean_translation_map(trans: dict[str, str]) -> int:
+    """
+    Чистить «старий стиль» fallback:
+    - прибирає порожні значення
+    - прибирає значення, які дорівнюють en (типовий автокопіпаст)
+
+    Повертає кількість видалених елементів.
+
+    Правило просте й чесне:
+    - en та uk залишаємо завжди (навіть якщо вони збігаються)
+    - інші мови лишаємо тільки якщо рядок не порожній і не дорівнює en
+    """
+    removed = 0
+
+    en_text = trans.get("en") if isinstance(trans.get("en"), str) else None
+
+    # 1) прибрати порожні
+    for lang in list(trans.keys()):
+        v = trans.get(lang)
+        if not isinstance(v, str):
+            trans.pop(lang, None)
+            removed += 1
+            continue
+        if lang not in ("en", "uk") and not v.strip():
+            trans.pop(lang, None)
+            removed += 1
+
+    # 2) прибрати «копію з en» (крім en/uk)
+    if en_text is not None:
+        for lang in list(trans.keys()):
+            if lang in ("en", "uk"):
+                continue
+            if trans.get(lang) == en_text:
+                trans.pop(lang, None)
+                removed += 1
+
+    return removed
+
+
 def format_translations(trans: dict, langs: Iterable[str] | None = None) -> str:
     """
     Форматує переклади в один рядок для консолі.
@@ -127,7 +170,6 @@ def format_translations(trans: dict, langs: Iterable[str] | None = None) -> str:
     if not items:
         return "<порожньо>"
 
-    # Не робимо “гарного” форматування — просто чесно показуємо.
     parts = [f"{k}={repr(v)}" for k, v in items]
     return "; ".join(parts)
 
@@ -156,21 +198,19 @@ def collect_used_keys(root: Path) -> set[str]:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except Exception:  # noqa
             continue
-        # LANG.resolve("Key") / LANG.resolve('Key')
+
         marker = "LANG.resolve("
         if marker in text:
-            # Проста, але надійна витяжка по лапках
             for q in ('"', "'"):
                 parts = text.split(marker)
                 for part in parts[1:]:
-                    # part починається з: "Key")...
                     if part.startswith(q):
                         end = part.find(q, 1)
                         if end > 1:
                             key = part[1:end].strip()
                             if "." in key:
                                 used.add(normalize_key(key))
-        # _lang_mgr.resolve("Key") / .resolve("Key") (узагальнено)
+
         for marker in (".resolve(", "_t(", "self._t("):
             if marker not in text:
                 continue
@@ -184,7 +224,6 @@ def collect_used_keys(root: Path) -> set[str]:
                             if "." in key:
                                 used.add(normalize_key(key))
 
-        # [Key]
         parts = text.split("[")
         for part in parts[1:]:
             if "]" not in part:
@@ -193,8 +232,6 @@ def collect_used_keys(root: Path) -> set[str]:
             if "." in key:
                 used.add(normalize_key(key))
 
-        # lang.t("Key") / lang.t('Key')
-        # простий парсер без regex (щоб не тягнути зайве)
         marker = "lang.t("
         pos = 0
         while True:
@@ -214,9 +251,8 @@ def collect_used_keys(root: Path) -> set[str]:
             key = text[start + 1 : end].strip()  # noqa
             if "." in key:
                 used.add(normalize_key(key))
-
             pos = end + 1
-        # --- ГЛОБАЛЬНИЙ збір для Python: усі "...." та '....' з фільтром по крапці
+
         for q in ('"', "'"):
             segs = text.split(q)
             for i in range(1, len(segs), 2):
@@ -229,14 +265,13 @@ def collect_used_keys(root: Path) -> set[str]:
                     if 3 <= len(s) <= 200 and s[0].isalpha():
                         used.add(normalize_key(s))
 
-    # ---- 2) UI: *.ui (XML). Шукаємо ключі як "[Key]" та як "Key" у лапках.
+    # ---- 2) UI: *.ui
     for path in root.rglob("*.ui"):
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except Exception:  # noqa
             continue
 
-        # [Key] у .ui
         parts = text.split("[")
         for part in parts[1:]:
             if "]" not in part:
@@ -245,11 +280,8 @@ def collect_used_keys(root: Path) -> set[str]:
             if "." in key:
                 used.add(normalize_key(key))
 
-        # Витягнути всі "...." та '....' і фільтрувати по крапці
-        # (мінімальний захист від сміття)
         for q in ('"', "'"):
             segs = text.split(q)
-            # парні сегменти між лапками: 1,3,5...
             for i in range(1, len(segs), 2):
                 s = segs[i].strip()
                 if (
@@ -282,6 +314,7 @@ def main() -> None:
     print(f"[ШЛЯХ] STRINGS  = {strings_path}")
     print(f"[ШЛЯХ] FALLBACK = {fallback_path}")
     print(f"[ШЛЯХ] DELETE_LOG = {delete_log_path}")
+
     # ------------------------------------------------------------------
     # 1/6 Читання strings.json
     # ------------------------------------------------------------------
@@ -330,24 +363,37 @@ def main() -> None:
     print(f"[2/6] Злиття strings → fallback (оновлень: {merged_count})")
 
     # ------------------------------------------------------------------
-    # 3/6 Побудова translated_languages (тільки з перекладних ключів)
+    # 3/6 Побудова translated_languages (з languages, а не з ключів)
     # ------------------------------------------------------------------
     translated_languages: set[str] = set()
-
-    for key, value in fallback.items():
-        if key in META_KEYS:
-            continue
-        if is_translation_map(value):
-            translated_languages.update(value.keys())
+    languages_meta = fallback.get("languages")
+    if isinstance(languages_meta, dict):
+        for code in languages_meta.keys():
+            if isinstance(code, str) and code:
+                translated_languages.add(code)
 
     fallback["translated_languages"] = sorted(translated_languages)
-
     print(f"[3/6] translated_languages: {len(translated_languages)} мов")
 
     # ------------------------------------------------------------------
-    # 4/6 Нормалізація fallback (заповнення пропусків)
+    # 3.5/6 Чистка «старого стилю» fallback (копії en у всі мови)
     # ------------------------------------------------------------------
-    added_missing = 0
+    cleaned = 0
+    for key, value in fallback.items():
+        if key in META_KEYS:
+            continue
+        if not is_translation_map(value):
+            continue
+        trans: dict[str, str] = value  # type: ignore[assignment]
+        cleaned += clean_translation_map(trans)
+
+    if cleaned:
+        print(f"[3.5/6] Чистка fallback (видалено записів: {cleaned})")
+
+    # ------------------------------------------------------------------
+    # 4/6 Нормалізація fallback (НЕ роздуваємо ключі порожніми мовами)
+    # ------------------------------------------------------------------
+    added_minimal = 0
 
     for key, value in fallback.items():
         if key in META_KEYS:
@@ -359,30 +405,28 @@ def main() -> None:
         if not trans:
             continue
 
-        for lang in translated_languages:
-            if lang in trans:
-                continue
-
-            if "en" in trans:
-                trans[lang] = trans["en"]
-                src = "en"
-            else:
-                src = next(iter(trans.keys()))
-                trans[lang] = trans[src]
-
-            added_missing += 1
+        if "uk" not in trans:
+            trans["uk"] = ""
+            added_minimal += 1
             print(
-                f"ПОПЕРЕДЖЕННЯ: додано відсутню мову [{lang}] для ключа {key} "
-                f"(скопійовано з {src}) | {format_translations(trans)}"
+                f"ПОПЕРЕДЖЕННЯ: додано мінімальну мову [uk] для ключа {key} "
+                f"(порожньо) | {format_translations(trans)}"
             )
 
-    print(f"[4/6] Fallback нормалізовано (додано: {added_missing})")
+        if "en" not in trans:
+            trans["en"] = ""
+            added_minimal += 1
+            print(
+                f"ПОПЕРЕДЖЕННЯ: додано мінімальну мову [en] для ключа {key} "
+                f"(порожньо) | {format_translations(trans)}"
+            )
+
+    print(f"[4/6] Fallback нормалізовано мінімально (додано: {added_minimal})")
 
     # ------------------------------------------------------------------
     # 5/6 Очищення strings.json (тільки lang_active)
     # ------------------------------------------------------------------
     backup_json(strings_path, "strings.bak.json")
-
     write_json(strings_path, {"lang_active": {"code": active_lang}})
     print("[5/6] strings.json очищено (залишено тільки lang_active)")
 
@@ -398,18 +442,15 @@ def main() -> None:
             continue
         if not is_translation_map(value):
             continue
-
         if key not in used_keys:
             trans: dict[str, str] = value  # type: ignore[assignment]
             to_delete.append((key, trans))
 
-    # --- ДРУК кандидатів завжди (навіть коли DELETE_UNUSED=False)
     print(f"[QC] Кандидатів на видалення (нема у проекті): {len(to_delete)}")
     if to_delete:
         for k, tr in to_delete:
-            print(f"[QC?] {k} | {format_translations(tr, langs=('uk', 'en', 'da'))}")
+            print(f"[QC?] {k} | {format_translations(tr)}")
 
-    # --- Видалення тільки якщо перемикач увімкнено
     if DELETE_UNUSED and to_delete:
         backup_json(fallback_path, "strings_fallback.bak.json")
 
@@ -438,7 +479,7 @@ def main() -> None:
 
         print(f"[QC] Видалено ключів із fallback (нема у проекті): {len(to_delete)}")
     else:
-        print(f"[QC] Автовидалення вимкнено (DELETE_UNUSED = {DELETE_UNUSED})")
+        print("[QC] Нічого видаляти")
 
     # ------------------------------------------------------------------
     # 6/6 Запис fallback + компіляція ресурсу (опційно)
