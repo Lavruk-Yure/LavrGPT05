@@ -278,6 +278,41 @@ class LicenseManager:
 
         return True, "Activated"
 
+    @classmethod
+    def enable_trial(
+        cls,
+        conf: Dict[str, Any],
+        *,
+        now: Optional[datetime] = None,
+        app_version: Optional[str] = None,
+    ) -> LicenseResult:
+        """
+        Явно вмикає TRIAL для free.
+        ЄДИНЕ місце, яке має право ставити activated_at для free без ключа.
+        """
+        now = now or datetime.now(UTC)
+        lic = cls._ensure_license_block(conf)
+
+        # clear "paid" fields
+        lic["payload_b64"] = None
+        lic["signature_b64"] = None
+        lic["issued_at"] = None
+        lic["expires_at"] = None
+        lic["version_min"] = None
+        lic["source"] = None
+        lic["note"] = None
+
+        lic["edition"] = "free"
+        if not lic.get("machine_id"):
+            lic["machine_id"] = cls.compute_machine_id()
+
+        if not lic.get("activated_at"):
+            lic["activated_at"] = now.isoformat()
+
+        # після явного старту — одразу порахувати та зафіксувати статус
+        res = cls.compute_and_update(conf, now=now, app_version=app_version)
+        return res
+
     # -----------------------------
     # Machine ID (Variant 1)
     # -----------------------------
@@ -393,18 +428,20 @@ class LicenseManager:
         """
         edition = cls._norm_edition(lic.get("edition"))
 
-        # no key => free flow
-        has_key = isinstance(lic.get("payload_b64"), str) and isinstance(
-            lic.get("signature_b64"), str
-        )
+        if edition == "free":
+            activated = cls._parse_dt(lic.get("activated_at"))
+            if activated is None:
+                return cls.ST_NO_LICENSE, 0, False, None
 
-        # For free: always trial logic
-        if edition == "free" or not has_key:
-            days_used = cls._days_used(lic, now, set_if_missing=True)
+            days_used = cls._days_used(lic, now, set_if_missing=False)
             free_days = cls._policy_int(lic, "free_preview_days", 90)
+
             if days_used <= free_days:
                 return cls.ST_TRIAL_OK, days_used, False, None
+
             return cls.ST_TRIAL_EXPIRED, days_used, False, None
+
+        # Free без ключа:
 
         # Pro/Pro+: validate stored signature/payload (stub now)
         # NOTE: real signature check will be added in Patch 19.2b

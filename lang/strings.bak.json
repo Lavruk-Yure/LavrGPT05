@@ -1,8 +1,122 @@
 {
   "lang_active": {
-    "code": "hi"
+    "code": "es"
+  },
+  "LGE05.msg.bad_conf.text_restart_reregister": {
+    "es": "Reinicie el programa para volver a registrarse."
+  },
+  "AboutDialog.title": {
+    "es": "LGE05 - ATS"
+  },
+  "SettingsCenter.tree.license": {
+    "es": "Licencia"
+  },
+  "SettingsPageLicense.lblHeader": {
+    "es": "Licencia"
+  },
+  "SettingsPageLicense.lblStatusTitle": {
+    "es": "Estado:"
+  },
+  "SettingsPageLicense.lblEditionTitle": {
+    "es": "Edición:"
+  },
+  "SettingsPageLicense.lblDaysTitle": {
+    "es": "Días utilizados:"
+  },
+  "SettingsPageLicense.lblMachineTitle": {
+    "es": "Máquina:"
+  },
+  "SettingsPageLicense.lblSourceTitle": {
+    "es": "Fuente:"
+  },
+  "SettingsPageLicense.lblActivatedTitle": {
+    "es": "Activado:"
+  },
+  "SettingsPageLicense.lblKeyTitle": {
+    "es": "Llave de licencia:"
+  },
+  "SettingsPageLicense.editLicenseKey.placeholder": {
+    "es": "Pegar LICENSE_KEY"
+  },
+  "SettingsPageLicense.btnActivate": {
+    "es": "Activar"
+  },
+  "SettingsPageLicense.btnCopyDiag": {
+    "es": "Copiar diagnósticos"
+  },
+  "SettingsPageLicense.msgNotLoggedIn": {
+    "es": "No conectado."
+  },
+  "SettingsPageLicense.msgEmptyKey": {
+    "es": "Clave de licencia vacía."
+  },
+  "SettingsPageLicense.msgActivated": {
+    "es": "Activado."
+  },
+  "SettingsPageLicense.msgSaveFailed": {
+    "es": "Activado, pero no ha podido guardar la configuración."
+  },
+  "SettingsPageLicense.msgDiagCopied": {
+    "es": "Diagnóstico copiado en el portapapeles."
   },
   "Common.btnCancel": {
-    "hi": "रद्द करें"
+    "es": "Cancelar"
+  },
+  "SettingsPageLicense.statusTrialOk": {
+    "es": "Juicio activo"
+  },
+  "SettingsPageLicense.statusTrialExpired": {
+    "es": "Prueba caducada"
+  },
+  "SettingsPageLicense.statusProOk": {
+    "es": "Licencia activa"
+  },
+  "SettingsPageLicense.statusProLimited": {
+    "es": "Licencia limitada"
+  },
+  "SettingsPageLicense.statusUpdateRequired": {
+    "es": "Actualización necesaria"
+  },
+  "SettingsPageLicense.statusExpired": {
+    "es": "Licencia caducada"
+  },
+  "SettingsPageLicense.statusOtherMachine": {
+    "es": "Otra máquina"
+  },
+  "SettingsPageLicense.statusTampered": {
+    "es": "Manipulado"
+  },
+  "StatusBar.full": {
+    "es": "Completo"
+  },
+  "StatusBar.orders": {
+    "es": "Pedidos"
+  },
+  "StatusBar.active": {
+    "es": "activo"
+  },
+  "StatusBar.limited": {
+    "es": "limitado"
+  },
+  "StatusBar.updateRequired": {
+    "es": "ACTUALIZACIÓN REQUERIDA"
+  },
+  "StatusBar.noLicense": {
+    "es": "SIN LICENCIA"
+  },
+  "StatusBar.otherMachine": {
+    "es": "OTROS PC"
+  },
+  "StatusBar.notAvailable": {
+    "es": "-"
+  },
+  "SettingsPageLicense.btnEnableTrial": {
+    "es": "Activar modo TRIAL"
+  },
+  "SettingsPageLicense.msgTrialInfo": {
+    "es": "PRUEBA: 90 días de funcionalidad casi completa (sólo cuentas demo)."
+  },
+  "SettingsPageLicense.msgTrialEnabled": {
+    "es": "Prueba activada."
   }
 }

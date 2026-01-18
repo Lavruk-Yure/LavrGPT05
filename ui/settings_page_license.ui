@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>388</height>
+    <width>746</width>
+    <height>398</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,40 +140,68 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="lblActivationInfo">
-     <property name="styleSheet">
-      <string notr="true">color: lightgray;</string>
-     </property>
-     <property name="text">
-      <string>[SettingsPageLicense.lblActivationInfo]</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QPushButton" name="btnActivate">
+      <widget class="QLabel" name="lblActivationInfo">
+       <property name="styleSheet">
+        <string notr="true">color: lightgray;</string>
+       </property>
        <property name="text">
-        <string>[SettingsPageLicense.btnActivate]</string>
+        <string>[SettingsPageLicense.lblActivationInfo]</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCopyDiag">
-       <property name="text">
-        <string>[SettingsPageLicense.btnCopyDiag]</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayoutRow1">
+       <item>
+        <widget class="QPushButton" name="btnEnableTrial">
+         <property name="text">
+          <string>[SettingsPageLicense.btnEnableTrial]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnActivate">
+         <property name="text">
+          <string>[SettingsPageLicense.btnActivate]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnCopyDiag">
+         <property name="text">
+          <string>[SettingsPageLicense.btnCopyDiag]</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCancel">
-       <property name="text">
-        <string>[Common.btnCancel]</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayoutRow2">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnCancel">
+         <property name="text">
+          <string>[Common.btnCancel]</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

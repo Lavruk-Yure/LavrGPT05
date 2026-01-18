@@ -16,15 +16,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFormLayout, QHBoxLayout, QLabel,
-    QPlainTextEdit, QPushButton, QSizePolicy, QVBoxLayout,
-    QWidget)
+    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_pageLicense(object):
     def setupUi(self, pageLicense):
         if not pageLicense.objectName():
             pageLicense.setObjectName(u"pageLicense")
-        pageLicense.resize(539, 388)
+        pageLicense.resize(746, 398)
         icon = QIcon()
         icon.addFile(u":/icons/lge_perplexity2_24x24.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         pageLicense.setWindowIcon(icon)
@@ -113,32 +113,51 @@ class Ui_pageLicense(object):
 
         self.verticalLayout.addLayout(self.formLayout)
 
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.lblActivationInfo = QLabel(pageLicense)
         self.lblActivationInfo.setObjectName(u"lblActivationInfo")
         self.lblActivationInfo.setStyleSheet(u"color: lightgray;")
         self.lblActivationInfo.setWordWrap(True)
 
-        self.verticalLayout.addWidget(self.lblActivationInfo)
+        self.verticalLayout_2.addWidget(self.lblActivationInfo)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayoutRow1 = QHBoxLayout()
+        self.horizontalLayoutRow1.setObjectName(u"horizontalLayoutRow1")
+        self.btnEnableTrial = QPushButton(pageLicense)
+        self.btnEnableTrial.setObjectName(u"btnEnableTrial")
+
+        self.horizontalLayoutRow1.addWidget(self.btnEnableTrial)
+
         self.btnActivate = QPushButton(pageLicense)
         self.btnActivate.setObjectName(u"btnActivate")
 
-        self.horizontalLayout.addWidget(self.btnActivate)
+        self.horizontalLayoutRow1.addWidget(self.btnActivate)
 
         self.btnCopyDiag = QPushButton(pageLicense)
         self.btnCopyDiag.setObjectName(u"btnCopyDiag")
 
-        self.horizontalLayout.addWidget(self.btnCopyDiag)
+        self.horizontalLayoutRow1.addWidget(self.btnCopyDiag)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayoutRow1)
+
+        self.horizontalLayoutRow2 = QHBoxLayout()
+        self.horizontalLayoutRow2.setObjectName(u"horizontalLayoutRow2")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayoutRow2.addItem(self.horizontalSpacer)
 
         self.btnCancel = QPushButton(pageLicense)
         self.btnCancel.setObjectName(u"btnCancel")
 
-        self.horizontalLayout.addWidget(self.btnCancel)
+        self.horizontalLayoutRow2.addWidget(self.btnCancel)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout_2.addLayout(self.horizontalLayoutRow2)
+
+
+        self.verticalLayout.addLayout(self.verticalLayout_2)
 
 
         self.retranslateUi(pageLicense)
@@ -164,6 +183,7 @@ class Ui_pageLicense(object):
         self.lblKeyTitle.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.lblKeyTitle]", None))
         self.editLicenseKey.setPlaceholderText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.editLicenseKey.placeholder]", None))
         self.lblActivationInfo.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.lblActivationInfo]", None))
+        self.btnEnableTrial.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.btnEnableTrial]", None))
         self.btnActivate.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.btnActivate]", None))
         self.btnCopyDiag.setText(QCoreApplication.translate("pageLicense", u"[SettingsPageLicense.btnCopyDiag]", None))
         self.btnCancel.setText(QCoreApplication.translate("pageLicense", u"[Common.btnCancel]", None))

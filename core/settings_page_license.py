@@ -64,6 +64,10 @@ class SettingsPageLicense(QWidget):
         self.ui.btnActivate.clicked.connect(self._on_activate)
         self.ui.btnCopyDiag.clicked.connect(self._on_copy_diag)
         self.ui.btnCancel.clicked.connect(self._on_cancel)
+        self.ui.btnEnableTrial.clicked.connect(self._on_enable_trial)
+
+        # старт: ховаємо, покажемо в refresh() якщо треба
+        self.ui.btnEnableTrial.setVisible(False)
 
         self.refresh()
 
@@ -82,6 +86,8 @@ class SettingsPageLicense(QWidget):
         status_raw = str(res.status)
         edition_raw = str(res.edition)
 
+        self.ui.btnEnableTrial.setVisible(status_raw == "NO_LICENSE")
+
         status_ui = self._status_text(status_raw)
         edition_ui = edition_raw
         days_used = str(res.days_used)
@@ -97,6 +103,15 @@ class SettingsPageLicense(QWidget):
         )
 
         # нижній рядок — тільки за статусом, або нейтральне
+        if status_raw == "NO_LICENSE":
+            self._set_info(
+                self._tr(
+                    "SettingsPageLicense.msgTrialInfo",
+                    "TRIAL: 90 days of near-full functionality (demo accounts only).",
+                ),
+                kind="info",
+            )
+
         if status_raw == "PRO_OK":
             self._set_info(
                 self._tr("SettingsPageLicense.msgActivated", "Activated."), kind="ok"
@@ -276,7 +291,6 @@ class SettingsPageLicense(QWidget):
         return s if isinstance(s, str) and s else fallback
 
     def _set_info(self, text: str, *, kind: str = "info") -> None:
-        # kind: info / ok / err
         if kind == "ok":
             self.ui.lblActivationInfo.setStyleSheet("color: lightgreen;")
         elif kind == "err":
@@ -284,11 +298,11 @@ class SettingsPageLicense(QWidget):
         else:
             self.ui.lblActivationInfo.setStyleSheet("color: lightgray;")
 
-        # якщо прилетів ключ у форматі [Key] — перекладаємо
-        s = text.strip()
+        s = (text or "").strip()
         if s.startswith("[") and s.endswith("]") and len(s) > 2:
             key = s[1:-1].strip()
-            text = self._tr(key, "")  # у тебе в fallback для lblActivationInfo якраз ""
+            text = self._tr(key, text)
+
         self.ui.lblActivationInfo.setText(text)
 
     def _on_cancel(self) -> None:
@@ -324,3 +338,36 @@ class SettingsPageLicense(QWidget):
             ),
             kind="info",
         )
+
+    def _on_enable_trial(self) -> None:
+        if (
+            session_state.CURRENT_CONFIG is None
+            or session_state.CURRENT_PASSWORD is None
+        ):
+            self._set_info(
+                self._tr("SettingsPageLicense.msgNotLoggedIn", "Not logged in."),
+                kind="err",
+            )
+            return
+
+        conf = session_state.CURRENT_CONFIG.to_dict()
+        app_version = str(conf.get("version") or "0.0.0")
+
+        try:
+            LicenseManager.enable_trial(conf, app_version=app_version)
+            ConfigManager(ROOT_CONF_PATH).save(conf, session_state.CURRENT_PASSWORD)
+            session_state.CURRENT_CONFIG = ConfigManager(ROOT_CONF_PATH).load(
+                session_state.CURRENT_PASSWORD
+            )
+        except Exception:  # noqa
+            self._set_info(
+                self._tr("SettingsPageLicense.msgSaveFailed", "Failed to save config."),
+                kind="err",
+            )
+            return
+
+        self._set_info(
+            self._tr("SettingsPageLicense.msgTrialEnabled", "TRIAL enabled."),
+            kind="ok",
+        )
+        self.refresh()

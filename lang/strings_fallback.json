@@ -2243,7 +2243,8 @@
     "sl": "Ponovno zaženite program, da se ponovno registrirate.",
     "sv": "Starta om programmet för att registrera dig på nytt.",
     "tr": "Yeniden kaydetmek için programı yeniden başlatın.",
-    "sq": "Rinisni programin për t'u regjistruar përsëri."
+    "sq": "Rinisni programin për t'u regjistruar përsëri.",
+    "es": "Reinicie el programa para volver a registrarse."
   },
   "MainAppWindow.btnAbout": {
     "uk": "Про програму",
@@ -2359,7 +2360,8 @@
     "sk": "LGE05 - ATS",
     "sl": "LGE05 - ATS",
     "sv": "LGE05 - ATS",
-    "tr": "LGE05 - ATS"
+    "tr": "LGE05 - ATS",
+    "es": "LGE05 - ATS"
   },
   "AboutDialog.btnOk": {
     "en": "Ok",
@@ -2476,71 +2478,83 @@
   "SettingsCenter.tree.license": {
     "uk": "Ліцензія",
     "en": "License",
-    "hi": "लाइसेंस"
+    "hi": "लाइसेंस",
+    "es": "Licencia"
   },
   "SettingsPageLicense.lblHeader": {
     "uk": "Ліцензія",
     "en": "License",
-    "hi": "लाइसेंस"
+    "hi": "लाइसेंस",
+    "es": "Licencia"
   },
   "SettingsPageLicense.lblStatusTitle": {
     "uk": "Статус:",
     "en": "Status:",
-    "hi": "स्थिति:"
+    "hi": "स्थिति:",
+    "es": "Estado:"
   },
   "SettingsPageLicense.lblEditionTitle": {
     "uk": "Редакція:",
     "en": "Edition:",
     "hi": "संस्करण:",
-    "pl": "Wydanie:"
+    "pl": "Wydanie:",
+    "es": "Edición:"
   },
   "SettingsPageLicense.lblDaysTitle": {
     "uk": "Днів використання:",
     "en": "Days used:",
     "hi": "उपयोग किए गए दिन:",
-    "pl": "Wykorzystane dni:"
+    "pl": "Wykorzystane dni:",
+    "es": "Días utilizados:"
   },
   "SettingsPageLicense.lblMachineTitle": {
     "uk": "Машина:",
     "en": "Machine:",
     "hi": "मशीन:",
-    "pl": "Maszyna:"
+    "pl": "Maszyna:",
+    "es": "Máquina:"
   },
   "SettingsPageLicense.lblSourceTitle": {
     "uk": "Джерело:",
     "en": "Source:",
     "hi": "स्रोत:",
-    "pl": "Źródło:"
+    "pl": "Źródło:",
+    "es": "Fuente:"
   },
   "SettingsPageLicense.lblActivatedTitle": {
     "uk": "Активовано:",
     "en": "Activated:",
     "hi": "सक्रिय:",
-    "pl": "Aktywowany:"
+    "pl": "Aktywowany:",
+    "es": "Activado:"
   },
   "SettingsPageLicense.lblKeyTitle": {
     "uk": "Ліцензійний ключ:",
     "en": "License key:",
     "hi": "लाइसेंस कुंजी:",
-    "pl": "Klucz licencyjny:"
+    "pl": "Klucz licencyjny:",
+    "es": "Llave de licencia:"
   },
   "SettingsPageLicense.editLicenseKey.placeholder": {
     "uk": "Вставте LICENSE_KEY",
     "en": "Paste LICENSE_KEY",
     "hi": "लाइसेंस कुंजी चिपकाएँ",
-    "pl": "Wklej LICENSE_KEY"
+    "pl": "Wklej LICENSE_KEY",
+    "es": "Pegar LICENSE_KEY"
   },
   "SettingsPageLicense.btnActivate": {
     "uk": "Активувати",
     "en": "Activate",
     "hi": "सक्रिय करें",
-    "pl": "Aktywuj"
+    "pl": "Aktywuj",
+    "es": "Activar"
   },
   "SettingsPageLicense.btnCopyDiag": {
     "uk": "Скопіювати діагностику",
     "en": "Copy diagnostics",
     "hi": "निदान की प्रतिलिपि",
-    "pl": "Diagnostyka kopiowania"
+    "pl": "Diagnostyka kopiowania",
+    "es": "Copiar diagnósticos"
   },
   "SettingsPageLicense.lblActivationInfo": {
     "en": "",
@@ -2550,31 +2564,36 @@
     "en": "Not logged in.",
     "uk": "Не виконано вхід.",
     "de": "Nicht eingeloggt.",
-    "pl": "Niezalogowany."
+    "pl": "Niezalogowany.",
+    "es": "No conectado."
   },
   "SettingsPageLicense.msgEmptyKey": {
     "en": "Empty license key.",
     "uk": "Порожній ліцензійний ключ.",
     "de": "Leerer Lizenzschlüssel.",
-    "pl": "Pusty klucz licencyjny."
+    "pl": "Pusty klucz licencyjny.",
+    "es": "Clave de licencia vacía."
   },
   "SettingsPageLicense.msgActivated": {
     "en": "Activated.",
     "uk": "Активовано.",
     "de": "Aktiviert.",
-    "pl": "Aktywowany."
+    "pl": "Aktywowany.",
+    "es": "Activado."
   },
   "SettingsPageLicense.msgSaveFailed": {
     "en": "Activated, but failed to save config.",
     "uk": "Активовано, але не вдалося зберегти конфіг.",
     "de": "Aktiviert, aber die Konfiguration konnte nicht gespeichert werden.",
-    "pl": "Aktywowano, ale nie udało się zapisać konfiguracji."
+    "pl": "Aktywowano, ale nie udało się zapisać konfiguracji.",
+    "es": "Activado, pero no ha podido guardar la configuración."
   },
   "SettingsPageLicense.msgDiagCopied": {
     "en": "Diagnostics copied to clipboard.",
     "uk": "Діагностику скопійовано в буфер.",
     "de": "Diagnostik in die Zwischenablage kopiert.",
-    "pl": "Diagnostyka skopiowana do schowka."
+    "pl": "Diagnostyka skopiowana do schowka.",
+    "es": "Diagnóstico copiado en el portapapeles."
   },
   "Common.btnCancel": {
     "uk": "Скасувати",
@@ -2583,65 +2602,76 @@
     "bg": "Отмяна на",
     "fr": "Annuler",
     "el": "Ακύρωση",
-    "hi": "रद्द करें"
+    "hi": "रद्द करें",
+    "es": "Cancelar"
   },
   "SettingsPageLicense.statusTrialOk": {
     "uk": "Пробний період активний",
     "en": "Trial active",
     "pl": "Okres próbny aktywny",
-    "de": "Testzeit aktiv"
+    "de": "Testzeit aktiv",
+    "es": "Juicio activo"
   },
   "SettingsPageLicense.statusTrialExpired": {
     "uk": "Пробний період завершено",
     "en": "Trial expired",
     "pl": "Okres próbny zakończony",
-    "de": "Testzeit abgelaufen"
+    "de": "Testzeit abgelaufen",
+    "es": "Prueba caducada"
   },
   "SettingsPageLicense.statusProOk": {
     "uk": "Ліцензія активна",
     "en": "License active",
     "pl": "Licencja aktywna",
-    "de": "Lizenz aktiv"
+    "de": "Lizenz aktiv",
+    "es": "Licencia activa"
   },
   "SettingsPageLicense.statusProLimited": {
     "uk": "Ліцензія обмежена",
     "en": "License limited",
     "pl": "Licencja ograniczona",
-    "de": "Lizenz eingeschränkt"
+    "de": "Lizenz eingeschränkt",
+    "es": "Licencia limitada"
   },
   "SettingsPageLicense.statusUpdateRequired": {
     "uk": "Потрібне оновлення",
     "en": "Update required",
     "pl": "Wymagana aktualizacja",
-    "de": "Update erforderlich"
+    "de": "Update erforderlich",
+    "es": "Actualización necesaria"
   },
   "SettingsPageLicense.statusExpired": {
     "uk": "Ліцензія прострочена",
     "en": "License expired",
     "pl": "Licencja wygasła",
-    "de": "Lizenz abgelaufen"
+    "de": "Lizenz abgelaufen",
+    "es": "Licencia caducada"
   },
   "SettingsPageLicense.statusOtherMachine": {
     "uk": "Інша машина",
     "en": "Other machine",
     "pl": "Inny komputer",
-    "de": "Anderer Rechner"
+    "de": "Anderer Rechner",
+    "es": "Otra máquina"
   },
   "SettingsPageLicense.statusTampered": {
     "uk": "Пошкоджено або підроблено",
     "en": "Tampered",
     "pl": "Naruszona / podrobiona",
-    "de": "Manipuliert"
+    "de": "Manipuliert",
+    "es": "Manipulado"
   },
   "StatusBar.full": {
     "uk": "Повний",
     "en": "Full",
-    "pl": "Pełny"
+    "pl": "Pełny",
+    "es": "Completo"
   },
   "StatusBar.orders": {
     "uk": "Ордера",
     "en": "Orders",
-    "pl": "Zamówienia"
+    "pl": "Zamówienia",
+    "es": "Pedidos"
   },
   "StatusBar.daysShort": {
     "uk": "дн",
@@ -2654,22 +2684,26 @@
   "StatusBar.active": {
     "uk": "активна",
     "en": "active",
-    "pl": "aktywny"
+    "pl": "aktywny",
+    "es": "activo"
   },
   "StatusBar.limited": {
     "uk": "обмежено",
     "en": "limited",
-    "pl": "ograniczony"
+    "pl": "ograniczony",
+    "es": "limitado"
   },
   "StatusBar.updateRequired": {
     "uk": "Потрібне оновлення",
     "en": "UPDATE REQUIRED",
-    "pl": "WYMAGANA AKTUALIZACJA"
+    "pl": "WYMAGANA AKTUALIZACJA",
+    "es": "ACTUALIZACIÓN REQUERIDA"
   },
   "StatusBar.noLicense": {
     "uk": "Ліцензії немає",
     "en": "NO LICENSE",
-    "pl": "BRAK LICENCJI"
+    "pl": "BRAK LICENCJI",
+    "es": "SIN LICENCIA"
   },
   "StatusBar.orderModeAuto": {
     "uk": "АВТО",
@@ -2687,13 +2721,36 @@
   "StatusBar.otherMachine": {
     "uk": "ІНШИЙ ПК",
     "en": "OTHER PC",
-    "pl": "INNE PC"
+    "pl": "INNE PC",
+    "es": "OTROS PC"
   },
   "StatusBar.notAvailable": {
     "uk": "—",
     "en": "—",
-    "pl": "-"
+    "pl": "-",
+    "es": "-"
   },
+
+  "SettingsPageLicense.msgTrialEnabled": {
+    "uk": "Режим TRIAL увімкнено.",
+    "en": "TRIAL mode enabled.",
+    "pl": "Tryb TRIAL włączony.",
+    "es": "Modo PRUEBA activado."
+  },
+
+  "SettingsPageLicense.msgHintPasteAndActivate": {
+    "uk": "Введіть ключ і натисніть Активувати",
+    "en": "Paste the key and click Activate",
+    "pl": "Wklej klucz i kliknij Aktywuj",
+    "es": "Pega la clave y pulsa Activar"
+  },
+  "SettingsPageLicense.btnEnableTrial": {
+    "uk": "Увімкнути режим TRIAL",
+    "en": "Enable TRIAL mode",
+    "pl": "Włącz tryb TRIAL",
+    "es": "Activar modo PRUEBA"
+  },
+
   "translated_languages": [
     "ar",
     "bg",
