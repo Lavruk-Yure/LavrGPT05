@@ -32,6 +32,7 @@ from engine.runtime_constants import (
     WORKSPACE_HISTORY_DELIMITERS,
     WORKSPACE_REPLAY_SOURCE_CSV,
     WORKSPACE_REPLAY_SOURCES,
+    resolve_workspace_history_default_spread,
 )
 
 
@@ -184,7 +185,10 @@ class WorkspaceReplaySettings:
                 "decimal_separator",
                 DEFAULT_WORKSPACE_HISTORY_DECIMAL_SEPARATOR,
             ),
-            spread=data.get("spread", DEFAULT_WORKSPACE_HISTORY_SPREAD),
+            spread=data.get(
+                "spread",
+                resolve_workspace_history_default_spread(workspace.symbol),
+            ),
             source_name=data.get("source", ""),
             source_timeframe=data.get("source_timeframe"),
             initial_balance=data.get(

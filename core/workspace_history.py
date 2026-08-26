@@ -23,8 +23,8 @@ from core.workspace_market_event import (
 from engine.runtime_constants import (
     DEFAULT_WORKSPACE_HISTORY_DECIMAL_SEPARATOR,
     DEFAULT_WORKSPACE_HISTORY_DELIMITER,
-    DEFAULT_WORKSPACE_HISTORY_SPREAD,
     DEFAULT_WORKSPACE_HISTORY_TIMEZONE,
+    resolve_workspace_history_default_spread,
 )
 
 _TIMESTAMP_ALIASES = ("timestamp", "time", "datetime", "date")
@@ -161,7 +161,7 @@ class WorkspaceCsvHistoryLoader:
         source_timezone: str = DEFAULT_WORKSPACE_HISTORY_TIMEZONE,
         delimiter: str = DEFAULT_WORKSPACE_HISTORY_DELIMITER,
         decimal_separator: str = DEFAULT_WORKSPACE_HISTORY_DECIMAL_SEPARATOR,
-        default_spread: float = DEFAULT_WORKSPACE_HISTORY_SPREAD,
+        default_spread: float | None = None,
         source_name: str | None = None,
     ) -> WorkspaceHistoryDataSet:
         """Load one strictly ordered CSV range without broker access."""
@@ -169,8 +169,13 @@ class WorkspaceCsvHistoryLoader:
         timezone = self._timezone(source_timezone)
         normalized_delimiter = self._normalize_delimiter(delimiter, path)
         normalized_decimal = self._normalize_decimal_separator(decimal_separator)
+        spread_value = (
+            resolve_workspace_history_default_spread(symbol)
+            if default_spread is None
+            else default_spread
+        )
         normalized_spread = self._non_negative_float(
-            default_spread,
+            spread_value,
             "default_spread",
         )
         range_start = self._optional_utc(start_utc)

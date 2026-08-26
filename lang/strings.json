@@ -49,5 +49,101 @@
     "en": "Downloading: {percent}% · requests {requests} · bars {bars} · earliest bar {covered_start} UTC",
     "uk": "Завантаження: {percent}% · запитів {requests} · барів {bars} · найраніший бар {covered_start} UTC",
     "pl": "Pobieranie: {percent}% · zapytań {requests} · barów {bars} · najwcześniejszy bar {covered_start} UTC"
+  },
+  "WorkspaceParameterGroup.dataReplay.title": {
+    "en": "Data and Replay",
+    "uk": "Дані та Replay"
+  },
+  "WorkspaceParameterGroup.dataReplay.description": {
+    "en": "Historical sources, Replay environment and market-data settings.",
+    "uk": "Історичні джерела, середовище Replay та налаштування ринкових даних."
+  },
+  "WorkspaceParameterGroup.algorithm.title": {
+    "en": "Algorithm",
+    "uk": "Алгоритм"
+  },
+  "WorkspaceParameterGroup.algorithm.description": {
+    "en": "Algorithm-specific detection and confirmation settings.",
+    "uk": "Налаштування виявлення та підтвердження, специфічні для алгоритму."
+  },
+  "WorkspaceParameterGroup.signals.title": {
+    "en": "Signals",
+    "uk": "Сигнали"
+  },
+  "WorkspaceParameterGroup.signals.description": {
+    "en": "Independent signal sources added one by one during testing.",
+    "uk": "Незалежні джерела сигналів додаються по одному під час тестування."
+  },
+  "WorkspaceParameterGroup.riskManagement.description": {
+    "en": "Limits applied before any broker execution is permitted.",
+    "uk": "Обмеження застосовуються до того, як буде дозволено будь-яке виконання брокерських операцій."
+  },
+  "WorkspaceParameterGroup.execution.title": {
+    "en": "Execution",
+    "uk": "Виконання"
+  },
+  "WorkspaceParameterGroup.execution.description": {
+    "en": "Paper and Live execution settings reserved for later RoadMaps.",
+    "uk": "Налаштування виконання на папері та в реальному часі залишено для подальших дорожніх карт."
+  },
+  "WorkspaceParameterGroup.diagnostics.title": {
+    "en": "Diagnostics and chart",
+    "uk": "Діагностика та графік"
+  },
+  "WorkspaceParameterGroup.diagnostics.description": {
+    "en": "Journal, chart overlays and runtime diagnostic settings.",
+    "uk": "Журнал, накладки на графіки та налаштування діагностики середовища виконання."
+  },
+  "WorkspaceParameter.macdCrossAngleModel.description": {
+    "en": "Select legacy calibrated or ABC real-time scaled angle.",
+    "uk": "Виберіть традиційний калібрований кут або кут, масштабований у реальному часі за методом ABC."
+  },
+  "WorkspaceParameter.macdCrossMinAbcAngle.description": {
+    "en": "Minimum angle used only by ABC_REALTIME_SCALED mode.",
+    "uk": "Мінімальний кут використовується лише в режимі ABC_REALTIME_SCALED."
+  },
+  "WorkspaceParameter.riskPercent.title": {
+    "en": "Risk per trade, %",
+    "uk": "Ризик на одну операцію, %"
+  },
+  "WorkspaceParameter.maximumPositionVolume.title": {
+    "en": "Maximum position volume",
+    "uk": "Максимальний обсяг позиції"
+  },
+  "WorkspaceParameter.maximumPositionVolume.description": {
+    "en": "Hard upper limit for the volume requested by one WSP signal.",
+    "uk": "Жорстка верхня межа обсягу, що запитується одним сигналом WSP."
+  },
+  "WorkspaceParameter.maximumOpenPositions.title": {
+    "en": "Maximum open positions",
+    "uk": "Максимальна кількість відкритих позицій"
+  },
+  "WorkspaceParameter.maximumOpenPositions.description": {
+    "en": "Maximum number of positions allowed by this WSP risk policy.",
+    "uk": "Максимальна кількість позицій, дозволена цією політикою управління ризиками WSP."
+  },
+  "WorkspaceParameter.maximumDailyLossPercent.title": {
+    "en": "Maximum daily loss, %",
+    "uk": "Максимальний щоденний збиток, %"
+  },
+  "WorkspaceParameter.maximumDailyLossPercent.description": {
+    "en": "Blocks new signals after the configured daily loss limit is reached.",
+    "uk": "Блокує нові сигнали після досягнення налаштованого щоденного ліміту збитків."
+  },
+  "WorkspaceParameter.requireStopLoss.title": {
+    "en": "Require Stop Loss",
+    "uk": "Вимагати стоп-лосс"
+  },
+  "WorkspaceParameter.requireStopLoss.description": {
+    "en": "Reject every trade intent that has no Stop Loss.",
+    "uk": "Відхиляйте кожну спробу укладення угоди, яка не має стоп-лосса."
+  },
+  "WorkspaceParameter.profitDrawdownClosePercent.title": {
+    "en": "Profit drawdown close, %",
+    "uk": "Прибуток, відкат, закриття, %"
+  },
+  "WorkspaceParameter.profitDrawdownClosePercent.description": {
+    "en": "Local close decision after the configured profit drawdown.",
+    "uk": "Рішення про закриття позиції на місцевому рівні після налаштованого відкату прибутку."
   }
 }

@@ -27,33 +27,10 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Protocol
 
+from engine.runtime_constants import resolve_forex_pip_size
+
 MACD_STATE_CROSS_UP = "MACD_CROSS_UP"
 MACD_STATE_CROSS_DOWN = "MACD_CROSS_DOWN"
-
-_FOREX_CURRENCY_CODES = frozenset(
-    {
-        "AUD",
-        "CAD",
-        "CHF",
-        "CNH",
-        "CZK",
-        "DKK",
-        "EUR",
-        "GBP",
-        "HKD",
-        "HUF",
-        "JPY",
-        "MXN",
-        "NOK",
-        "NZD",
-        "PLN",
-        "SEK",
-        "SGD",
-        "TRY",
-        "USD",
-        "ZAR",
-    }
-)
 
 
 class WorkspaceMacdCrossAngleObservation(Protocol):
@@ -115,15 +92,8 @@ class WorkspaceMacdCrossAngleAbcReport:
 
 
 def resolve_workspace_macd_cross_angle_value_scale(symbol: str) -> float:
-    """Повернути Forex Y-scale для ABC або відмовити для невідомого symbol."""
-    normalized = str(symbol or "").strip().upper()
-    if len(normalized) != 6 or not normalized.isalpha():
-        raise ValueError("ABC MACD angle requires canonical 6-letter Forex symbol")
-    base = normalized[:3]
-    quote = normalized[3:]
-    if base not in _FOREX_CURRENCY_CODES or quote not in _FOREX_CURRENCY_CODES:
-        raise ValueError("ABC MACD angle supports verified Forex symbols only")
-    return 100.0 if quote == "JPY" else 10000.0
+    """Повернути Forex Y-scale ABC через канонічний pip resolver."""
+    return 1.0 / resolve_forex_pip_size(symbol)
 
 
 def evaluate_workspace_macd_cross_angle_abc(

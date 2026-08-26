@@ -40,6 +40,7 @@ from engine.runtime_constants import (
     DEFAULT_WORKSPACE_REPLAY_SOURCE,
     WORKSPACE_REPLAY_SOURCE_CSV,
     WORKSPACE_REPLAY_SOURCE_SYNTHETIC,
+    resolve_workspace_history_default_spread,
 )
 
 # ``0`` is a persisted sentinel for MAX; ``-1`` is MAX FAST. Neither value
@@ -320,7 +321,7 @@ class WorkspaceReplayService:
     DEFAULT_START_UTC = datetime(2026, 1, 2, 8, 0, tzinfo=UTC)
     DEFAULT_EVENT_COUNT = 64
     DEFAULT_BASE_PRICE = 1.10000
-    DEFAULT_SPREAD = 0.00012
+    DEFAULT_SPREAD = DEFAULT_WORKSPACE_HISTORY_SPREAD
 
     _MOVEMENTS = (
         0.00000,
@@ -422,7 +423,7 @@ class WorkspaceReplayService:
                 ),
                 default_spread=self._positive_float(
                     settings.get("spread"),
-                    DEFAULT_WORKSPACE_HISTORY_SPREAD,
+                    resolve_workspace_history_default_spread(symbol),
                     "spread",
                     allow_zero=True,
                 ),
@@ -543,7 +544,7 @@ class WorkspaceReplayService:
         )
         spread = self._positive_float(
             settings.get("spread"),
-            self.DEFAULT_SPREAD,
+            resolve_workspace_history_default_spread(symbol),
             "spread",
             allow_zero=True,
         )

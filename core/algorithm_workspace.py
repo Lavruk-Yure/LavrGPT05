@@ -32,9 +32,11 @@ from core.workspace_indicator_profile import (
 from engine.runtime_constants import (
     NEW_WORKSPACE_MACD_CROSS_ANGLE_MODEL,
     NEW_WORKSPACE_MACD_CROSS_MIN_ABC_ANGLE,
-    NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE,
-    NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE,
     NEW_WORKSPACE_MACD_SIGNAL_MODE,
+    WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_KEY,
+    WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY,
+    resolve_new_workspace_macd_extremum_min_prominence,
+    resolve_new_workspace_macd_extremum_to_cross_min_distance,
 )
 
 WORKSPACE_SCHEMA_VERSION = 5
@@ -102,15 +104,23 @@ DEFAULT_PROFIT_PROTECTION = {
     "minimum_profit": 0.0,
 }
 
-NEW_WORKSPACE_MACD_PARAMETERS = {
+NEW_WORKSPACE_MACD_STATIC_PARAMETERS = {
     "macd_signal_mode": NEW_WORKSPACE_MACD_SIGNAL_MODE,
-    "macd_extremum_min_prominence": NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE,
-    "macd_extremum_to_cross_min_distance": (
-        NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE
-    ),
     "macd_cross_angle_model": NEW_WORKSPACE_MACD_CROSS_ANGLE_MODEL,
     "macd_cross_min_abc_angle": NEW_WORKSPACE_MACD_CROSS_MIN_ABC_ANGLE,
 }
+
+
+def new_workspace_macd_parameters(symbol: str) -> dict[str, Any]:
+    """Матеріалізувати symbol-aware MACD reference-defaults нового WSP."""
+    parameters = dict(NEW_WORKSPACE_MACD_STATIC_PARAMETERS)
+    parameters[WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_KEY] = (
+        resolve_new_workspace_macd_extremum_min_prominence(symbol)
+    )
+    parameters[WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY] = (
+        resolve_new_workspace_macd_extremum_to_cross_min_distance(symbol)
+    )
+    return parameters
 
 
 class AlgorithmWorkspaceError(ValueError):
@@ -309,7 +319,7 @@ class AlgorithmWorkspace:
             data_mode=data_mode,
             control_mode=control_mode,
             parameters=(
-                dict(NEW_WORKSPACE_MACD_PARAMETERS)
+                new_workspace_macd_parameters(normalized_symbol)
                 if parameters is None
                 else dict(parameters)
             ),

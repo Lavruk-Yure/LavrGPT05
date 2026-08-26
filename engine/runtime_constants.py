@@ -13,6 +13,55 @@ from __future__ import annotations
 
 
 # =============================================================================
+# Forex: канонічні symbol/pip conventions
+# =============================================================================
+
+# Підтримані ISO-like currency codes для fail-closed Forex symbol resolver.
+FOREX_CURRENCY_CODES = frozenset(
+    {
+        "AUD",
+        "CAD",
+        "CHF",
+        "CNH",
+        "CZK",
+        "DKK",
+        "EUR",
+        "GBP",
+        "HKD",
+        "HUF",
+        "JPY",
+        "MXN",
+        "NOK",
+        "NZD",
+        "PLN",
+        "SEK",
+        "SGD",
+        "TRY",
+        "USD",
+        "ZAR",
+    }
+)
+
+# Один pip для звичайної Forex quote currency та для JPY quote.
+FOREX_STANDARD_PIP_SIZE = 0.0001
+FOREX_JPY_QUOTE_PIP_SIZE = 0.01
+
+
+def resolve_forex_pip_size(symbol: str) -> float:
+    """Повернути канонічний pip size для 6-letter Forex symbol."""
+    normalized = str(symbol or "").strip().upper()
+    if len(normalized) != 6 or not normalized.isalpha():
+        raise ValueError("Forex pip size requires canonical 6-letter symbol")
+    base = normalized[:3]
+    quote = normalized[3:]
+    if base not in FOREX_CURRENCY_CODES or quote not in FOREX_CURRENCY_CODES:
+        raise ValueError("Forex pip size supports verified Forex symbols only")
+    if quote == "JPY":
+        return FOREX_JPY_QUOTE_PIP_SIZE
+    return FOREX_STANDARD_PIP_SIZE
+
+
+# =============================================================================
 # WSP Replay: джерела та імпорт історичних даних
 # =============================================================================
 
@@ -47,7 +96,21 @@ WORKSPACE_HISTORY_TIMEZONE_CHOICES = (
 )
 
 # Spread для OHLC-файлів без bid/ask або spread колонок.
-DEFAULT_WORKSPACE_HISTORY_SPREAD = 0.00012
+# Канонічне значення задається в pips; raw fallback зберігає попередню
+# поведінку для non-Forex symbols, де Forex pip convention не застосовна.
+DEFAULT_WORKSPACE_HISTORY_SPREAD_PIPS = 1.2
+DEFAULT_WORKSPACE_HISTORY_SPREAD = (
+    DEFAULT_WORKSPACE_HISTORY_SPREAD_PIPS * FOREX_STANDARD_PIP_SIZE
+)
+
+
+def resolve_workspace_history_default_spread(symbol: str) -> float:
+    """Повернути symbol-aware default Replay spread у raw price units."""
+    try:
+        pip_size = resolve_forex_pip_size(symbol)
+    except ValueError:
+        return DEFAULT_WORKSPACE_HISTORY_SPREAD
+    return DEFAULT_WORKSPACE_HISTORY_SPREAD_PIPS * pip_size
 
 
 # =============================================================================
@@ -206,10 +269,41 @@ DEFAULT_WORKSPACE_MACD_CROSS_MIN_ABC_ANGLE = 2.0
 # DEFAULT_WORKSPACE_* fallback-и вище, тому старі Replay не мігрують мовчки.
 # Значення не є універсальними для інших symbol/timeframe/regime.
 NEW_WORKSPACE_MACD_SIGNAL_MODE = WORKSPACE_MACD_SIGNAL_MODE_EXTENDED
-NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE = 0.000015
-NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE = 0.00005
+# Reference-defaults для нового WSP задаються у pips, а raw values
+# обчислюються за symbol. Старі raw constants лишаються legacy fallback для
+# persisted/non-Forex WSP і не мігруються приховано.
+NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_PIPS = 0.15
+NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_PIPS = 0.5
+NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE = (
+    NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_PIPS * FOREX_STANDARD_PIP_SIZE
+)
+NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE = (
+    NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_PIPS
+    * FOREX_STANDARD_PIP_SIZE
+)
 NEW_WORKSPACE_MACD_CROSS_ANGLE_MODEL = WORKSPACE_MACD_CROSS_ANGLE_MODEL_ABC
 NEW_WORKSPACE_MACD_CROSS_MIN_ABC_ANGLE = 2.25
+
+
+def resolve_new_workspace_macd_extremum_min_prominence(symbol: str) -> float:
+    """Повернути symbol-aware prominence нового WSP у raw price units."""
+    try:
+        pip_size = resolve_forex_pip_size(symbol)
+    except ValueError:
+        return NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE
+    return NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_PIPS * pip_size
+
+
+def resolve_new_workspace_macd_extremum_to_cross_min_distance(
+    symbol: str,
+) -> float:
+    """Повернути symbol-aware extremum distance нового WSP у raw units."""
+    try:
+        pip_size = resolve_forex_pip_size(symbol)
+    except ValueError:
+        return NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE
+    return NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_PIPS * pip_size
+
 
 # Storage key і початковий стан незалежного фільтра Alligator.
 WORKSPACE_ALLIGATOR_FILTER_ENABLED_KEY = "alligator_filter_enabled"
