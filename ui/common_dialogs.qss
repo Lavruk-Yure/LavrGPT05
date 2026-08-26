@@ -1,0 +1,175 @@
+/* common_dialogs.qss */
+
+/* ====== BASE (для всіх common dialog) ====== */
+QDialog {
+    background-color: #F9FAFB;
+}
+
+QLabel#lblHeader {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+QLabel#lblDetails {
+    font-size: 12px;
+    color: #374151;
+}
+
+/* іконка кругла — базові параметри (колір задаємо нижче по типу) */
+QLabel#lblIcon {
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 16px;
+    qproperty-alignment: 'AlignCenter';
+}
+
+/* ====== BUTTONS ====== */
+
+QPushButton {
+    min-height: 24px;
+    padding: 4px 12px;
+
+    background-color: #123f4a;
+    color: #ffffff;
+
+    border: 1px solid #7f9aa3;
+    border-radius: 3px;
+}
+
+QPushButton:hover {
+    background-color: #17505e;
+}
+
+QPushButton:pressed {
+    background-color: #0f3440;
+}
+
+QPushButton:focus {
+    outline: none;
+    border: 1px solid #7f9aa3;
+}
+
+QPushButton:default {
+    border: 1px solid #7f9aa3;
+}
+
+QPushButton:disabled {
+    background-color: #173841;
+    color: #8fa3aa;
+    border: 1px solid #365862;
+}
+
+QPushButton:disabled:hover {
+    background-color: #173841;
+    color: #8fa3aa;
+    border: 1px solid #365862;
+}
+
+QPushButton:disabled:pressed {
+    background-color: #173841;
+    color: #8fa3aa;
+    border: 1px solid #365862;
+}
+
+/* Explicit broker/settings buttons text colors */
+QPushButton:enabled {
+    color: #ffffff;
+}
+
+QPushButton:enabled:hover {
+    color: #ffffff;
+}
+
+QPushButton:enabled:pressed {
+    color: #ffffff;
+}
+
+QPushButton:enabled:focus {
+    color: #ffffff;
+}
+
+QPushButton:enabled:default {
+    color: #ffffff;
+}
+
+QPushButton:disabled {
+    color: #111827;
+}
+
+/* ====== TYPE: CONFIRM ====== */
+QDialog#CommonConfirmDialog QFrame#frameAccent {
+    background-color: #16A34A;
+    border: none;
+}
+
+QDialog#CommonConfirmDialog QLabel#lblIcon {
+    background-color: rgba(22, 163, 74, 40);
+    color: #166534;
+}
+
+/* Primary action button ONLY for Confirm */
+QDialog#CommonConfirmDialog QPushButton#btnYes {
+    background-color: #16A34A;
+    color: white;
+    border: none;
+    padding: 6px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+QDialog#CommonConfirmDialog QPushButton#btnYes:hover {
+    background-color: #15803D;
+}
+
+QDialog#CommonConfirmDialog QPushButton#btnYes:pressed {
+    background-color: #166534;
+}
+
+/* ====== TYPE: ERROR ====== */
+QDialog#CommonErrorDialog QFrame#frameAccent {
+    background-color: #DC2626;
+    border: none;
+}
+
+QDialog#CommonErrorDialog QLabel#lblIcon {
+    background-color: rgba(220, 38, 38, 40);
+    color: #991B1B;
+}
+
+/* Error: кнопки залишаються нейтральними (нічого не фарбуємо) */
+
+/* ====== TYPE: INFO ====== */
+QDialog#CommonInfoDialog QFrame#frameAccent {
+    background-color: #2563EB;
+    border: none;
+}
+
+QDialog#CommonInfoDialog QLabel#lblIcon {
+    background-color: rgba(37, 99, 235, 40);
+    color: #1E40AF;
+}
+
+/* Info: кнопки залишаються нейтральними (нічого не фарбуємо) */
+
+/* OrdersPage: full-row selection for broker groups and virtual legs. */
+QTreeWidget#tblOpenPositions {
+    selection-background-color: #2f7f9f;
+    selection-color: #ffffff;
+}
+
+QTreeWidget#tblOpenPositions::item:selected {
+    background-color: #2f7f9f;
+    color: #ffffff;
+}
+
+QTreeWidget#tblOpenPositions::item:selected:!active {
+    background-color: #2f7f9f;
+    color: #ffffff;
+}
+
+QTreeWidget#tblOpenPositions::item:focus {
+    border: none;
+}

@@ -1,0 +1,202 @@
+/*
+ * office - Qt Style Sheet
+ * Created: 16.02.2026
+ *
+ * QSS Toolkit Quick Tips:
+ * - Press Ctrl+Space (Cmd+Space) for intelligent auto-completion
+ * - Use Ctrl+/ (Cmd+/) to comment/uncomment code blocks
+ * - Click color gutter icons to open the visual color picker
+ * - Type :: for sub-controls (e.g., QScrollBar::handle)
+ * - Type : for pseudo-states (e.g., QPushButton:hover)
+ * - RGB/RGBA colors: rgb(255, 0, 0) or rgba(255, 0, 0, 128)
+ */
+
+/* Add your QSS styles here */
+QWidget {
+    background-color: #F4F6F8;
+    color: #1D2939;
+    font-size: 10pt;
+}
+
+QGroupBox, QFrame {
+    background-color: #FFFFFF;
+    border: 1px solid #D0D5DD;  /* width style color */
+}
+
+
+QToolButton {
+    background: transparent;
+    border: none;
+    padding: 4px;
+}
+
+QToolButton:hover {
+    background-color: #EEF2F6;
+}
+
+QToolButton:pressed {
+    background-color: #E4E7EC;
+}
+
+QPushButton[role="accent"] {
+    background-color: #0F5C5C;
+    color: white;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+QPushButton[role="accent"]:hover {
+    background-color: #147373;
+}
+
+QPushButton[role="accent"]:pressed {
+    background-color: #0C4A4A;
+}
+
+QTableView {
+    background-color: #FFFFFF;
+    alternate-background-color: #F9FAFB;
+    gridline-color: #E4E7EC;
+}
+
+QHeaderView::section {
+    background-color: #F2F4F7;
+    border: 1px solid #E4E7EC;
+    padding: 4px;
+}
+QTableView::item:selected {
+    background-color: #B2EBF2;   /* м’який cyan */
+    color: black;
+}
+
+QTableView::item:selected:active {
+    background-color: #80DEEA;   /* трохи глибший */
+    color: black;
+}
+
+/* Customers filters buttons */
+/* Customers filter action button */
+
+QPushButton#btnCustFilterAction {
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
+
+    border: none;
+    background-color: transparent;
+    padding: 0px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* apply mode */
+QPushButton#btnCustFilterAction[mode="apply"] {
+    background-image: url(:/office/icons/bisnes_push/filter_default.png);
+}
+QPushButton#btnCustFilterAction[mode="apply"]:hover {
+    background-image: url(:/office/icons/bisnes_push/filter_hover.png);
+}
+QPushButton#btnCustFilterAction[mode="apply"]:disabled {
+    background-image: url(:/office/icons/bisnes_push/filter_disabled.png);
+}
+
+/* reset mode */
+QPushButton#btnCustFilterAction[mode="reset"] {
+    background-image: url(:/office/icons/bisnes_push/clear_filter_default.png);
+}
+QPushButton#btnCustFilterAction[mode="reset"]:hover {
+    background-image: url(:/office/icons/bisnes_push/clear_filter_hover.png);
+}
+QPushButton#btnCustFilterAction[mode="reset"]:disabled {
+    background-image: url(:/office/icons/bisnes_push/clear_filter_disabled.png);
+}
+
+/* ---------------------------
+   DbGrid кнопки: ROLE + STATE
+   --------------------------- */
+
+QPushButton[role="office"],
+QPushButton[role="business"] {
+    border-radius: 3px;
+    padding: 2px;
+    color: #1D2939;
+}
+
+/* office */
+
+QPushButton[role="office"][state="active"] {
+    background-color: #d9ecff;
+    border: 1px solid #9cc7ff;
+    color: #1D2939;
+}
+
+QPushButton[role="office"][state="active"]:hover {
+    background-color: #c6e2ff;
+    border: 1px solid #7fb6ff;
+}
+
+QPushButton[role="office"][state="inactive"] {
+    background-color: #f3f3f3;
+    border: 1px solid #d0d0d0;
+    color: #98A2B3;
+}
+
+/* business */
+
+QPushButton[role="business"][state="active"] {
+    background-color: #00e5ff;
+    border: 1px solid #00bcd4;
+    color: #1D2939;
+}
+
+QPushButton[role="business"][state="active"]:hover {
+    background-color: #00d5ef;
+    border: 1px solid #00a9bf;
+}
+
+QPushButton[role="business"][state="inactive"] {
+    background-color: #f3f3f3;
+    border: 1px solid #d0d0d0;
+    color: #98A2B3;
+}
+
+/* ---------------------------
+   QCheckBox
+   --------------------------- */
+
+QCheckBox {
+    spacing: 6px;
+    color: #1D2939;
+    background: transparent;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #98A2B3;
+    border-radius: 3px;
+    background-color: #FFFFFF;
+}
+
+QCheckBox::indicator:hover {
+    border: 1px solid #7FB6FF;
+    background-color: #F8FBFF;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid #98A2B3;
+    background-color: #FFFFFF;
+}
+
+QCheckBox::indicator:checked {
+    border: 1px solid #00A9BF;
+    background-color: #00E5FF;
+    image: url(:/office/icons/bisnes_push/check_white_16.png);
+}
+
+QCheckBox::indicator:disabled {
+    border: 1px solid #D0D5DD;
+    background-color: #F2F4F7;
+}

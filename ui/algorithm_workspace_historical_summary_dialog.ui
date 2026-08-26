@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AlgorithmWorkspaceHistoricalSummaryDialog</class>
+ <widget class="QDialog" name="AlgorithmWorkspaceHistoricalSummaryDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>700</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>620</width>
+    <height>580</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>[AlgorithmWorkspaceHistoricalSummaryDialog.windowTitle]</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>[AlgorithmWorkspaceHistoricalSummaryDialog.title]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpData">
+     <property name="title">
+      <string>[AlgorithmWorkspaceHistoricalSummaryDialog.grpData]</string>
+     </property>
+     <layout class="QGridLayout" name="gridData">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblSymbolCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.symbol]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="lblSymbol">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="lblTimeframeCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.timeframe]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="lblTimeframe">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblPeriodCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.period]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+       <widget class="QLabel" name="lblPeriod">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblBarsCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.bars]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="lblBars">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="lblSpreadCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.spread]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="lblSpread">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lblSourceTimeframeCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.sourceTimeframe]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="lblSourceTimeframe">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="lblCsvSelectionTimeCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.csvSelectionTime]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLabel" name="lblCsvSelectionTime">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lblReplayTimeCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.replayTime]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="lblReplayTime">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpResult">
+     <property name="title">
+      <string>[AlgorithmWorkspaceHistoricalSummaryDialog.grpResult]</string>
+     </property>
+     <layout class="QGridLayout" name="gridResult">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblInitialBalanceCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.initialBalance]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="lblInitialBalance">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="lblFinalBalanceCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.finalBalance]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="lblFinalBalance">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblNetPnlCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.netPnl]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="lblNetPnl">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lblProfitFactorCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.profitFactor]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="lblProfitFactor">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblTradesCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.trades]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="lblTrades">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="lblWinRateCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.winRate]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="lblWinRate">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lblWinnersCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.winners]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="lblWinners">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="lblLosersCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.losers]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLabel" name="lblLosers">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lblMaxDrawdownCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.maxDrawdown]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="lblMaxDrawdown">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QLabel" name="lblAverageTradeCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.averageTrade]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QLabel" name="lblAverageTrade">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpSignals">
+     <property name="title">
+      <string>[AlgorithmWorkspaceHistoricalSummaryDialog.grpSignals]</string>
+     </property>
+     <layout class="QGridLayout" name="gridSignals">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblSignalsCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.signals]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="lblSignals">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="lblDirectionsCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.directions]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="lblDirections">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblAlligatorCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.alligator]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="lblAlligator">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lblRejectsCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.rejects]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="lblRejects">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblMacdQualityCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.macdQuality]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="lblMacdQuality">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="lblMacdQualityRejectsCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.macdQualityRejects]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="lblMacdQualityRejects">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpExits">
+     <property name="title">
+      <string>[AlgorithmWorkspaceHistoricalSummaryDialog.grpExits]</string>
+     </property>
+     <layout class="QGridLayout" name="gridExits">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblStopLossCaption">
+        <property name="text">
+         <string>STOP_LOSS:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="lblStopLoss">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="lblTakeProfitCaption">
+        <property name="text">
+         <string>TAKE_PROFIT:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="lblTakeProfit">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblProfitDrawdownCaption">
+        <property name="text">
+         <string>PROFIT_DRAWDOWN:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="lblProfitDrawdown">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lblSessionEndCaption">
+        <property name="text">
+         <string>SESSION_END:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="lblSessionEnd">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblOtherCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceHistoricalSummaryDialog.other]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="lblOther">
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutButtons">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>[AlgorithmWorkspaceHistoricalSummaryDialog.btnClose]</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

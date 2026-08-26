@@ -1,0 +1,368 @@
+# ai_translator.py
+# -*- coding: utf-8 -*-
+"""
+AITranslator — переклад для автозаповнення strings (DeepL / mock / off).
+
+Важливе:
+- Налаштування беруться з conf["translator"].
+- DeepL: 2 ключі (deepl_key_1, deepl_key_2).
+- LibreTranslate прибрано.
+- На будь-якій помилці повертаємо оригінальний текст (не ламаємо рантайм).
+- Підтримка DeepL context для коротких галузевих UI-рядків.
+- Простий лог у lang/ai_translate.log (тільки якщо DEBUG увімкнено).
+
+Алгоритм:
+  1) key1 (звичайний)
+  2) key2 (звичайний)
+  3) key1 (beta)
+  4) key2 (beta)
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+import logging
+import os
+import time
+from pathlib import Path
+from typing import Any, Dict
+
+import requests
+
+from core.translation_format import restore_format_placeholders
+
+logger = logging.getLogger(__name__)
+
+# Увімкнути:
+# 1) або тут True
+# 2) або змінна середовища LGE_AI_TRANSLATOR_DEBUG=1
+DEBUG_AI_TRANSLATOR = False
+
+MAX_RETRIES_429 = 5
+
+
+class AITranslator:
+    """Перекладач для автозаповнення strings.json (DeepL / mock / off)."""
+
+    def __init__(self, conf: Dict[str, Any], lang_dir: Path) -> None:
+        """Ініціалізація перекладача."""
+        self.lang_dir = Path(lang_dir)
+        self.log_path = self.lang_dir / "ai_translate.log"
+
+        global DEBUG_AI_TRANSLATOR
+        env_dbg = (os.getenv("LGE_AI_TRANSLATOR_DEBUG") or "").strip()
+        if env_dbg in ("1", "true", "True", "yes", "YES"):
+            DEBUG_AI_TRANSLATOR = False
+
+        tr_conf = conf.get("translator", {}) if isinstance(conf, dict) else {}
+        if not isinstance(tr_conf, dict):
+            tr_conf = {}
+
+        # provider: off/mock/deepl
+        self.provider: str = str(tr_conf.get("provider") or "mock").strip().lower()
+
+        # DeepL keys (canonical)
+        self.deepl_key_1: str = str(tr_conf.get("deepl_key_1") or "").strip()
+        self.deepl_key_2: str = str(tr_conf.get("deepl_key_2") or "").strip()
+
+        self._cache: dict[tuple[str, str, str, str], str] = {}
+
+        self._dbg(
+            "init",
+            provider=self.provider,
+            has_deepl1=bool(self.deepl_key_1),
+            has_deepl2=bool(self.deepl_key_2),
+            log_path=str(self.log_path),
+        )
+
+    # ---------------------------------------------------------
+    def translate(
+        self,
+        text: str,
+        target_lang: str,
+        source_lang: str = "en",
+        *,
+        context: str = "",
+    ) -> str:
+        """
+        Повертає переклад тексту.
+        На помилці — повертає text.
+        """
+        text = text or ""
+        target_lang = (target_lang or "").strip()
+        source_lang = (source_lang or "en").strip()
+        context = (context or "").strip()
+
+        provider = self.provider
+        if provider not in ("off", "mock", "deepl"):
+            provider = "mock"
+
+        if DEBUG_AI_TRANSLATOR:
+            self._append_log(
+                self._ts_line(
+                    "ENTER",
+                    f"provider={provider} src={source_lang} tgt={target_lang} "
+                    f"text={repr(text[:60])}",
+                )
+            )
+
+        if provider in ("off", "mock"):
+            return text
+
+        if not target_lang or target_lang.lower() == source_lang.lower():
+            if DEBUG_AI_TRANSLATOR:
+                self._append_log(
+                    self._ts_line("SKIP", "empty target or same as source")
+                )
+            return text
+
+        # --- CACHE (до запиту в DeepL) ---
+        cache_key = (
+            text,
+            source_lang.lower(),
+            target_lang.lower(),
+            context,
+        )
+        cached = self._cache.get(cache_key)
+        if isinstance(cached, str) and cached.strip():
+            if DEBUG_AI_TRANSLATOR:
+                self._append_log(
+                    self._ts_line("CACHE", f"hit src={source_lang} tgt={target_lang}")
+                )
+            return cached
+
+        try:
+            result = self._translate_deepl(
+                text,
+                target_lang,
+                source_lang,
+                context=context,
+            )
+            result = self._postprocess_translation(source=text, translated=result)
+
+            if result.strip():
+                self._cache[cache_key] = result
+
+            if DEBUG_AI_TRANSLATOR:
+                self._append_log(
+                    self._ts_line(
+                        "OK",
+                        f"deepl src={source_lang} tgt={target_lang} "
+                        f"out={repr(result[:60])}",
+                    )
+                )
+            return result
+        except Exception as exc:  # noqa: BLE001
+            if DEBUG_AI_TRANSLATOR:
+                self._append_log(
+                    self._ts_line(
+                        "FAIL",
+                        f"deepl src={source_lang} tgt={target_lang} | {exc}",
+                    )
+                )
+            return text
+
+    # ---------------------------------------------------------
+    @staticmethod
+    def _deepl_lang(code: str) -> str:
+        """
+        DeepL API: target_lang = "EN", "DE", "PT-BR", "EN-GB"...
+        Беремо base і підрегіон (якщо є), переводимо у верхній регістр.
+        """
+        s = (code or "").strip()
+        if not s:
+            return "EN"
+        s = s.replace("_", "-").strip()
+        parts = s.split("-", 1)
+        base = parts[0].upper()
+        if len(parts) == 1:
+            return base
+        sub = parts[1].upper()
+        return f"{base}-{sub}"
+
+    # ---------------------------------------------------------
+    def _translate_deepl(
+        self,
+        text: str,
+        target_lang: str,
+        source_lang: str,
+        *,
+        context: str = "",
+    ) -> str:
+        candidates = [
+            ("key1", self.deepl_key_1),
+            ("key2", self.deepl_key_2),
+        ]
+        candidates = [(slot, k) for slot, k in candidates if k]
+        if not candidates:
+            raise ValueError("DeepL keys are missing (deepl_key_1/deepl_key_2)")
+
+        url = "https://api-free.deepl.com/v2/translate"
+        tgt = self._deepl_lang(target_lang)
+        src = self._deepl_lang(source_lang)
+
+        # 1) key1 без beta, 2) key2 без beta
+        out = self._deepl_attempt(
+            url=url,
+            text=text,
+            src=src,
+            tgt=tgt,
+            candidates=candidates,
+            enable_beta=False,
+            context=context,
+        )
+        if out is not None:
+            return out
+
+        # 3) key1 beta, 4) key2 beta
+        out = self._deepl_attempt(
+            url=url,
+            text=text,
+            src=src,
+            tgt=tgt,
+            candidates=candidates,
+            enable_beta=True,
+            context=context,
+        )
+        if out is not None:
+            return out
+
+        raise ConnectionError("DeepL failed (no successful attempt)")
+
+    def _deepl_attempt(
+        self,
+        *,
+        url: str,
+        text: str,
+        src: str,
+        tgt: str,
+        candidates: list[tuple[str, str]],
+        enable_beta: bool,
+        context: str = "",
+    ) -> str | None:
+        """
+        Один прохід по ключах (звичайний або beta).
+        Повертає str при успіху, або None якщо всі ключі не дали результат.
+        """
+        payload = {
+            "text": text,
+            "target_lang": tgt,
+            "source_lang": src,
+        }
+        if context:
+            payload["context"] = context
+
+        if enable_beta:
+            payload["enable_beta_languages"] = "1"
+            if DEBUG_AI_TRANSLATOR:
+                self._append_log(
+                    self._ts_line("DEEPL", f"beta enabled src={src} tgt={tgt}")
+                )
+
+        last_err: str = ""
+
+        for slot, auth_key in candidates:
+            headers = {"Authorization": f"DeepL-Auth-Key {auth_key}"}
+
+            try:
+                if DEBUG_AI_TRANSLATOR:
+                    self._append_log(
+                        self._ts_line(
+                            "DEEPL",
+                            f"try={slot} src={src} tgt={tgt} beta={int(enable_beta)} "
+                            f"text={repr(text[:60])}",
+                        )
+                    )
+
+                retries_429 = 0
+
+                while True:
+                    r = requests.post(url, data=payload, headers=headers, timeout=20)
+
+                    if DEBUG_AI_TRANSLATOR:
+                        preview = (r.text or "")[:300].replace("\n", "\\n")
+                        self._append_log(
+                            self._ts_line(
+                                "DEEPL_HTTP",
+                                f"try={slot} status={r.status_code} resp={preview}",
+                            )
+                        )
+
+                    if r.status_code == 200:
+                        data = r.json()
+                        translations = data.get("translations")
+                        if not isinstance(translations, list) or not translations:
+                            raise ValueError("DeepL: empty translations")
+                        out = translations[0].get("text")
+                        if not isinstance(out, str) or not out.strip():
+                            raise ValueError("DeepL: empty text")
+                        return out
+
+                    if r.status_code == 429:
+                        retries_429 += 1
+                        if retries_429 >= MAX_RETRIES_429:
+                            raise ConnectionError("DeepL 429 retry limit exceeded")
+
+                        wait = 2**retries_429  # 2,4,8,16...
+                        if DEBUG_AI_TRANSLATOR:
+                            self._append_log(
+                                self._ts_line("DEEPL_WAIT", f"{wait}s (#{retries_429})")
+                            )
+                        time.sleep(wait)
+                        continue
+
+                    raise ConnectionError(
+                        f"HTTP {r.status_code}: {(r.text or '')[:200]}"
+                    )
+
+            except Exception as exc:  # noqa: BLE001
+                last_err = f"{slot}: {exc}"
+                continue
+
+        if DEBUG_AI_TRANSLATOR and last_err:
+            self._append_log(self._ts_line("DEEPL_FAIL", last_err))
+
+        return None
+
+    # ---------------------------------------------------------
+    @staticmethod
+    def _postprocess_translation(*, source: str, translated: str) -> str:
+        """
+        Прибираємо "зайву крапку" в кінці перекладу,
+        якщо її не було в source.
+        """
+        src = (source or "").strip()
+        out = (translated or "").strip()
+
+        if not src or not out:
+            return translated
+
+        out = restore_format_placeholders(src, out)
+
+        end_punct = (".", "!", "?", "…", ":", ";")
+        if not src.endswith(end_punct) and out.endswith("."):
+            out = out[:-1].rstrip()
+
+        return out
+
+    # ---------------------------------------------------------
+    @staticmethod
+    def _ts_line(tag: str, msg: str) -> str:
+        ts = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return f"[{ts}] {tag} | {msg}"
+
+    def _append_log(self, line: str) -> None:
+        if not DEBUG_AI_TRANSLATOR:
+            return
+        try:
+            self.log_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.log_path.open("a", encoding="utf-8") as f:
+                f.write(line + "\n")
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("AITranslator log write failed: %s", exc)
+
+    @staticmethod
+    def _dbg(name: str, **kw: Any) -> None:
+        if not DEBUG_AI_TRANSLATOR:
+            return
+        logger.debug("AITranslator.%s | %s", name, kw)

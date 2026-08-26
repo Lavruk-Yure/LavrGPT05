@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AlgorithmWorkspaceWindow</class>
+ <widget class="QFrame" name="AlgorithmWorkspaceWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>500</width>
+    <height>360</height>
+   </size>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame#AlgorithmWorkspaceWindow {
+    border: 2px solid #6f8f98;
+    border-radius: 7px;
+}
+QFrame#AlgorithmWorkspaceWindow[replayConfigured=&quot;true&quot;] {
+    border-color: #4aa3d8;
+}
+QLabel#lblName[replayConfigured=&quot;true&quot;] {
+    color: #8ad7ff;
+}
+QFrame#AlgorithmWorkspaceWindow[activeWorkspace=&quot;true&quot;] {
+    border: 3px solid #f2c14e;
+}
+QLabel#lblName[activeWorkspace=&quot;true&quot;] {
+    background-color: rgba(242, 193, 78, 78);
+    border-left: 6px solid #f2c14e;
+    border-radius: 4px;
+    color: #fff4c2;
+    padding: 0px 6px;
+}
+QPushButton#btnReplaySettings[replayConfigured=&quot;true&quot;] {
+    border: 1px solid #4aa3d8;
+    color: #d8f3ff;
+    font-weight: 700;
+}
+QFrame#AlgorithmWorkspaceWindow[runtimeState=&quot;RUNNING&quot;] {
+    border-color: #35b96f;
+}
+QFrame#AlgorithmWorkspaceWindow[runtimeState=&quot;STARTING&quot;],
+QFrame#AlgorithmWorkspaceWindow[runtimeState=&quot;STOPPING&quot;] {
+    border-color: #f2c14e;
+}
+QFrame#AlgorithmWorkspaceWindow[runtimeState=&quot;ERROR&quot;] {
+    border-color: #ef5350;
+}
+QPushButton#btnStartStop[actionMode=&quot;START&quot;] {
+    background-color: #237a4b;
+    border: 1px solid #35b96f;
+    color: #ffffff;
+    font-weight: 700;
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px 10px;
+}
+QPushButton#btnStartStop[actionMode=&quot;STOP&quot;] {
+    background-color: #8f2d2d;
+    border: 1px solid #ef5350;
+    color: #ffffff;
+    font-weight: 700;
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px 10px;
+}
+QLabel#lblState {
+    border: 1px solid #54747d;
+    border-radius: 5px;
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px 8px;
+    font-weight: 700;
+}
+QPushButton#btnHistoryDownload,
+QPushButton#btnReplaySettings,
+QPushButton#btnParameters,
+QPushButton#btnRename {
+    min-height: 0px;
+    max-height: 22px;
+    padding: 0px 8px;
+    font: 9pt &quot;Segoe UI&quot;;
+}
+QPushButton#btnReplayPause,
+QPushButton#btnReplayStep {
+    min-height: 0px;
+    max-height: 18px;
+    padding: 0px 6px;
+    font: 8pt &quot;Segoe UI&quot;;
+}
+QComboBox#cmbReplaySpeed {
+    min-height: 0px;
+    max-height: 18px;
+    padding: 0px 4px;
+    font: 8pt &quot;Segoe UI&quot;;
+}
+QLabel#lblReplayStatus,
+QLabel#lblReplaySpeed {
+    font: 8pt &quot;Segoe UI&quot;;
+}
+QFrame#frameSummary {
+    border: 1px solid #315965;
+    border-radius: 5px;
+}
+QLabel[summaryValue=&quot;true&quot;] {
+    font-weight: 700;
+}
+QTabWidget#tabsWorkspace::pane {
+    border: 1px solid #315965;
+}
+QTabBar::tab {
+    padding: 4px 10px;
+}</string>
+  </property>
+  <property name="frameShape">
+   <enum>QFrame::Shape::StyledPanel</enum>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>4</number>
+   </property>
+   <property name="leftMargin">
+    <number>8</number>
+   </property>
+   <property name="topMargin">
+    <number>8</number>
+   </property>
+   <property name="rightMargin">
+    <number>8</number>
+   </property>
+   <property name="bottomMargin">
+    <number>8</number>
+   </property>
+   <item>
+    <layout class="QGridLayout" name="gridLayoutHeader">
+     <property name="horizontalSpacing">
+      <number>8</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>2</number>
+     </property>
+     <item row="0" column="0" colspan="4">
+      <widget class="QLabel" name="lblName">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 700 13pt &quot;Segoe UI&quot;;
+color: #ffffff;</string>
+       </property>
+       <property name="text">
+        <string>Workspace</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="lblState">
+       <property name="minimumSize">
+        <size>
+         <width>104</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>STOPPED</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QPushButton" name="btnStartStop">
+       <property name="minimumSize">
+        <size>
+         <width>78</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.btnStart]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <spacer name="horizontalSpacerHeader">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="btnHistoryDownload">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.btnHistoryDownload]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="btnReplaySettings">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.btnReplaySettings]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QPushButton" name="btnParameters">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.btnParameters]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QPushButton" name="btnRename">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.btnRename]</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayoutInfo">
+     <property name="horizontalSpacing">
+      <number>7</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>3</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblBrokerCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblBroker]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="lblBroker">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>—</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="lblAccountCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblAccount]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="lblAccount">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>2</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>—</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblSymbolCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblSymbol]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="lblSymbol">
+       <property name="text">
+        <string>—</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="lblTimeframeCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblTimeframe]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLabel" name="lblTimeframe">
+       <property name="text">
+        <string>—</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblAlgorithmCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblAlgorithm]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="lblAlgorithm">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>—</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLabel" name="lblDataModeCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblDataMode]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QComboBox" name="cmbDataMode"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lblBalanceCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblBalance]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="lblBalance">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>—</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLabel" name="lblControlModeCaption">
+       <property name="text">
+        <string>[AlgorithmWorkspaceWindow.lblControlMode]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QComboBox" name="cmbControlMode"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="frameSummary">
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayoutSummary">
+      <property name="leftMargin">
+       <number>8</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>8</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="lblOrdersCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.lblOrders]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblOrdersCount">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="summaryValue" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblPositionsCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.lblPositions]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblPositionsCount">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="summaryValue" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblCurrentProfitCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.lblCurrentProfit]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblCurrentProfit">
+        <property name="text">
+         <string>0.00</string>
+        </property>
+        <property name="summaryValue" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblPeakProfitCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.lblPeakProfit]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblPeakProfit">
+        <property name="text">
+         <string>0.00</string>
+        </property>
+        <property name="summaryValue" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblProfitDrawdownCaption">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.lblProfitDrawdown]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblProfitDrawdown">
+        <property name="text">
+         <string>0.0%</string>
+        </property>
+        <property name="summaryValue" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacerSummary">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frameReplayControls">
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayoutReplay">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="lblReplayStatus">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.replayNotConnected]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacerReplay">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnReplayPause">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.btnReplayPause]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnReplayStep">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.btnReplayStep]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblReplaySpeed">
+        <property name="text">
+         <string>[AlgorithmWorkspaceWindow.lblReplaySpeed]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cmbReplaySpeed">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>1x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>5x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>10x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>100x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1000x</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MAX</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MAX FAST</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabsWorkspace">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabOrders">
+      <attribute name="title">
+       <string>[AlgorithmWorkspaceWindow.tabOrders]</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayoutOrders">
+       <property name="leftMargin">
+        <number>6</number>
+       </property>
+       <property name="topMargin">
+        <number>6</number>
+       </property>
+       <property name="rightMargin">
+        <number>6</number>
+       </property>
+       <property name="bottomMargin">
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QTableWidget" name="tblOrders">
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>6</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>[AlgorithmWorkspaceWindow.colOrderId]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[AlgorithmWorkspaceWindow.colSide]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[AlgorithmWorkspaceWindow.colVolume]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[AlgorithmWorkspaceWindow.colPrice]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[AlgorithmWorkspaceWindow.colStatus]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[AlgorithmWorkspaceWindow.colProfit]</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabChart">
+      <attribute name="title">
+       <string>[AlgorithmWorkspaceWindow.tabChart]</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayoutChart">
+       <item>
+        <widget class="QLabel" name="lblChartPlaceholder">
+         <property name="text">
+          <string>[AlgorithmWorkspaceWindow.chartPlaceholder]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabPosition">
+      <attribute name="title">
+       <string>[AlgorithmWorkspaceWindow.tabPosition]</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayoutPosition">
+       <item>
+        <widget class="QLabel" name="lblPositionPlaceholder">
+         <property name="text">
+          <string>[AlgorithmWorkspaceWindow.positionPlaceholder]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabSignals">
+      <attribute name="title">
+       <string>[AlgorithmWorkspaceWindow.tabSignals]</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayoutSignals">
+       <item>
+        <widget class="QLabel" name="lblSignalsPlaceholder">
+         <property name="text">
+          <string>[AlgorithmWorkspaceWindow.signalsPlaceholder]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabLog">
+      <attribute name="title">
+       <string>[AlgorithmWorkspaceWindow.tabLog]</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayoutLog">
+       <item>
+        <widget class="QPlainTextEdit" name="txtLog">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="plainText">
+          <string>[AlgorithmWorkspaceWindow.logPlaceholder]</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,98 @@
+# Python
+__pycache__/
+.mypy_cache/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+venv*/
+.venv*/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs & temp
+*.log
+*.tmp
+*.swp
+
+# Secrets
+tokens.json
+*.env
+.env.*
+secrets.json
+*.pem
+*.crt
+*.key
+
+# OS
+.DS_Store
+
+# auto-py-to-exe
+*.exe
+/dist/
+/dist_auto/
+/build/
+*.spec
+*.msi
+
+# runtime конфіги
+*.conf
+*.conf.bad
+LGE.conf
+LGE.conf.bad
+tokens*.json
+LGE_plain.json
+Session/
+
+# LGEOffice licensing keys
+office/keys/*
+*.lic
+
+# LGE licensing keys
+dev_tools/_private_ed25519.pem
+dev_tools/_public_ed25519.b64
+# LGEOffice secrets
+office/mail_settings.py
+
+
+# Issuer outputs (future)
+office/*.db
+office/office_config.json
+office/logs/*
+office/licenses/*
+
+# tokens
+tokens/tokens.json
+
+# =========================================================
+# Runtime SQLite DB
+# =========================================================
+
+data/*.db
+data/*.*
+data/*.db-shm
+data/*.db-wal
+/data/history/
+
+tests/runtime/data/*.db
+tests/runtime/data/*.db-shm
+tests/runtime/data/*.db-wal
+
+# =========================================================
+# SQLite temporary files
+# =========================================================
+
+*.sqlite
+*.sqlite3
+
+
+
+
+

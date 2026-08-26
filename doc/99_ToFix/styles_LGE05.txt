@@ -1,0 +1,131 @@
+───────────────────────────────────────────────
+🎨 LGE STYLE CHEAT SHEET
+───────────────────────────────────────────────
+Фірмові кольори:
+  🔵 #2E7EF9 – основний акцент (кнопки, рамки)
+  ⚪ #E0E0E0 – світлий текст / фони
+  ⚫ #101820 – темна основа
+  🩶 #A0A0A0 – допоміжний текст
+───────────────────────────────────────────────
+
+───────────────────────────────────────────────
+🟦 QLabel – звичайний текст
+───────────────────────────────────────────────
+color: #333333;
+font-family: "Segoe UI";
+font-size: 10pt;
+background-color: transparent;
+
+───────────────────────────────────────────────
+🟦 QLabel – заголовок
+───────────────────────────────────────────────
+color: #2E7EF9;
+font-family: "Segoe UI";
+font-size: 14pt;
+font-weight: bold;
+background-color: transparent;
+
+───────────────────────────────────────────────
+🟥 QLabel – текст помилки
+───────────────────────────────────────────────
+color: #FF5555;
+font-size: 9pt;
+font-style: italic;
+background-color: transparent;
+
+───────────────────────────────────────────────
+⬜ QLineEdit – поле вводу
+───────────────────────────────────────────────
+border: 1px solid #AAAAAA;
+border-radius: 4px;
+padding: 4px;
+font-size: 10pt;
+background-color: white;
+
+QLineEdit:focus {
+    border: 1px solid #2E7EF9;
+}
+
+───────────────────────────────────────────────
+🟨 QComboBox – список
+───────────────────────────────────────────────
+border: 1px solid #AAAAAA;
+border-radius: 4px;
+padding: 3px;
+font-size: 10pt;
+background-color: white;
+
+QComboBox:focus {
+    border: 1px solid #2E7EF9;
+}
+
+───────────────────────────────────────────────
+🟩 QPushButton – основна дія
+───────────────────────────────────────────────
+background-color: #2E7EF9;
+color: white;
+border-radius: 6px;
+height: 30px;
+font-size: 10pt;
+font-weight: bold;
+
+QPushButton:hover {
+    background-color: #1E5FD0;
+}
+
+───────────────────────────────────────────────
+⬜ QPushButton – додаткова / нейтральна
+───────────────────────────────────────────────
+background-color: #E0E0E0;
+color: #000000;
+border-radius: 6px;
+height: 30px;
+font-size: 10pt;
+
+QPushButton:hover {
+    background-color: #CCCCCC;
+}
+
+───────────────────────────────────────────────
+🟣 QLabel – титул або фоновий напис
+───────────────────────────────────────────────
+color: #E0E0E0;
+font-family: "Segoe UI";
+font-size: 18pt;
+font-weight: bold;
+letter-spacing: 1px;
+text-shadow: 1px 1px 2px #000000;
+background-color: transparent;
+
+───────────────────────────────────────────────
+🔵 QProgressBar – індикатор
+───────────────────────────────────────────────
+QProgressBar {
+    border: 1px solid #2E7EF9;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 30);
+    height: 12px;
+}
+
+QProgressBar::chunk {
+    background-color: #2E7EF9;
+    border-radius: 5px;
+}
+
+───────────────────────────────────────────────
+🌍 Background – градієнт лівої панелі
+───────────────────────────────────────────────
+background-color: qlineargradient(
+    x1:0, y1:0, x2:0, y2:1,
+    stop:0 #1A2A3A, stop:1 #101820
+);
+
+───────────────────────────────────────────────
+🧠 SplashScreen – фон із картинкою
+───────────────────────────────────────────────
+QWidget#SplashScreen {
+    background-image: url(:/icons/robot_600x400.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+───────────────────────────────────────────────

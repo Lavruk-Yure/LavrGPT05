@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DbGridWindow</class>
+ <widget class="QDialog" name="DbGridWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1240</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>900</width>
+    <height>650</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>DbGrid</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/office/icons/lgeoffice_gpt_24x24.png</normaloff>:/office/icons/lgeoffice_gpt_24x24.png</iconset>
+  </property>
+  <property name="layoutDirection">
+   <enum>Qt::LayoutDirection::LeftToRight</enum>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayoutMain">
+   <item>
+    <widget class="QSplitter" name="splitterMain">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
+     <widget class="QGroupBox" name="grpCustomers">
+      <property name="minimumSize">
+       <size>
+        <width>320</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Клієнти</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayoutCustomers" stretch="20,4,1">
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <item>
+        <widget class="QTableView" name="tvCustomers">
+         <property name="editTriggers">
+          <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="layoutCustFilters" stretch="5,5,5,1">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="leftMargin">
+          <number>6</number>
+         </property>
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="editCustFilterEmail">
+           <property name="placeholderText">
+            <string>Email містить...</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="editCustFilterName">
+           <property name="placeholderText">
+            <string>ПІБ містить...</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboCustFilterCreated">
+           <item>
+            <property name="text">
+             <string>Всі</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>7 днів</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>1 місяць</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>1 рік</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="layoutCustFilterButtons">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnCustFilterAction">
+             <property name="toolTip">
+              <string>Застосувати фільтр</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="layoutCustNav">
+         <item>
+          <widget class="QPushButton" name="btnCustFirst"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustPrev"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustNext"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustLast"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustAdd">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustDel"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustSave"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustCancel"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustRefresh"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCustOrderRequest">
+           <property name="toolTip">
+            <string>Замовлення ліцензії (створити замовлення для вибраного клієнта)</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QSplitter" name="splitterRight">
+      <property name="orientation">
+       <enum>Qt::Orientation::Vertical</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QGroupBox" name="grpOrders">
+       <property name="title">
+        <string>Замовлення</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayoutOrders">
+        <property name="topMargin">
+         <number>20</number>
+        </property>
+        <item>
+         <widget class="QTableView" name="tvOrders"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="layoutOrdNav">
+          <item>
+           <widget class="QPushButton" name="btnOrdFirst"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdPrev"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdNext"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdLast"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdAdd"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdDel"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdSave"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdCancel"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdRefresh"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOrdIssue"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QSplitter" name="splitterPayLic">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+       <property name="childrenCollapsible">
+        <bool>false</bool>
+       </property>
+       <widget class="QGroupBox" name="grpPayments">
+        <property name="title">
+         <string>Платежі</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayoutPayments">
+         <property name="topMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="chkPayUnlinked">
+           <property name="text">
+            <string>Не прив'язані платежі</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTableView" name="tvPayments"/>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="layoutPayNav">
+           <item>
+            <widget class="QPushButton" name="btnPayFirst"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayPrev"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayNext"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayLast"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayAdd"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayDel"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPaySave"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayCancel"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayRefresh"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayAddDialog">
+             <property name="toolTip">
+              <string>Додати платіж (через форму)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacerPayOffice">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPayLinkToOrder">
+             <property name="toolTip">
+              <string>Прив'язати платіж до замовлення</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QGroupBox" name="grpLicenses">
+        <property name="title">
+         <string>Ліцензії</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayoutLicenses">
+         <property name="topMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="QTableView" name="tvLicenses"/>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="layoutLicNav">
+           <item>
+            <widget class="QPushButton" name="btnLicFirst"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicPrev"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicNext"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicLast"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicAdd"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicDel"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicSave"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicCancel"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicRefresh"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacerLicOffice">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnLicEmail">
+             <property name="toolTip">
+              <string>Надіслати e-Mail</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layoutBottomButtons">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>Закрити</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

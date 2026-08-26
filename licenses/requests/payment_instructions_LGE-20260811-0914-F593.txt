@@ -1,0 +1,58 @@
+========================
+LGE — Інструкція з оплати (Proforma)
+ORDER_ID: LGE-20260811-0914-F593
+ДАТА (UTC): 2026-08-11T06:14:14Z
+========================
+
+1) Продукт: LGE v1.0.1
+2) Ліцензія: PRO
+3) Сума: 99.00 USD
+4) Спосіб оплати: Card/Bank transfer
+
+Реквізити отримувача:
+- Отримувач: Lavruk Yurii
+- Картка / IBAN: 1111 2222 3333 4444
+- Банк: a-bank
+- Країна: Ukraina
+- Контакт: erclavr@gmail.com
+
+Призначення платежу (обовʼязково):
+LGE LGE-20260811-0914-F593
+
+Після оплати:
+- Відповідайте на лист-заявку з темою: LGE License Request LGE-20260811-0914-F593
+- Якщо банк не дозволяє вказати призначення — додайте квитанцію або скрін оплати.
+
+Умови:
+- Персональна ліцензія з привʼязкою до цього ПК (fingerprint).
+- Ліцензійний ключ надсилається після підтвердження оплати.
+
+
+========================
+LGE — Payment Instructions (Proforma)
+ORDER_ID: LGE-20260811-0914-F593
+DATE (UTC): 2026-08-11T06:14:14Z
+========================
+
+1) Product: LGE v1.0.1
+2) License: PRO
+3) Amount: 99.00 USD
+4) Payment method: Card/Bank transfer
+
+Seller details:
+- Recipient: Lavruk Yurii
+- Card/IBAN: 1111 2222 3333 4444
+- Bank: a-bank
+- Country: Ukraina
+- Contact: erclavr@gmail.com
+
+Payment reference (important):
+LGE LGE-20260811-0914-F593
+
+After payment:
+- Reply to your request email with subject: LGE License Request LGE-20260811-0914-F593
+- If your bank does not allow a reference — attach a payment receipt/screenshot.
+
+Terms:
+- Personal license bound to this PC (fingerprint).
+- License key is sent after payment verification.

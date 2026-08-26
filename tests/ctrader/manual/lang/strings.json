@@ -1,0 +1,14 @@
+{
+  "lang_active": {
+    "code": "en"
+  },
+  "token_expired": {
+    "en": "Token expired. Refreshing access token."
+  },
+  "tokens_saved": {
+    "en": "Tokens saved: {path}"
+  },
+  "token_still_valid": {
+    "en": "Token is still valid."
+  }
+}

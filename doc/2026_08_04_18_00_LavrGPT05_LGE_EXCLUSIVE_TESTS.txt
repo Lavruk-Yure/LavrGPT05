@@ -1,0 +1,44 @@
+LavrGPT05 — LGE EXCLUSIVE / SAFETY_HOLD_EXTERNAL_EXPOSURE
+Windows regression commands
+
+1. Persistent external-exposure ledger and pre-Trade guard
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_ib\run_ib_fx_external_exposure_ledger_check.py
+
+2. Current/stale external exposure display snapshot
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_ib\run_ib_fx_external_exposure_display_snapshot_check.py
+
+3. WSP SAFETY HOLD lifecycle
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_workspace\run_algorithm_workspace_external_exposure_safety_hold_check.py
+
+4. WSP Live Read-only regression
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_workspace\run_algorithm_workspace_live_readonly_check.py
+
+5. OrdersPage external-only read-only row and recovery route
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_orders\run_orders_page_ib_external_only_exposure_check.py
+
+6. OrdersPage stale external exposure
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_orders\run_orders_page_ib_stale_external_exposure_check.py
+
+7. OrdersPage translations and dynamic headers
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_orders\run_orders_page_retranslation_check.py
+
+8. Centralized translation policy
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_translation\run_translation_policy_check.py
+
+9. Fallback rebuild policy
+D:\LavrGPT\venv313\Scripts\python.exe D:\LavrGPT\LavrGPT05\tests\runtime_translation\run_rebuild_fallback_english_fill_check.py
+
+Manual Windows/PySide6 check after all tests are green:
+
+1. Start an IB broker-data WSP for a symbol with no external TWS exposure.
+   Expected: WSP reaches RUNNING.
+2. While LGE and the WSP are running, create an external TWS FX position for the same account and symbol.
+   Expected within about 10 seconds: WSP enters ЗАХИСНА ПАУЗА / SAFETY HOLD;
+   OrdersPage opens; filter Зовнішні у брокері is enabled; the exact symbol is focused.
+3. Try to place a new LGE MANUAL order for that same account and symbol.
+   Expected: localized LGE EXCLUSIVE warning; no Trade row and no IB broker request.
+4. Close/resolve the external TWS position and its protective orders. In LGE press Оновити.
+   Expected: external exposure is confirmed CLEARED; WSP moves to WAIT_SPREAD.
+5. Wait for a new valid live quote/spread.
+   Expected: WSP returns to RUNNING. Old spread must not be reused.
+6. Verify a different symbol is not blocked by the external exposure of the first symbol.

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AlgorithmWorkspaceArea</class>
+ <widget class="QWidget" name="AlgorithmWorkspaceArea">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1180</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>12</number>
+   </property>
+   <property name="topMargin">
+    <number>8</number>
+   </property>
+   <property name="rightMargin">
+    <number>12</number>
+   </property>
+   <property name="bottomMargin">
+    <number>8</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutToolbar">
+     <item>
+      <widget class="QLabel" name="lblTitle">
+       <property name="styleSheet">
+        <string notr="true">font: 700 15pt &quot;Segoe UI&quot;;
+color: #ffffff;</string>
+       </property>
+       <property name="text">
+        <string>[AlgorithmWorkspaceArea.lblTitle]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacerToolbar">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnNew">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px 10px;
+    font: 9pt &quot;Segoe UI&quot;;
+}</string>
+       </property>
+       <property name="text">
+        <string>[AlgorithmWorkspaceArea.btnNew]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCascade">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px 10px;
+    font: 9pt &quot;Segoe UI&quot;;
+}</string>
+       </property>
+       <property name="text">
+        <string>[AlgorithmWorkspaceArea.btnCascade]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnTile">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px 10px;
+    font: 9pt &quot;Segoe UI&quot;;
+}</string>
+       </property>
+       <property name="text">
+        <string>[AlgorithmWorkspaceArea.btnTile]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnWorkspaceLock">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>30</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QToolButton#btnWorkspaceLock {
+    background-color: #d7edf1;
+    border: 1px solid #6ca6b2;
+    border-radius: 5px;
+    min-height: 0px;
+    max-height: 24px;
+    padding: 0px;
+}
+QToolButton#btnWorkspaceLock:hover {
+    background-color: #ffffff;
+    border-color: #9bd3dc;
+}
+QToolButton#btnWorkspaceLock:pressed {
+    background-color: #c4e1e6;
+    border-color: #4f8e9b;
+}
+QToolButton#btnWorkspaceLock:checked {
+    background-color: #f2c14e;
+    border-color: #d49b00;
+}
+QToolButton#btnWorkspaceLock:checked:hover {
+    background-color: #ffd66a;
+    border-color: #d49b00;
+}</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/icons/lock_open.png</normaloff>:/icons/lock_open.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>18</width>
+         <height>18</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoRaise">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackWorkspaceState">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="pageEmpty">
+      <layout class="QVBoxLayout" name="verticalLayoutEmpty">
+       <item>
+        <spacer name="verticalSpacerEmptyTop">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblEmpty">
+         <property name="styleSheet">
+          <string notr="true">color: #a7cbd2;
+font: 600 12pt &quot;Segoe UI&quot;;</string>
+         </property>
+         <property name="text">
+          <string>[AlgorithmWorkspaceArea.lblEmpty]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacerEmptyBottom">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageMdi">
+      <layout class="QVBoxLayout" name="verticalLayoutMdi">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QMdiArea" name="mdiWorkspaces">
+         <property name="styleSheet">
+          <string notr="true">QMdiArea#mdiWorkspaces {
+    background-color: #132c35;
+    border: 1px solid #315965;
+    border-radius: 6px;
+}</string>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="activationOrder">
+          <enum>QMdiArea::WindowOrder::ActivationHistoryOrder</enum>
+         </property>
+         <property name="viewMode">
+          <enum>QMdiArea::ViewMode::SubWindowView</enum>
+         </property>
+         <property name="documentMode">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,98 @@
+<RCC>
+  <qresource prefix="/office">
+    <file>icons/lgeoffice_gpt_24x24.png</file>
+    <file>icons/robot_400x400.png</file>
+    <file>icons/oko_26x26.png</file>
+    <file>icons/eye_closed.svg</file>
+    <file>icons/eye_open.svg</file>
+    <file>ui/office.qss</file>
+
+    <!-- dbNavigator (Normal) -->
+    <file>icons/nav/nav_first.png</file>
+    <file>icons/nav/nav_prev.png</file>
+    <file>icons/nav/nav_next.png</file>
+    <file>icons/nav/nav_last.png</file>
+
+    <file>icons/nav/nav_add.png</file>
+    <file>icons/nav/nav_delete.png</file>
+    <file>icons/nav/nav_save.png</file>
+    <file>icons/nav/nav_cancel.png</file>
+    <file>icons/nav/nav_refresh.png</file>
+
+    <file>icons/nav/nav_issue.png</file>
+
+    <!-- dbNavigator (Hover) -->
+    <file>icons/nav/nav_first_hover.png</file>
+    <file>icons/nav/nav_prev_hover.png</file>
+    <file>icons/nav/nav_next_hover.png</file>
+    <file>icons/nav/nav_last_hover.png</file>
+
+    <file>icons/nav/nav_add_hover.png</file>
+    <file>icons/nav/nav_delete_hover.png</file>
+    <file>icons/nav/nav_save_hover.png</file>
+    <file>icons/nav/nav_cancel_hover.png</file>
+    <file>icons/nav/nav_refresh_hover.png</file>
+
+    <file>icons/nav/nav_issue_hover.png</file>
+
+    <!-- dbNavigator (Disabled) -->
+    <file>icons/nav/nav_first_disabled.png</file>
+    <file>icons/nav/nav_prev_disabled.png</file>
+    <file>icons/nav/nav_next_disabled.png</file>
+    <file>icons/nav/nav_last_disabled.png</file>
+
+    <file>icons/nav/nav_add_disabled.png</file>
+    <file>icons/nav/nav_delete_disabled.png</file>
+    <file>icons/nav/nav_save_disabled.png</file>
+    <file>icons/nav/nav_cancel_disabled.png</file>
+    <file>icons/nav/nav_refresh_disabled.png</file>
+
+    <file>icons/nav/nav_issue_disabled.png</file>
+    <!-- bisnes_push (Disabled) -->
+    <file>icons/bisnes_push/add_order_default.png</file>
+    <file>icons/bisnes_push/add_order_hover.png</file>
+    <file>icons/bisnes_push/add_order_disabled.png</file>
+
+    <file>icons/bisnes_push/add_payment_default.png</file>
+    <file>icons/bisnes_push/add_payment_hover.png</file>
+    <file>icons/bisnes_push/add_payment_disabled.png</file>
+
+    <file>icons/bisnes_push/filter_default.png</file>
+    <file>icons/bisnes_push/filter_hover.png</file>
+    <file>icons/bisnes_push/filter_disabled.png</file>
+
+    <file>icons/bisnes_push/generate_license_default.png</file>
+    <file>icons/bisnes_push/generate_license_hover.png</file>
+    <file>icons/bisnes_push/generate_license_disabled.png</file>
+
+    <file>icons/bisnes_push/mark_verified_default.png</file>
+    <file>icons/bisnes_push/mark_verified_hover.png</file>
+    <file>icons/bisnes_push/mark_verified_disabled.png</file>
+
+    <file>icons/bisnes_push/payment_from_order_default.png</file>
+    <file>icons/bisnes_push/payment_from_order_hover.png</file>
+    <file>icons/bisnes_push/payment_from_order_disabled.png</file>
+
+    <file>icons/bisnes_push/send_email_default.png</file>
+    <file>icons/bisnes_push/send_email_hover.png</file>
+    <file>icons/bisnes_push/send_email_disabled.png</file>
+
+    <file>icons/bisnes_push/show_license_default.png</file>
+    <file>icons/bisnes_push/show_license_hover.png</file>
+    <file>icons/bisnes_push/show_license_disabled.png</file>
+
+    <file>icons/bisnes_push/clear_filter_default.png</file>
+    <file>icons/bisnes_push/clear_filter_hover.png</file>
+    <file>icons/bisnes_push/clear_filter_disabled.png</file>
+
+    <file>icons/bisnes_push/check_black_16.png</file>
+    <file>icons/bisnes_push/check_white_16.png</file>
+  </qresource>
+  <qresource prefix="/icons">
+    <file>icons/LGEOffice.ico</file>
+  </qresource>
+  <qresource prefix="/sql">
+    <file>core/schema.sql</file>
+  </qresource>
+</RCC>
+

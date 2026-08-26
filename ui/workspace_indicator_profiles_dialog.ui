@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WorkspaceIndicatorProfilesDialog</class>
+ <widget class="QDialog" name="WorkspaceIndicatorProfilesDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>900</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>[WorkspaceIndicatorProfilesDialog.windowTitle]</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblWorkspace">
+     <property name="text">
+      <string>[WorkspaceIndicatorProfilesDialog.workspace]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblCurrentBindings">
+     <property name="text">
+      <string>[WorkspaceIndicatorProfilesDialog.currentBindings]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="splitProfiles">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="pnlProfiles">
+      <layout class="QVBoxLayout" name="verticalLayoutProfiles">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>8</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTreeWidget" name="treeProfiles">
+         <property name="minimumSize">
+          <size>
+           <width>390</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>true</bool>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
+         </property>
+         <property name="columnCount">
+          <number>3</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>[WorkspaceIndicatorProfilesDialog.columnProfile]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[WorkspaceIndicatorProfilesDialog.columnRevision]</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>[WorkspaceIndicatorProfilesDialog.columnStatus]</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayoutProfileActions">
+         <item>
+          <widget class="QPushButton" name="btnNew">
+           <property name="text">
+            <string>[WorkspaceIndicatorProfilesDialog.btnNew]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDuplicate">
+           <property name="text">
+            <string>[WorkspaceIndicatorProfilesDialog.btnDuplicate]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnArchive">
+           <property name="text">
+            <string>[WorkspaceIndicatorProfilesDialog.btnArchive]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDelete">
+           <property name="text">
+            <string>[WorkspaceIndicatorProfilesDialog.btnDelete]</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pnlEditor">
+      <layout class="QVBoxLayout" name="verticalLayoutEditor">
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="grpProfile">
+         <property name="title">
+          <string>[WorkspaceIndicatorProfilesDialog.grpProfile]</string>
+         </property>
+         <layout class="QFormLayout" name="formLayoutProfile">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblNameCaption">
+            <property name="text">
+             <string>[WorkspaceIndicatorProfilesDialog.lblName]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="edtName"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblIndicatorCaption">
+            <property name="text">
+             <string>[WorkspaceIndicatorProfilesDialog.lblIndicator]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="lblIndicatorValue">
+            <property name="text">
+             <string>—</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblSourceReferenceCaption">
+            <property name="text">
+             <string>[WorkspaceIndicatorProfilesDialog.lblSourceReference]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="lblSourceReferenceValue">
+            <property name="text">
+             <string>—</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lblRevisionCaption">
+            <property name="text">
+             <string>[WorkspaceIndicatorProfilesDialog.lblRevision]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="lblRevisionValue">
+            <property name="text">
+             <string>—</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lblProfileStatusCaption">
+            <property name="text">
+             <string>[WorkspaceIndicatorProfilesDialog.lblStatus]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="lblProfileStatusValue">
+            <property name="text">
+             <string>—</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QStackedWidget" name="stackIndicator">
+         <widget class="QWidget" name="pageNoSelection">
+          <layout class="QVBoxLayout" name="verticalLayoutNoSelection">
+           <item>
+            <widget class="QLabel" name="lblNoSelection">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.noSelection]</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageMacd">
+          <layout class="QFormLayout" name="formLayoutMacd">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblMacdSource">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblSource]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmbMacdSource"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lblMacdFast">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblFastPeriod]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="spnMacdFast">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="lblMacdSlow">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblSlowPeriod]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="spnMacdSlow">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="lblMacdSignal">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblSignalPeriod]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QSpinBox" name="spnMacdSignal">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="lblMacdOscillatorMa">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblOscillatorMa]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QComboBox" name="cmbMacdOscillatorMa"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="lblMacdSignalMa">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblSignalMa]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QComboBox" name="cmbMacdSignalMa"/>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="lblMacdShift">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblShift]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="spnMacdShift">
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageAlligator">
+          <layout class="QFormLayout" name="formLayoutAlligator">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblAlligatorSource">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblSource]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmbAlligatorSource"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lblJawPeriod">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblJawPeriod]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="spnJawPeriod">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="lblJawShift">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblJawShift]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="spnJawShift">
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="lblTeethPeriod">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblTeethPeriod]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QSpinBox" name="spnTeethPeriod">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="lblTeethShift">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblTeethShift]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QSpinBox" name="spnTeethShift">
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="lblLipsPeriod">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblLipsPeriod]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QSpinBox" name="spnLipsPeriod">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="lblLipsShift">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblLipsShift]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="spnLipsShift">
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>100000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="lblAlligatorMa">
+             <property name="text">
+              <string>[WorkspaceIndicatorProfilesDialog.lblMaType]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QComboBox" name="cmbAlligatorMa"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacerEditor">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblNote">
+     <property name="text">
+      <string>[WorkspaceIndicatorProfilesDialog.note]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutButtons">
+     <item>
+      <widget class="QPushButton" name="btnUseForWorkspace">
+       <property name="text">
+        <string>[WorkspaceIndicatorProfilesDialog.btnUseForWorkspace]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacerButtons">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="text">
+        <string>[WorkspaceIndicatorProfilesDialog.btnSave]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>[WorkspaceIndicatorProfilesDialog.btnClose]</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
