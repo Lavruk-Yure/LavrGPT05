@@ -2,112 +2,53 @@
   "lang_active": {
     "code": "uk"
   },
+  "AlgorithmWorkspaceWindow.colClosedAt": {
+    "en": "Closed",
+    "uk": "Закрито"
+  },
   "AlgorithmWorkspaceWindow.signalGoJournalHint": {
     "en": "Open journal records for the selected signal timestamp."
   },
-  "AlgorithmWorkspaceSignalTooltip.macdQualityResult": {
-    "en": "MACD Quality result",
-    "uk": "Результат MACD Quality"
+  "AlgorithmWorkspaceWindow.chartDrawSegmentHint": {
+    "en": "Slanted segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: finish. Left click while drawing: finish this segment and continue a polyline from the same point.",
+    "uk": "Похилий відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші. ПКМ — завершити лінію. ЛКМ під час побудови — завершити поточний відрізок і продовжити ламану з цієї ж точки."
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorObservationState": {
-    "en": "Alligator observation state",
-    "uk": "Стан observation Alligator"
+  "AlgorithmWorkspaceWindow.chartDrawHorizontalHint": {
+    "en": "Horizontal segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: second point.",
+    "uk": "Горизонтальний відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші, ПКМ — друга точка."
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorPhase": {
-    "en": "Alligator phase",
-    "uk": "Фаза Alligator"
+  "AlgorithmWorkspaceWindow.chartDrawVerticalHint": {
+    "en": "Vertical segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: second point.",
+    "uk": "Вертикальний відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші, ПКМ — друга точка."
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorActiveAge": {
-    "en": "Alligator active age",
-    "uk": "Вік ACTIVE, барів"
+  "AlgorithmWorkspaceWindow.chartDrawClearHint": {
+    "en": "Clear all temporary manual lines from the current chart.",
+    "uk": "Очистити всі тимчасові ручні лінії на поточній діаграмі."
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorT2": {
-    "en": "Alligator t-2",
-    "uk": "Alligator t-2"
+  "AlgorithmWorkspaceWindow.chartDrawingStartLabel": {
+    "en": "Start",
+    "uk": "Початок"
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorT1": {
-    "en": "Alligator t-1",
-    "uk": "Alligator t-1"
+  "AlgorithmWorkspaceWindow.chartDrawingEndLabel": {
+    "en": "End",
+    "uk": "Кінець"
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorT": {
-    "en": "Alligator t",
-    "uk": "Alligator t"
+  "AlgorithmWorkspaceWindow.chartDrawingLineLabel": {
+    "en": "Line",
+    "uk": "Лінія"
   },
-  "AlgorithmWorkspaceSignalTooltip.alligatorDecision": {
-    "en": "Alligator decision",
-    "uk": "Рішення Alligator"
+  "AlgorithmWorkspaceWindow.chartDrawingTimeLabel": {
+    "en": "Time UTC",
+    "uk": "Час UTC"
   },
-  "AlgorithmWorkspaceSignalTooltip.finalDecision": {
-    "en": "Final decision",
-    "uk": "Підсумкове рішення"
+  "AlgorithmWorkspaceWindow.chartDrawingValueLabel": {
+    "en": "Value",
+    "uk": "Значення"
   },
-  "AlgorithmWorkspaceSignalTooltip.candidateFLifecycle": {
-    "en": "Candidate F lifecycle",
-    "uk": "Життєвий цикл Candidate F"
-  },
-  "AlgorithmWorkspaceSignalTooltip.lifecycleReason": {
-    "en": "Lifecycle reason",
-    "uk": "Причина завершення lifecycle"
-  },
-  "AlgorithmWorkspaceSignalTooltip.lifecycleTime": {
-    "en": "Lifecycle time",
-    "uk": "Час завершення lifecycle"
-  },
-  "AlgorithmWorkspaceSignalTooltip.lifecycleDelayBars": {
-    "en": "Lifecycle delay, bars",
-    "uk": "Очікування, барів"
-  },
-  "AlgorithmWorkspaceSignalTooltip.lifecycleSnapshot": {
-    "en": "Lifecycle snapshot",
-    "uk": "Стан при завершенні lifecycle"
-  },
-  "AlgorithmWorkspaceAlligatorPhase.starting": {
-    "en": "Starting",
-    "uk": "STARTING"
-  },
-  "AlgorithmWorkspaceAlligatorPhase.active": {
-    "en": "Active",
-    "uk": "ACTIVE"
-  },
-  "AlgorithmWorkspaceAlligatorPhase.ending": {
-    "en": "Ending",
-    "uk": "ENDING"
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.armed": {
-    "en": "ARMED",
-    "uk": "ARMED"
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.release": {
-    "en": "RELEASE",
-    "uk": "RELEASE"
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.cancel": {
-    "en": "CANCEL",
-    "uk": "CANCEL"
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.expire": {
-    "en": "EXPIRE",
-    "uk": "EXPIRE"
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.oppositeMacd": {
-    "en": "Opposite MACD signal cancelled the armed candidate.",
-    "uk": "З’явився протилежний сигнал MACD; ARMED скасовано."
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.macdInvalid": {
-    "en": "MACD relation became invalid before release.",
-    "uk": "Співвідношення MACD стало невалідним до підтвердження."
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.oppositeActiveAlligator": {
-    "en": "Opposite ACTIVE Alligator cancelled the armed candidate.",
-    "uk": "Протилежний ACTIVE Alligator скасував ARMED."
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.ttlExpired": {
-    "en": "ARMED TTL expired before confirmation.",
-    "uk": "TTL ARMED завершився без підтвердження."
-  },
-  "AlgorithmWorkspaceCandidateFLifecycle.releasedByAlligator": {
-    "en": "Alligator confirmation released the armed candidate.",
-    "uk": "Підтвердження Alligator дозволило відкладений сигнал."
+  "AlgorithmWorkspaceHistoryDownloadDialog.statusProgress": {
+    "en": "Downloading: {percent}% · requests {requests} · bars {bars} · earliest bar {covered_start} UTC",
+    "uk": "Завантаження: {percent}% · запитів {requests} · барів {bars} · найраніший бар {covered_start} UTC",
+    "pl": "Pobieranie: {percent}% · zapytań {requests} · barów {bars} · najwcześniejszy bar {covered_start} UTC"
   },
   "WorkspaceParameterGroup.dataReplay.title": {
     "en": "Data and Replay",
@@ -179,7 +120,7 @@
   },
   "WorkspaceParameter.maximumOpenPositions.description": {
     "en": "Maximum number of positions allowed by this WSP risk policy.",
-    "uk": "Максимальна кількість позицій, дозволених цією політикою ризиків WSP."
+    "uk": "Максимальна кількість позицій, дозволена цією політикою управління ризиками WSP."
   },
   "WorkspaceParameter.maximumDailyLossPercent.title": {
     "en": "Maximum daily loss, %",
@@ -195,7 +136,7 @@
   },
   "WorkspaceParameter.requireStopLoss.description": {
     "en": "Reject every trade intent that has no Stop Loss.",
-    "uk": "Відхиляйте кожну спробу укладення угоди, яка не має стоп-лосу."
+    "uk": "Відхиляйте кожну спробу укладення угоди, яка не має стоп-лосса."
   },
   "WorkspaceParameter.profitDrawdownClosePercent.title": {
     "en": "Profit drawdown close, %",
@@ -204,93 +145,5 @@
   "WorkspaceParameter.profitDrawdownClosePercent.description": {
     "en": "Local close decision after the configured profit drawdown.",
     "uk": "Рішення про закриття позиції на місцевому рівні після налаштованого відкату прибутку."
-  },
-  "AlgorithmWorkspaceSignalSummary.header": {
-    "en": "************************************ DECISION SUMMARY ************************************",
-    "uk": "************************************ ПІДСУМОК РІШЕННЯ ************************************"
-  },
-  "AlgorithmWorkspaceSignalSummary.footer": {
-    "en": "************************************ END OF SUMMARY ************************************",
-    "uk": "************************************ КІНЕЦЬ ПІДСУМКУ ************************************"
-  },
-  "AlgorithmWorkspaceSignalSummary.signal": {
-    "en": "Signal",
-    "uk": "Сигнал"
-  },
-  "AlgorithmWorkspaceSignalSummary.macdQuality": {
-    "en": "MACD Quality",
-    "uk": "MACD Quality"
-  },
-  "AlgorithmWorkspaceSignalSummary.alligator": {
-    "en": "Alligator",
-    "uk": "Alligator"
-  },
-  "AlgorithmWorkspaceSignalSummary.alligatorStrength": {
-    "en": "Alligator strength",
-    "uk": "Сила Alligator"
-  },
-  "AlgorithmWorkspaceSignalSummary.lifecycle": {
-    "en": "Candidate F",
-    "uk": "Candidate F"
-  },
-  "AlgorithmWorkspaceSignalSummary.lifecycleSnapshot": {
-    "en": "Lifecycle state",
-    "uk": "Стан lifecycle"
-  },
-  "AlgorithmWorkspaceSignalSummary.lifecycleReason": {
-    "en": "Lifecycle reason",
-    "uk": "Причина lifecycle"
-  },
-  "AlgorithmWorkspaceSignalSummary.filter": {
-    "en": "Filter / guard",
-    "uk": "Фільтр / guard"
-  },
-  "AlgorithmWorkspaceSignalSummary.decision": {
-    "en": "Decision",
-    "uk": "Рішення"
-  },
-  "AlgorithmWorkspaceSignalSummary.technicalHeader": {
-    "en": "*** TECHNICAL DIAGNOSTICS ***",
-    "uk": "*** ТЕХНІЧНА ДІАГНОСТИКА ***"
-  },
-  "AlgorithmWorkspaceSignalSummary.alligatorConfirmation": {
-    "en": "Alligator confirmation",
-    "uk": "Підтвердження Alligator"
-  },
-  "AlgorithmWorkspaceSignalSummary.confirmationPassedRelease": {
-    "en": "PASSED → RELEASE",
-    "uk": "ПРОЙДЕНО → RELEASE"
-  },
-  "AlgorithmWorkspaceSignalSummary.structuralGuard": {
-    "en": "Structural guard",
-    "uk": "Structural guard"
-  },
-  "AlgorithmWorkspaceSignalSummary.finalDecision": {
-    "en": "Final decision",
-    "uk": "Фінальне рішення"
-  },
-  "AlgorithmWorkspaceWindow.lblPositionDateJump": {
-    "en": "Go to date",
-    "uk": "Перейти до дати"
-  },
-  "AlgorithmWorkspaceWindow.btnPositionDateJump": {
-    "en": "Go",
-    "uk": "Перейти на вказану дату"
-  },
-  "AlgorithmWorkspaceWindow.positionDateJumpHint": {
-    "en": "Select an opening date from the calendar and go to the first visible position on that date, or the next available date.",
-    "uk": "Вибрати календарну дату відкриття й перейти до першої видимої позиції цього дня або найближчої наступної доступної дати."
-  },
-  "AlgorithmWorkspaceWindow.lblSignalDateJump": {
-    "en": "Go to date",
-    "uk": "Перейти до дати"
-  },
-  "AlgorithmWorkspaceWindow.btnSignalDateJump": {
-    "en": "Go",
-    "uk": "Перейти на вказану дату"
-  },
-  "AlgorithmWorkspaceWindow.signalDateJumpHint": {
-    "en": "Select a signal date from the calendar and go to the first visible signal on that date, or the next available date.",
-    "uk": "Вибрати календарну дату сигналу й перейти до першого видимого сигналу цього дня або найближчої наступної доступної дати."
   }
 }

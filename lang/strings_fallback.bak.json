@@ -7132,10 +7132,6 @@
     "en": "Replay entry policy",
     "uk": "Вхід Replay"
   },
-  "AlgorithmWorkspaceParametersDialog.brokerExecutionDisabledReplay": {
-    "en": "Disabled in Historical Replay",
-    "uk": "Вимкнено у Historical Replay"
-  },
   "AlgorithmWorkspaceParametersDialog.snapshotBrokerExecution": {
     "en": "Broker execution",
     "uk": "Виконання у брокера"
@@ -7167,5 +7163,197 @@
   "AlgorithmWorkspaceParametersDialog.snapshotUpdatedUtc": {
     "en": "WSP snapshot updated UTC",
     "uk": "Оновлено snapshot WSP, UTC"
+  },
+  "AlgorithmWorkspaceSignalTooltip.macdQualityResult": {
+    "en": "MACD Quality result",
+    "uk": "Результат MACD Quality"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorObservationState": {
+    "en": "Alligator observation state",
+    "uk": "Стан observation Alligator"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorPhase": {
+    "en": "Alligator phase",
+    "uk": "Фаза Alligator"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorActiveAge": {
+    "en": "Alligator active age",
+    "uk": "Вік ACTIVE, барів"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorT2": {
+    "en": "Alligator t-2",
+    "uk": "Alligator t-2"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorT1": {
+    "en": "Alligator t-1",
+    "uk": "Alligator t-1"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorT": {
+    "en": "Alligator t",
+    "uk": "Alligator t"
+  },
+  "AlgorithmWorkspaceSignalTooltip.alligatorDecision": {
+    "en": "Alligator decision",
+    "uk": "Рішення Alligator"
+  },
+  "AlgorithmWorkspaceSignalTooltip.finalDecision": {
+    "en": "Final decision",
+    "uk": "Підсумкове рішення"
+  },
+  "AlgorithmWorkspaceSignalTooltip.candidateFLifecycle": {
+    "en": "Candidate F lifecycle",
+    "uk": "Життєвий цикл Candidate F"
+  },
+  "AlgorithmWorkspaceSignalTooltip.lifecycleReason": {
+    "en": "Lifecycle reason",
+    "uk": "Причина завершення lifecycle"
+  },
+  "AlgorithmWorkspaceSignalTooltip.lifecycleTime": {
+    "en": "Lifecycle time",
+    "uk": "Час завершення lifecycle"
+  },
+  "AlgorithmWorkspaceSignalTooltip.lifecycleDelayBars": {
+    "en": "Lifecycle delay, bars",
+    "uk": "Очікування, барів"
+  },
+  "AlgorithmWorkspaceSignalTooltip.lifecycleSnapshot": {
+    "en": "Lifecycle snapshot",
+    "uk": "Стан при завершенні lifecycle"
+  },
+  "AlgorithmWorkspaceAlligatorPhase.starting": {
+    "en": "Starting",
+    "uk": "STARTING"
+  },
+  "AlgorithmWorkspaceAlligatorPhase.active": {
+    "en": "Active",
+    "uk": "ACTIVE"
+  },
+  "AlgorithmWorkspaceAlligatorPhase.ending": {
+    "en": "Ending",
+    "uk": "ENDING"
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.armed": {
+    "en": "ARMED",
+    "uk": "ARMED"
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.release": {
+    "en": "RELEASE",
+    "uk": "RELEASE"
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.cancel": {
+    "en": "CANCEL",
+    "uk": "CANCEL"
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.expire": {
+    "en": "EXPIRE",
+    "uk": "EXPIRE"
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.oppositeMacd": {
+    "en": "Opposite MACD signal cancelled the armed candidate.",
+    "uk": "З’явився протилежний сигнал MACD; ARMED скасовано."
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.macdInvalid": {
+    "en": "MACD relation became invalid before release.",
+    "uk": "Співвідношення MACD стало невалідним до підтвердження."
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.oppositeActiveAlligator": {
+    "en": "Opposite ACTIVE Alligator cancelled the armed candidate.",
+    "uk": "Протилежний ACTIVE Alligator скасував ARMED."
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.ttlExpired": {
+    "en": "ARMED TTL expired before confirmation.",
+    "uk": "TTL ARMED завершився без підтвердження."
+  },
+  "AlgorithmWorkspaceCandidateFLifecycle.releasedByAlligator": {
+    "en": "Alligator confirmation released the armed candidate.",
+    "uk": "Підтвердження Alligator дозволило відкладений сигнал."
+  },
+  "AlgorithmWorkspaceSignalSummary.header": {
+    "en": "************************************ DECISION SUMMARY ************************************",
+    "uk": "************************************ ПІДСУМОК РІШЕННЯ ************************************"
+  },
+  "AlgorithmWorkspaceSignalSummary.footer": {
+    "en": "************************************ END OF SUMMARY ************************************",
+    "uk": "************************************ КІНЕЦЬ ПІДСУМКУ ************************************"
+  },
+  "AlgorithmWorkspaceSignalSummary.signal": {
+    "en": "Signal",
+    "uk": "Сигнал"
+  },
+  "AlgorithmWorkspaceSignalSummary.macdQuality": {
+    "en": "MACD Quality",
+    "uk": "MACD Quality"
+  },
+  "AlgorithmWorkspaceSignalSummary.alligator": {
+    "en": "Alligator",
+    "uk": "Alligator"
+  },
+  "AlgorithmWorkspaceSignalSummary.alligatorStrength": {
+    "en": "Alligator strength",
+    "uk": "Сила Alligator"
+  },
+  "AlgorithmWorkspaceSignalSummary.lifecycle": {
+    "en": "Candidate F",
+    "uk": "Candidate F"
+  },
+  "AlgorithmWorkspaceSignalSummary.lifecycleSnapshot": {
+    "en": "Lifecycle state",
+    "uk": "Стан lifecycle"
+  },
+  "AlgorithmWorkspaceSignalSummary.lifecycleReason": {
+    "en": "Lifecycle reason",
+    "uk": "Причина lifecycle"
+  },
+  "AlgorithmWorkspaceSignalSummary.filter": {
+    "en": "Filter / guard",
+    "uk": "Фільтр / guard"
+  },
+  "AlgorithmWorkspaceSignalSummary.decision": {
+    "en": "Decision",
+    "uk": "Рішення"
+  },
+  "AlgorithmWorkspaceSignalSummary.technicalHeader": {
+    "en": "*** TECHNICAL DIAGNOSTICS ***",
+    "uk": "*** ТЕХНІЧНА ДІАГНОСТИКА ***"
+  },
+  "AlgorithmWorkspaceSignalSummary.alligatorConfirmation": {
+    "en": "Alligator confirmation",
+    "uk": "Підтвердження Alligator"
+  },
+  "AlgorithmWorkspaceSignalSummary.confirmationPassedRelease": {
+    "en": "PASSED → RELEASE",
+    "uk": "ПРОЙДЕНО → RELEASE"
+  },
+  "AlgorithmWorkspaceSignalSummary.structuralGuard": {
+    "en": "Structural guard",
+    "uk": "Structural guard"
+  },
+  "AlgorithmWorkspaceSignalSummary.finalDecision": {
+    "en": "Final decision",
+    "uk": "Фінальне рішення"
+  },
+  "AlgorithmWorkspaceWindow.lblPositionDateJump": {
+    "en": "Go to date",
+    "uk": "Перейти до дати"
+  },
+  "AlgorithmWorkspaceWindow.btnPositionDateJump": {
+    "en": "Go",
+    "uk": "Перейти на вказану дату"
+  },
+  "AlgorithmWorkspaceWindow.positionDateJumpHint": {
+    "en": "Select an opening date from the calendar and go to the first visible position on that date, or the next available date.",
+    "uk": "Вибрати календарну дату відкриття й перейти до першої видимої позиції цього дня або найближчої наступної доступної дати."
+  },
+  "AlgorithmWorkspaceWindow.lblSignalDateJump": {
+    "en": "Go to date",
+    "uk": "Перейти до дати"
+  },
+  "AlgorithmWorkspaceWindow.btnSignalDateJump": {
+    "en": "Go",
+    "uk": "Перейти на вказану дату"
+  },
+  "AlgorithmWorkspaceWindow.signalDateJumpHint": {
+    "en": "Select a signal date from the calendar and go to the first visible signal on that date, or the next available date.",
+    "uk": "Вибрати календарну дату сигналу й перейти до першого видимого сигналу цього дня або найближчої наступної доступної дати."
   }
 }

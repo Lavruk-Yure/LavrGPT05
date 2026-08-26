@@ -7355,5 +7355,50 @@
   "AlgorithmWorkspaceWindow.signalDateJumpHint": {
     "en": "Select a signal date from the calendar and go to the first visible signal on that date, or the next available date.",
     "uk": "Вибрати календарну дату сигналу й перейти до першого видимого сигналу цього дня або найближчої наступної доступної дати."
+  },
+  "AlgorithmWorkspaceWindow.colClosedAt": {
+    "en": "Closed",
+    "uk": "Закрито"
+  },
+  "AlgorithmWorkspaceWindow.chartDrawSegmentHint": {
+    "en": "Slanted segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: finish. Left click while drawing: finish this segment and continue a polyline from the same point.",
+    "uk": "Похилий відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші. ПКМ — завершити лінію. ЛКМ під час побудови — завершити поточний відрізок і продовжити ламану з цієї ж точки."
+  },
+  "AlgorithmWorkspaceWindow.chartDrawHorizontalHint": {
+    "en": "Horizontal segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: second point.",
+    "uk": "Горизонтальний відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші, ПКМ — друга точка."
+  },
+  "AlgorithmWorkspaceWindow.chartDrawVerticalHint": {
+    "en": "Vertical segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: second point.",
+    "uk": "Вертикальний відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші, ПКМ — друга точка."
+  },
+  "AlgorithmWorkspaceWindow.chartDrawClearHint": {
+    "en": "Clear all temporary manual lines from the current chart.",
+    "uk": "Очистити всі тимчасові ручні лінії на поточній діаграмі."
+  },
+  "AlgorithmWorkspaceWindow.chartDrawingStartLabel": {
+    "en": "Start",
+    "uk": "Початок"
+  },
+  "AlgorithmWorkspaceWindow.chartDrawingEndLabel": {
+    "en": "End",
+    "uk": "Кінець"
+  },
+  "AlgorithmWorkspaceWindow.chartDrawingLineLabel": {
+    "en": "Line",
+    "uk": "Лінія"
+  },
+  "AlgorithmWorkspaceWindow.chartDrawingTimeLabel": {
+    "en": "Time UTC",
+    "uk": "Час UTC"
+  },
+  "AlgorithmWorkspaceWindow.chartDrawingValueLabel": {
+    "en": "Value",
+    "uk": "Значення"
+  },
+  "AlgorithmWorkspaceHistoryDownloadDialog.statusProgress": {
+    "en": "Downloading: {percent}% · requests {requests} · bars {bars} · earliest bar {covered_start} UTC",
+    "uk": "Завантаження: {percent}% · запитів {requests} · барів {bars} · найраніший бар {covered_start} UTC",
+    "pl": "Pobieranie: {percent}% · zapytań {requests} · barów {bars} · najwcześniejszy bar {covered_start} UTC"
   }
 }
