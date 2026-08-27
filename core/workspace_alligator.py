@@ -376,6 +376,30 @@ class WorkspaceAlligatorObservation:
 
 
 @dataclass(frozen=True, slots=True)
+class WorkspaceAlligatorCausalProjection:
+    """Відома зараз forward-shift геометрія Alligator без future market data.
+
+    ``horizon_bars`` є зміщенням у графічних bar-slots, а не прогнозом
+    майбутнього timestamp. Усі значення побудовані лише з MA samples, які
+    вже causal доступні на ``source_timestamp``.
+    """
+
+    source_timestamp: datetime
+    available_at: datetime
+    horizon_bars: int
+    jaw: float
+    teeth: float
+    lips: float
+    state: str
+    center: float
+    opening: float
+    center_slope_per_bar: float | None
+    range_reference: float | None
+    normalized_slope: float | None
+    normalized_opening: float | None
+
+
+@dataclass(frozen=True, slots=True)
 class WorkspaceAlligatorDecision:
     """Рішення фільтра для пропозиції сигналу."""
 
@@ -593,6 +617,101 @@ class WorkspaceAlligatorFilter:
         if not self._observations:
             return None
         return self._observations[-1]
+
+    @property
+    def maximum_causal_projection_bars(self) -> int:
+        """Повернути forward bar-slots, уже визначені shifts Alligator.
+
+        Межа дорівнює найменшому shift трьох ліній. За її межами хоча б
+        одна лінія потребувала б ще не обчисленого MA sample.
+        """
+        if not self.active:
+            return 0
+        return min(
+            self.runtime_profile.jaw_shift,
+            self.runtime_profile.teeth_shift,
+            self.runtime_profile.lips_shift,
+        )
+
+    def causal_forward_projections(
+        self,
+    ) -> tuple[WorkspaceAlligatorCausalProjection, ...]:
+        """Повернути H0..Hn forward-shift геометрію без look-ahead.
+
+        Projection відтворює саме графічний displacement Alligator. Це не
+        прогноз майбутньої ціни: для Hn використовуються тільки вже наявні
+        raw MA values зі зменшеним залишковим shift. Нормалізація H1..Hn
+        свідомо використовує поточний causal ``range_reference``.
+        """
+        latest = self.latest_observation
+        if latest is None or not self.active or not latest.warmed_up:
+            return ()
+
+        maximum_horizon = self.maximum_causal_projection_bars
+        current_index = len(self._observations) - 1
+        result: list[WorkspaceAlligatorCausalProjection] = []
+        for horizon in range(maximum_horizon + 1):
+            jaw = _shifted_value(
+                self._jaw_history,
+                self.runtime_profile.jaw_shift - horizon,
+            )
+            teeth = _shifted_value(
+                self._teeth_history,
+                self.runtime_profile.teeth_shift - horizon,
+            )
+            lips = _shifted_value(
+                self._lips_history,
+                self.runtime_profile.lips_shift - horizon,
+            )
+            if jaw is None or teeth is None or lips is None:
+                continue
+
+            center = (jaw + teeth + lips) / 3.0
+            opening = max(jaw, teeth, lips) - min(jaw, teeth, lips)
+            reference_index = (
+                current_index + horizon - ALLIGATOR_REGIME_LOOKBACK_BARS
+            )
+            previous_center: float | None = None
+            if reference_index >= 0:
+                previous_center = self._observations[reference_index].center
+
+            center_slope_per_bar: float | None = None
+            if previous_center is not None:
+                center_slope_per_bar = (
+                    center - previous_center
+                ) / ALLIGATOR_REGIME_LOOKBACK_BARS
+
+            range_reference = latest.range_reference
+            normalized_slope: float | None = None
+            normalized_opening: float | None = None
+            if range_reference is not None and range_reference > 0.0:
+                normalized_opening = opening / range_reference
+                if center_slope_per_bar is not None:
+                    normalized_slope = abs(center_slope_per_bar) / range_reference
+
+            result.append(
+                WorkspaceAlligatorCausalProjection(
+                    source_timestamp=latest.timestamp,
+                    available_at=latest.available_at,
+                    horizon_bars=horizon,
+                    jaw=float(jaw),
+                    teeth=float(teeth),
+                    lips=float(lips),
+                    state=_alligator_state(
+                        jaw,
+                        teeth,
+                        lips,
+                        warmed_up=True,
+                    ),
+                    center=center,
+                    opening=opening,
+                    center_slope_per_bar=center_slope_per_bar,
+                    range_reference=range_reference,
+                    normalized_slope=normalized_slope,
+                    normalized_opening=normalized_opening,
+                )
+            )
+        return tuple(result)
 
     def diagnostic_observation_history(
         self,
