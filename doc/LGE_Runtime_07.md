@@ -1,9 +1,10 @@
-# LGE Runtime 07 — RoadMap101–102
+# LGE Runtime 07 — RoadMap101–104
 
 ## MACD Quality, Alligator Regime та Candidate F
 
 Дата початку: 2026-08-17  
-Дата закриття: 2026-08-21
+Дата базового checkpoint: 2026-08-21  
+Дата актуалізації: 2026-08-28
 
 ---
 
@@ -812,3 +813,208 @@ RoadMap103 починається з:
 ```
 
 ---
+
+# 20. RoadMap103 — Stop-Loss / Structural SL/TP checkpoint
+
+RoadMap103 не змінював production 6K exit policy. Дослідження SL/TP виконувалося
+як causal paired diagnostic на тих самих production entries.
+
+## 20.1. Stop-Loss anatomy
+
+Production baseline 2025:
+
+```text
+trades = 59
+wins / losses / break-even = 40 / 18 / 1
+net = -4.05 USD
+PF = 0.7808
+DD = 5.80 USD
+STOP_LOSS = 9
+```
+
+Для STOP_LOSS trades зафіксовано:
+
+```text
+stop distance: min 12.0, median 15.4, max 37.0 pip
+initial risk: min 1.20, median 1.54, max 3.70 USD
+next-bar adverse gap: min +0.005R, median +0.053R, max +0.075R
+```
+
+One-bar impulse gate був сильним diagnostic у 2025, але cross-period показав,
+що його не можна переносити в production як універсальний entry gate.
+
+## 20.2. Structural support/resistance geometry
+
+Досліджено causal support/resistance zones тільки з завершених M15 bars.
+Фінальна bounded geometry RoadMap103 / 8A:
+
+```text
+SL fallback = 12 pip
+SL structural window = 12..24 pip
+structure buffer = 1 pip
+TP fallback = 2R
+TP minimum = 24 pip
+TP structural target = nearest valid zone від max(24 pip, 1R) до 2R
+TP trailing = False
+broken TP zone -> automatic re-entry = False
+continuation -> only by a new signal
+future bars for level definition = False
+```
+
+Cross-period paired diagnostic:
+
+```text
+2025 BASELINE          net -4.05  PF 0.7808  DD 5.80
+2025 FIXED_12_2R       net -0.26  PF 0.9826  DD 4.82
+2025 ZONE_SL_2R        net -1.17  PF 0.9297  DD 5.50
+2025 FINAL_ZONE_SL_TP  net -1.80  PF 0.8919  DD 5.50
+
+2026 BASELINE          net +1.37  PF 1.2518  DD 3.53
+2026 FIXED_12_2R       net +1.68  PF 1.2833  DD 2.88
+2026 ZONE_SL_2R        net +2.43  PF 1.4691  DD 2.88
+2026 FINAL_ZONE_SL_TP  net +2.43  PF 1.4691  DD 2.88
+```
+
+Висновок: structural SL має перспективу, але фінальний SL/TP policy у production
+не зафіксовано. Structural TP не показав стабільної додаткової переваги.
+Поточний стан — research candidate, не production contract.
+
+---
+
+# 21. RoadMap104 — ранній Alligator opening та exit/re-entry research
+
+## 21.1. GREEN entry baseline 8C.1
+
+`FIRST_EXPANSION_FROM_CANONICAL_COMPRESSED_MOUTH` прийнято як сильний test-only
+entry baseline. Використовується існуючий поріг `normalized_opening <= 0.600`,
+без нового numeric tuning.
+
+```text
+2025 STARTING reference: 88 trades, net -19.20, PF 0.7500, DD 30.00
+2025 OPENING EXPANSION: 122 trades, net +8.40, PF 1.0886, DD 14.40
+median lead до formal STARTING = 2 M15 bars
+
+2026 STARTING reference: 79 trades, net -19.20, PF 0.7241, DD 22.80
+2026 OPENING EXPANSION: 90 trades, net +26.67, PF 1.4293, DD 15.60
+median lead до formal STARTING = 3 M15 bars
+```
+
+Simple opposite MACD cross як exit відхилено: у 2026 він погіршив результат до
+`net -17.70`. Entry pipeline 8C.1 лишається frozen під час exit research.
+
+## 21.2. Exit і Donchian
+
+Ранні MACD contraction/slope reversal events самі по собі виявилися надто
+частими і як direct exit погіршували baseline. Alligator state у момент раннього
+MACD reversal не дав чистого structural discriminator.
+
+Donchian використовується causal:
+
+```text
+period = 20 reference only
+shift = 0
+channel = previous completed M15 bars
+current bar excluded from channel reference
+no look-ahead
+```
+
+Donchian midline як прямий exit нестабільний. Opposite boundary break був
+кращим structural event, але не перевершив frozen SL/TP baseline в обох
+періодах. TP release після favorable breakout дав покращення у 2025, але
+сильне погіршення у 2026, тому universal TP-release policy відхилено.
+
+Post-TP Donchian re-entry і pullback/re-breakout без додаткового momentum
+filter також нестабільні між періодами.
+
+## 21.3. Relative MACD restart і identity blocker
+
+`dominant acceleration` diagnostic:
+
+```text
+signal momentum favorable
+AND signal_hist_delta > abs(signal_hist)
+```
+
+дав позитивний incremental result у 2025 і 2026, але sample малий.
+T104-13 виявив causal identity collisions у first-leg, re-entry і selected
+re-entry inventory. До production/re-entry висновків ці collisions мають бути
+усунені або канонічно нормалізовані; diagnostic collapse не є execution policy.
+
+## 21.4. Alligator forward displacement projection
+
+Forward shifted Alligator lines — це не price forecast. Це відома display
+geometry, яку можна обчислити causal без future market data.
+
+```text
+maximum causal projection horizon = 3 M15 bars
+2025 H1 candidate precision = 0.8765, coverage = 0.8320
+2026 H1 candidate precision = 0.8766, coverage = 0.8420
+median lead = 1 M15 bar
+```
+
+Projected H1 лишається diagnostic / early-warning source, не самостійним entry
+permission.
+
+---
+
+# 22. Manual indicator screening — TradingView reference
+
+Manual screening на EURUSD M15 виконується як visual hypothesis generation,
+а не як доказ performance. Community scripts не є runtime dependency LGE;
+формули для LGE мають реалізовуватися й тестуватися незалежно.
+
+| Indicator | Reference | Поточна оцінка / роль |
+| --- | --- | --- |
+| BBW | 20, Close, 2 | дуже перспективний `compression -> expansion`, FLAT -> START |
+| CHOP | 14 | regime guard: chop/flat vs directional trend |
+| AC | Bill Williams 34/5/5 reference | acceleration/deceleration momentum, START/EXIT warning |
+| Stochastic | 14/1/3 | pullback completion, second-leg / re-entry candidate |
+| DMI/ADX | 14/14 | strength/direction guard для вже сформованого trend |
+| Aroon | 14 | шумний на M15; не priority |
+| Ichimoku | 9/26/52/26 | regime/support-resistance reference; не current priority |
+
+Поточний short list для quantitative research:
+
+```text
+BBW         -> compression / expansion
+AC          -> acceleration / deceleration
+Stochastic  -> pullback completion
+DMI/ADX     -> trend strength guard, якщо буде потрібен після основних tests
+```
+
+---
+
+# 23. Boundary / порядок продовження RoadMap104
+
+Перед новим SL/TP-indicator screening завершити незакриті quantitative роботи
+і не змішувати одночасно entry, exit, re-entry та protection policy.
+
+Канонічний порядок:
+
+```text
+1. causal identity collisions — окремо закрити regression/normalization;
+2. BBW compression -> expansion quantitative anatomy;
+3. AC acceleration/deceleration quantitative anatomy;
+4. Stochastic pullback-completion quantitative anatomy;
+5. лише після цього повернутися до SL/TP visual screening;
+6. кожний перспективний SL/TP indicator перевіряти окремим causal runner;
+7. production змінювати тільки після cross-period validation і regression.
+```
+
+Для SL/TP visual screening першочергові кандидати:
+
+```text
+confirmed swing / fractal levels -> local support/resistance
+Pivot Points Standard            -> higher-level session/day S/R
+ATR                              -> distance/buffer, не price level
+Supertrend                       -> dynamic stop / trailing-exit reference
+Donchian                         -> already researched structural boundary reference
+```
+
+`Zig Zag` не використовувати як causal SL/TP source без окремої confirmed-pivot
+семантики через ризик repaint/look-ahead. Volume Profile відкласти: він більше
+залежить від feed/session semantics і не є першим кандидатом для canonical LGE.
+
+RoadMap104 лишається active research. Жоден із BBW / AC / Stochastic / DMI/ADX
+поки не перенесений у production logic.
+
