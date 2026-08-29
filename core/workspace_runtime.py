@@ -26,7 +26,7 @@ import math
 import time
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, replace
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, cast
 
 from core.algorithm_workspace import (
@@ -72,6 +72,7 @@ from core.workspace_indicator_profile import (
     workspace_indicator_profile_binding,
 )
 from core.workspace_market_event import WorkspaceMarketEvent
+from core.timeframes import get_timeframe
 from core.workspace_ownership import (
     WorkspaceBinding,
     WorkspaceOrderSnapshot,
@@ -174,12 +175,16 @@ def _candidate_f_negative_pd_recovery_enabled(
     )
     if not enabled:
         return False
-    confirmation = str(
-        workspace.parameters.get(
-            "alligator_confirmation",
-            DEFAULT_WORKSPACE_ALLIGATOR_CONFIRMATION,
+    confirmation = (
+        str(
+            workspace.parameters.get(
+                "alligator_confirmation",
+                DEFAULT_WORKSPACE_ALLIGATOR_CONFIRMATION,
+            )
         )
-    ).strip().upper()
+        .strip()
+        .upper()
+    )
     if confirmation != WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME:
         return False
     binding = workspace_indicator_profile_binding(
@@ -427,10 +432,8 @@ class WorkspaceRuntime:
             ),
         )
         if _candidate_f_negative_pd_recovery_enabled(workspace):
-            self.profit_drawdown_guard = (
-                WorkspaceCandidateFNegativePdRecoveryGuard(
-                    self.profit_protection_policy
-                )
+            self.profit_drawdown_guard = WorkspaceCandidateFNegativePdRecoveryGuard(
+                self.profit_protection_policy
             )
         else:
             self.profit_drawdown_guard = WorkspaceProfitDrawdownGuard(
@@ -476,9 +479,7 @@ class WorkspaceRuntime:
                     "Candidate F negative-PD recovery policy active: "
                     "3 M1 with M2 two-step deterioration abort."
                 ),
-                recovery_window_m1=(
-                    CANDIDATE_F_NEGATIVE_PD_RECOVERY_WINDOW_M1
-                ),
+                recovery_window_m1=CANDIDATE_F_NEGATIVE_PD_RECOVERY_WINDOW_M1,
                 early_abort_event_index=(
                     CANDIDATE_F_NEGATIVE_PD_EARLY_ABORT_EVENT_INDEX
                 ),
@@ -932,6 +933,24 @@ class WorkspaceRuntime:
             return
         self._append_replay_execution_events(engine.on_market_event(event))
         self._sync_replay_execution_snapshot(snapshot_utc=event.timestamp)
+
+    def _apply_replay_sell_supertrend_exit(
+        self,
+        event: WorkspaceMarketEvent,
+    ) -> None:
+        """Route a completed M15 switch through the virtual close path."""
+        engine = self.replay_execution
+        if engine is None:
+            return
+        lifecycle = engine.on_completed_m15_bar(event)
+        if not lifecycle:
+            return
+        completed_at = event.timestamp + timedelta(
+            minutes=get_timeframe(event.timeframe).minutes
+        )
+        self._append_replay_execution_events(lifecycle)
+        self._sync_replay_execution_snapshot(snapshot_utc=completed_at)
+        self._evaluate_profit_protection_at(completed_at)
 
     def _apply_replay_profit_protection(
         self,
@@ -1926,6 +1945,7 @@ class WorkspaceRuntime:
                     self.evaluate_profit_protection()
                 else:
                     self._apply_replay_profit_protection(event)
+            self._apply_replay_sell_supertrend_exit(event)
             journal_event = "EVENT_ACCEPTED"
             if origin == "LIVE_READ_ONLY":
                 if not self._live_quote_received:
@@ -2161,9 +2181,7 @@ class WorkspaceRuntime:
             return
 
         action = str(getattr(event, "action", "") or "").strip().upper()
-        reason_code = str(
-            getattr(event, "reason_code", "") or ""
-        ).strip().upper()
+        reason_code = str(getattr(event, "reason_code", "") or "").strip().upper()
         event_timestamp = getattr(event, "event_timestamp", None)
         if not action or not isinstance(event_timestamp, datetime):
             return

@@ -20,6 +20,7 @@ import math
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 
+from core.timeframes import get_timeframe
 from core.workspace_historical_trade_diagnostics import (
     WorkspaceHistoricalTradeDiagnostic,
 )
@@ -36,18 +37,26 @@ from core.workspace_replay_margin import (
     replay_required_margin,
 )
 from core.workspace_signal import WorkspaceSignalRecord
-from core.timeframes import get_timeframe
 
 REPLAY_CLOSE_STOP_LOSS = "STOP_LOSS"
 REPLAY_CLOSE_TAKE_PROFIT = "TAKE_PROFIT"
+REPLAY_CLOSE_SUPERTREND_OPPOSITE_SWITCH = "SUPERTREND_OPPOSITE_SWITCH"
 REPLAY_CLOSE_PROFIT_DRAWDOWN = "PROFIT_DRAWDOWN"
 REPLAY_CLOSE_SESSION_END = "SESSION_END"
 REPLAY_CLOSE_REASONS = (
     REPLAY_CLOSE_STOP_LOSS,
     REPLAY_CLOSE_TAKE_PROFIT,
+    REPLAY_CLOSE_SUPERTREND_OPPOSITE_SWITCH,
     REPLAY_CLOSE_PROFIT_DRAWDOWN,
     REPLAY_CLOSE_SESSION_END,
 )
+
+SELL_SUPERTREND_TIMEFRAME = "M15"
+SELL_SUPERTREND_ATR_LENGTH = 10
+SELL_SUPERTREND_FACTOR = 3.0
+SELL_SUPERTREND_SOURCE = "HL2"
+SELL_SUPERTREND_ATR_SMOOTHING = "WILDER_RMA"
+_SUPERTREND_EPSILON = 1e-12
 
 MAX_REPLAY_EXECUTION_ROWS = 1000
 
@@ -166,6 +175,146 @@ class WorkspaceReplayExecutionEvent:
     details: dict[str, object]
 
 
+@dataclass(frozen=True, slots=True)
+class WorkspaceSupertrendObservation:
+    """Canonical Supertrend state from one completed M15 bar."""
+
+    atr: float | None
+    upper_band: float | None
+    lower_band: float | None
+    line: float | None
+    state: str | None
+    previous_state: str | None
+    switched: bool
+
+    @property
+    def sell_to_buy_switch(self) -> bool:
+        return bool(
+            self.switched and self.previous_state == "SELL" and self.state == "BUY"
+        )
+
+
+class WorkspaceCanonicalSupertrend:
+    """Incremental HL2 Supertrend(10, 3) over completed M15 bars only."""
+
+    def __init__(self) -> None:
+        self._true_ranges: list[float] = []
+        self._rma: float | None = None
+        self._previous_close: float | None = None
+        self._previous_upper: float | None = None
+        self._previous_lower: float | None = None
+        self._previous_line: float | None = None
+        self._previous_state: str | None = None
+        self._last_timestamp: datetime | None = None
+
+    def reset(self) -> None:
+        self._true_ranges = []
+        self._rma = None
+        self._previous_close = None
+        self._previous_upper = None
+        self._previous_lower = None
+        self._previous_line = None
+        self._previous_state = None
+        self._last_timestamp = None
+
+    def on_completed_m15_bar(
+        self,
+        event: WorkspaceMarketEvent,
+    ) -> WorkspaceSupertrendObservation:
+        """Advance once with data known at the completed M15 bar close."""
+        if event.timeframe != SELL_SUPERTREND_TIMEFRAME:
+            raise ValueError("canonical SELL Supertrend requires M15 bars")
+        if self._last_timestamp is not None and event.timestamp <= self._last_timestamp:
+            raise ValueError("completed M15 bars must be strictly ordered")
+
+        high = float(event.high)
+        low = float(event.low)
+        if self._previous_close is None:
+            true_range = high - low
+        else:
+            true_range = max(
+                high - low,
+                abs(high - self._previous_close),
+                abs(low - self._previous_close),
+            )
+        if not math.isfinite(true_range) or true_range < 0.0:
+            raise ValueError("Supertrend true range must be finite and non-negative")
+        self._true_ranges.append(true_range)
+
+        bar_count = len(self._true_ranges)
+        if bar_count == SELL_SUPERTREND_ATR_LENGTH:
+            self._rma = math.fsum(self._true_ranges) / SELL_SUPERTREND_ATR_LENGTH
+        elif bar_count > SELL_SUPERTREND_ATR_LENGTH:
+            assert self._rma is not None
+            self._rma = (
+                (SELL_SUPERTREND_ATR_LENGTH - 1) * self._rma + true_range
+            ) / SELL_SUPERTREND_ATR_LENGTH
+
+        previous_state = self._previous_state
+        if self._rma is None:
+            observation = WorkspaceSupertrendObservation(
+                atr=None,
+                upper_band=None,
+                lower_band=None,
+                line=None,
+                state=None,
+                previous_state=previous_state,
+                switched=False,
+            )
+        else:
+            midpoint = (high + low) / 2.0
+            basic_upper = midpoint + SELL_SUPERTREND_FACTOR * self._rma
+            basic_lower = midpoint - SELL_SUPERTREND_FACTOR * self._rma
+            if self._previous_upper is None or self._previous_lower is None:
+                upper = basic_upper
+                lower = basic_lower
+            else:
+                assert self._previous_close is not None
+                upper = (
+                    basic_upper
+                    if basic_upper < self._previous_upper
+                    or self._previous_close > self._previous_upper
+                    else self._previous_upper
+                )
+                lower = (
+                    basic_lower
+                    if basic_lower > self._previous_lower
+                    or self._previous_close < self._previous_lower
+                    else self._previous_lower
+                )
+
+            if self._previous_line is None:
+                state = "SELL"
+            elif math.isclose(
+                self._previous_line,
+                float(self._previous_upper),
+                rel_tol=0.0,
+                abs_tol=_SUPERTREND_EPSILON,
+            ):
+                state = "BUY" if float(event.close) > upper else "SELL"
+            else:
+                state = "SELL" if float(event.close) < lower else "BUY"
+            line = lower if state == "BUY" else upper
+            switched = previous_state is not None and state != previous_state
+            observation = WorkspaceSupertrendObservation(
+                atr=self._rma,
+                upper_band=upper,
+                lower_band=lower,
+                line=line,
+                state=state,
+                previous_state=previous_state,
+                switched=switched,
+            )
+            self._previous_upper = upper
+            self._previous_lower = lower
+            self._previous_line = line
+            self._previous_state = state
+
+        self._previous_close = float(event.close)
+        self._last_timestamp = event.timestamp
+        return observation
+
+
 class WorkspaceReplayExecutionEngine:
     """Replay-only virtual execution with deterministic OHLC protection."""
 
@@ -204,6 +353,7 @@ class WorkspaceReplayExecutionEngine:
         self._position_counter = 0
         self.realized_profit = 0.0
         self.closed_trades = 0
+        self._sell_supertrend = WorkspaceCanonicalSupertrend()
 
     def reset(self) -> None:
         """Clear only volatile Replay execution state."""
@@ -215,20 +365,17 @@ class WorkspaceReplayExecutionEngine:
         self._position_counter = 0
         self.realized_profit = 0.0
         self.closed_trades = 0
+        self._sell_supertrend.reset()
 
     def margin_snapshot(self) -> WorkspaceReplayMarginSnapshot:
         """Return current synthetic balance/equity/margin state."""
         unrealized_profit = sum(
-            position.current_profit
-            for position in self._positions
-            if position.active
+            position.current_profit for position in self._positions if position.active
         )
         balance = self.initial_balance + self.realized_profit
         equity = balance + unrealized_profit
         used_margin = sum(
-            position.required_margin
-            for position in self._positions
-            if position.active
+            position.required_margin for position in self._positions if position.active
         )
         return WorkspaceReplayMarginSnapshot(
             leverage=self.leverage,
@@ -294,9 +441,7 @@ class WorkspaceReplayExecutionEngine:
         else:
             raise ValueError(f"Unsupported Replay signal direction: {direction}")
         timeframe_minutes = get_timeframe(signal_event.timeframe).minutes
-        expected_fill_at = signal_event.timestamp + timedelta(
-            minutes=timeframe_minutes
-        )
+        expected_fill_at = signal_event.timestamp + timedelta(minutes=timeframe_minutes)
         pending = _PendingOrder(
             order_id=order_id,
             signal_uid=record.signal_uid,
@@ -394,6 +539,76 @@ class WorkspaceReplayExecutionEngine:
                 continue
             self._update_open_bar_excursions(position, event)
             self._mark_position(position, event)
+        return tuple(lifecycle)
+
+    def on_completed_m15_bar(
+        self,
+        event: WorkspaceMarketEvent,
+    ) -> tuple[WorkspaceReplayExecutionEvent, ...]:
+        """Apply SELL-only Supertrend protection at a completed M15 close.
+
+        Runtime calls this after the bar's hard SL/TP execution events. The
+        local hard-protection check makes the ordering explicit for a direct
+        M15 path as well: SL, then TP, then SELL->BUY Supertrend switch. BUY
+        positions are never selected by this method.
+        """
+        if event.timeframe != SELL_SUPERTREND_TIMEFRAME:
+            return ()
+        observation = self._sell_supertrend.on_completed_m15_bar(event)
+        completed_at = event.timestamp + timedelta(
+            minutes=get_timeframe(event.timeframe).minutes
+        )
+        close_event = replace(event, timestamp=completed_at)
+        lifecycle: list[WorkspaceReplayExecutionEvent] = []
+
+        for position in tuple(self._positions):
+            if not position.active or position.side != "SELL":
+                continue
+            if position.opened_at >= completed_at:
+                continue
+            hard_close_reason = self._bar_close_reason(position, event)
+            if hard_close_reason is not None:
+                close_price = self._protection_close_price(
+                    position,
+                    event,
+                    hard_close_reason,
+                )
+                self._update_close_excursion(position, close_price)
+                lifecycle.append(
+                    self._close_position(
+                        position,
+                        close_event,
+                        close_price=close_price,
+                        close_reason=hard_close_reason,
+                    )
+                )
+                continue
+            if not observation.sell_to_buy_switch:
+                continue
+            close_price = self._executable_close_price(position, event)
+            self._update_close_excursion(position, close_price)
+            closed = self._close_position(
+                position,
+                close_event,
+                close_price=close_price,
+                close_reason=REPLAY_CLOSE_SUPERTREND_OPPOSITE_SWITCH,
+            )
+            lifecycle.append(
+                replace(
+                    closed,
+                    details={
+                        **closed.details,
+                        "completed_m15_bars_only": True,
+                        "future_price_used": False,
+                        "hard_sl_tp_priority_on_same_bar": True,
+                        "switch_exit_equals_switch_bar_close": True,
+                        "supertrend_atr_length": SELL_SUPERTREND_ATR_LENGTH,
+                        "supertrend_factor": SELL_SUPERTREND_FACTOR,
+                        "supertrend_source": SELL_SUPERTREND_SOURCE,
+                        "supertrend_atr_smoothing": SELL_SUPERTREND_ATR_SMOOTHING,
+                    },
+                )
+            )
         return tuple(lifecycle)
 
     def close_profit_drawdown(
@@ -623,8 +838,7 @@ class WorkspaceReplayExecutionEngine:
             return WorkspaceReplayExecutionEvent(
                 event="VIRTUAL_ORDER_BLOCKED_MARGIN",
                 message=(
-                    f"Replay order {pending.order_id} blocked by margin "
-                    "requirement."
+                    f"Replay order {pending.order_id} blocked by margin " "requirement."
                 ),
                 details={
                     "order_id": pending.order_id,
@@ -804,24 +1018,14 @@ class WorkspaceReplayExecutionEngine:
                 macd_state=position.macd_state,
                 alligator_state=position.alligator_state,
                 alligator_timeframe=position.alligator_timeframe,
-                stop_loss_distance=abs(
-                    position.entry_price - position.stop_loss
-                ),
-                take_profit_distance=abs(
-                    position.take_profit - position.entry_price
-                ),
-                maximum_favorable_excursion=(
-                    position.maximum_favorable_excursion
-                ),
-                maximum_adverse_excursion=(
-                    position.maximum_adverse_excursion
-                ),
+                stop_loss_distance=abs(position.entry_price - position.stop_loss),
+                take_profit_distance=abs(position.take_profit - position.entry_price),
+                maximum_favorable_excursion=position.maximum_favorable_excursion,
+                maximum_adverse_excursion=position.maximum_adverse_excursion,
                 peak_profit=position.peak_profit,
                 final_profit=realized_profit,
                 close_reason=close_reason,
-                holding_seconds=(
-                    event.timestamp - position.opened_at
-                ).total_seconds(),
+                holding_seconds=(event.timestamp - position.opened_at).total_seconds(),
             )
         )
         self._replace_order_row(
@@ -902,9 +1106,7 @@ class WorkspaceReplayExecutionEngine:
                 else None
             ),
             close_reason=position.close_reason,
-            signal_timestamp=(
-                position.signal_timestamp.astimezone(UTC).isoformat()
-            ),
+            signal_timestamp=(position.signal_timestamp.astimezone(UTC).isoformat()),
             signal_uid=position.signal_uid,
         )
         if not position.active:
