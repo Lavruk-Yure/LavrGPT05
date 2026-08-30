@@ -26,7 +26,7 @@ import math
 import time
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, replace
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any, cast
 
 from core.algorithm_workspace import (
@@ -72,7 +72,6 @@ from core.workspace_indicator_profile import (
     workspace_indicator_profile_binding,
 )
 from core.workspace_market_event import WorkspaceMarketEvent
-from core.timeframes import get_timeframe
 from core.workspace_ownership import (
     WorkspaceBinding,
     WorkspaceOrderSnapshot,
@@ -127,11 +126,14 @@ from engine.risk.risk_model import (
 from engine.runtime_constants import (
     DEFAULT_WORKSPACE_ALLIGATOR_CONFIRMATION,
     DEFAULT_WORKSPACE_ALLIGATOR_FILTER_ENABLED,
+    DEFAULT_WORKSPACE_PROFIT_DRAWDOWN_CLOSE_PERCENT,
     DEFAULT_WORKSPACE_SPREAD_LIMIT,
     DEFAULT_WORKSPACE_WARMUP_BARS,
     WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME,
     WORKSPACE_ALLIGATOR_FILTER_ENABLED_KEY,
 )
+
+DEFAULT_PD_CLOSE_PERCENT = DEFAULT_WORKSPACE_PROFIT_DRAWDOWN_CLOSE_PERCENT
 
 WORKSPACE_STARTUP_PHASE_IDLE = "IDLE"
 WORKSPACE_STARTUP_PHASE_LOAD_DATA = "LOAD_DATA"
@@ -300,7 +302,7 @@ class WorkspaceRuntimeContext:
     peak_profit: float = 0.0
     profit_drawdown: float = 0.0
     profit_protection_enabled: bool = True
-    profit_drawdown_close_percent: float = 30.0
+    profit_drawdown_close_percent: float = DEFAULT_PD_CLOSE_PERCENT
     profit_drawdown_minimum_profit: float = 0.0
     profit_decisions_count: int = 0
     pending_close_decisions_count: int = 0
@@ -366,7 +368,10 @@ class WorkspaceRuntimeContext:
             free_margin=free_margin,
             profit_protection_enabled=bool(profit_protection.get("enabled", True)),
             profit_drawdown_close_percent=float(
-                profit_protection.get("max_profit_drawdown_percent", 30.0)
+                profit_protection.get(
+                    "max_profit_drawdown_percent",
+                    DEFAULT_PD_CLOSE_PERCENT,
+                )
             ),
             profit_drawdown_minimum_profit=float(
                 profit_protection.get("minimum_profit", 0.0)
@@ -424,7 +429,7 @@ class WorkspaceRuntime:
             max_drawdown_percent=float(
                 workspace.profit_protection.get(
                     "max_profit_drawdown_percent",
-                    30.0,
+                    DEFAULT_PD_CLOSE_PERCENT,
                 )
             ),
             minimum_profit=float(
@@ -933,24 +938,6 @@ class WorkspaceRuntime:
             return
         self._append_replay_execution_events(engine.on_market_event(event))
         self._sync_replay_execution_snapshot(snapshot_utc=event.timestamp)
-
-    def _apply_replay_sell_supertrend_exit(
-        self,
-        event: WorkspaceMarketEvent,
-    ) -> None:
-        """Route a completed M15 switch through the virtual close path."""
-        engine = self.replay_execution
-        if engine is None:
-            return
-        lifecycle = engine.on_completed_m15_bar(event)
-        if not lifecycle:
-            return
-        completed_at = event.timestamp + timedelta(
-            minutes=get_timeframe(event.timeframe).minutes
-        )
-        self._append_replay_execution_events(lifecycle)
-        self._sync_replay_execution_snapshot(snapshot_utc=completed_at)
-        self._evaluate_profit_protection_at(completed_at)
 
     def _apply_replay_profit_protection(
         self,
@@ -1945,7 +1932,6 @@ class WorkspaceRuntime:
                     self.evaluate_profit_protection()
                 else:
                     self._apply_replay_profit_protection(event)
-            self._apply_replay_sell_supertrend_exit(event)
             journal_event = "EVENT_ACCEPTED"
             if origin == "LIVE_READ_ONLY":
                 if not self._live_quote_received:

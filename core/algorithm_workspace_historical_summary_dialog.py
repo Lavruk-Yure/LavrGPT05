@@ -171,6 +171,12 @@ class AlgorithmWorkspaceHistoricalSummaryDialog(QDialog):
                 "Losers:",
             )
         )
+        self.ui.lblBreakEvenCaption.setText(
+            self._tr(
+                "AlgorithmWorkspaceHistoricalSummaryDialog.breakEven",
+                "Break-even:",
+            )
+        )
         self.ui.lblMaxDrawdownCaption.setText(
             self._tr(
                 "AlgorithmWorkspaceHistoricalSummaryDialog.maxDrawdown",
@@ -299,6 +305,7 @@ class AlgorithmWorkspaceHistoricalSummaryDialog(QDialog):
         self.ui.lblWinRate.setText(f"{summary.win_rate_percent:.1f}%")
         self.ui.lblWinners.setText(str(summary.winning_trades))
         self.ui.lblLosers.setText(str(summary.losing_trades))
+        self.ui.lblBreakEven.setText(str(summary.break_even_trades))
         self.ui.lblMaxDrawdown.setText(
             f"{summary.maximum_drawdown:.2f} USD / "
             f"{summary.maximum_drawdown_percent:.2f}%"

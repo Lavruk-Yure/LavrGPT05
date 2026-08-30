@@ -39,6 +39,14 @@ class WorkspaceChartSeriesPoint:
 
 
 @dataclass(frozen=True, slots=True)
+class WorkspaceChartProjectionPoint:
+    """Одна chart-only точка причинного forward displacement без future bar."""
+
+    horizon_bars: int
+    value: float
+
+
+@dataclass(frozen=True, slots=True)
 class WorkspaceChartSeries:
     """One read-only chart series produced by the active algorithm."""
 
@@ -49,6 +57,7 @@ class WorkspaceChartSeries:
     profile_uid: str
     profile_revision: int
     points: tuple[WorkspaceChartSeriesPoint, ...]
+    projection_points: tuple[WorkspaceChartProjectionPoint, ...] = ()
 
 
 class WorkspaceChartError(RuntimeError):

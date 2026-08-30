@@ -29,6 +29,7 @@ from core.workspace_parameters import (  # noqa: E402
     WorkspaceParametersError,
 )
 from engine.runtime_constants import (  # noqa: E402
+    DEFAULT_WORKSPACE_PROFIT_DRAWDOWN_CLOSE_PERCENT,
     WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_1,
     WORKSPACE_MACD_SIGNAL_MODE_EXTENDED,
 )
@@ -78,7 +79,10 @@ def main() -> None:
         assert defaults.spread_limit == 0.00020
         assert defaults.risk_percent == 0.5
         assert defaults.maximum_position_volume == 1000.0
-        assert defaults.profit_drawdown_close_percent == 30.0
+        assert (
+            defaults.profit_drawdown_close_percent
+            == DEFAULT_WORKSPACE_PROFIT_DRAWDOWN_CLOSE_PERCENT
+        )
 
         custom = WorkspaceAlgorithmParameters(
             macd_signal_mode=WORKSPACE_MACD_SIGNAL_MODE_EXTENDED,

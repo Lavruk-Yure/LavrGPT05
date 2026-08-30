@@ -635,11 +635,12 @@ Alligator = LGE Candidate F Smoothed r1,
 
 ---
 
-# 17. Candidate F negative-PD recovery — production 6K
+# 17. Candidate F negative-PD recovery — production 6K historical checkpoint
 
 RoadMap102 / 6K переносить у production лише перевірену exit state-machine для
 negative `PROFIT_DRAWDOWN`. Positive profit drawdown, як і раніше, закривається
-негайно.
+негайно. Значення PD threshold `30%` у цьому розділі є історичним checkpoint;
+поточний production default після RoadMap105 зафіксований у розділі 24.
 
 Канонічна policy:
 
@@ -963,15 +964,15 @@ Manual screening на EURUSD M15 виконується як visual hypothesis g
 а не як доказ performance. Community scripts не є runtime dependency LGE;
 формули для LGE мають реалізовуватися й тестуватися незалежно.
 
-| Indicator | Reference | Поточна оцінка / роль |
-| --- | --- | --- |
-| BBW | 20, Close, 2 | дуже перспективний `compression -> expansion`, FLAT -> START |
-| CHOP | 14 | regime guard: chop/flat vs directional trend |
-| AC | Bill Williams 34/5/5 reference | acceleration/deceleration momentum, START/EXIT warning |
-| Stochastic | 14/1/3 | pullback completion, second-leg / re-entry candidate |
-| DMI/ADX | 14/14 | strength/direction guard для вже сформованого trend |
-| Aroon | 14 | шумний на M15; не priority |
-| Ichimoku | 9/26/52/26 | regime/support-resistance reference; не current priority |
+| Indicator  | Reference                      | Поточна оцінка / роль                                        |
+|------------|--------------------------------|--------------------------------------------------------------|
+| BBW        | 20, Close, 2                   | дуже перспективний `compression -> expansion`, FLAT -> START |
+| CHOP       | 14                             | regime guard: chop/flat vs directional trend                 |
+| AC         | Bill Williams 34/5/5 reference | acceleration/deceleration momentum, START/EXIT warning       |
+| Stochastic | 14/1/3                         | pullback completion, second-leg / re-entry candidate         |
+| DMI/ADX    | 14/14                          | strength/direction guard для вже сформованого trend          |
+| Aroon      | 14                             | шумний на M15; не priority                                   |
+| Ichimoku   | 9/26/52/26                     | regime/support-resistance reference; не current priority     |
 
 Поточний short list для quantitative research:
 
@@ -984,7 +985,7 @@ DMI/ADX     -> trend strength guard, якщо буде потрібен післ
 
 ---
 
-# 23. Boundary / порядок продовження RoadMap104
+# 23. RoadMap104 boundary — historical checkpoint
 
 Перед новим SL/TP-indicator screening завершити незакриті quantitative роботи
 і не змішувати одночасно entry, exit, re-entry та protection policy.
@@ -1015,6 +1016,95 @@ Donchian                         -> already researched structural boundary refer
 семантики через ризик repaint/look-ahead. Volume Profile відкласти: він більше
 залежить від feed/session semantics і не є першим кандидатом для canonical LGE.
 
-RoadMap104 лишається active research. Жоден із BBW / AC / Stochastic / DMI/ADX
-поки не перенесений у production logic.
+Цей порядок є історичним boundary RoadMap104. Поточну production-істину після
+його завершення задає RoadMap105 у розділі 24. Жоден із BBW / AC / Stochastic /
+DMI/ADX не перенесений у production logic.
+
+---
+
+# 24. RoadMap105 — current production exit-stack truth
+
+RoadMap105 очистив production exit stack після експериментів RoadMap104 і
+зафіксував фактичну runtime-істину Candidate F.
+
+## 24.1. Stop-Loss / Take-Profit geometry
+
+Поточний production `WorkspaceRuntime` використовує динамічну геометрію:
+
+```text
+SL = max(signal_bar_range, spread * 10)
+TP = 2R
+```
+
+Frozen `12 pip / 24 pip` лишається лише research reference і не є production
+baseline.
+
+## 24.2. Supertrend
+
+Production wiring із T104-27 відкотено. Causal prototype T104-29 підтвердив
+правильну chronology `M1 x15 -> completed M15 Supertrend` без look-ahead, але
+під фактичним production exit stack Supertrend не створив жодного окремого
+exit: його випередили `PROFIT_DRAWDOWN` / `STOP_LOSS`.
+
+Канонічний verdict:
+
+```text
+SUPERTREND_NO_EFFECT_UNDER_CURRENT_PRODUCTION_EXIT_STACK
+```
+
+Supertrend не входить у поточну production exit logic.
+
+## 24.3. Profit Drawdown threshold
+
+Cross-period fine sweep T105-09 підтвердив невелике, але стабільне покращення
+при `35%` проти попереднього production default `30%`. Тому canonical default
+змінено:
+
+```text
+Profit Drawdown threshold = 35%
+```
+
+Actual cTrader Candidate F regression після production-зміни:
+
+```text
+2025:
+trades = 59
+wins / losses / break-even = 40 / 18 / 1
+net = -3.79 USD
+profit factor = 0.7949
+maximum drawdown = 5.19 USD
+PD / SL / TP = 48 / 9 / 2
+
+2026 до 2026-08-25 15:07 UTC:
+trades = 29
+wins / losses / break-even = 23 / 5 / 1
+net = +3.32 USD
+profit factor = 1.6103
+maximum drawdown = 3.53 USD
+PD / SL / TP = 26 / 2 / 1
+```
+
+Покращення не трактувати як великий алгоритмічний приріст; це локальне
+cross-period підтверджене налаштування protection policy.
+
+Negative-PD recovery state-machine не змінена:
+
+```text
+recovery window = 3 completed M1 events
+M2 early abort = enabled
+positive PD = immediate close
+```
+
+Fresh WSP canonical default = `35%`. Persisted WSP лишається явним джерелом
+свого збереженого параметра і не мігрується приховано; для чинного WSP значення
+`35%` має бути збережене через Parameters UI або інший штатний persistence path.
+
+Контрольний production regression:
+
+```text
+T105_10_PD_35_PRODUCTION_REGRESSION=OK
+broker_requests=0
+broker_execution_attempted=False
+completed market events only
+```
 

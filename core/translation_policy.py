@@ -228,6 +228,12 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "de": "Verlierer:",
         "fr": "Perdants :",
     },
+    "AlgorithmWorkspaceHistoricalSummaryDialog.breakEven": {
+        "uk": "Беззбиткові:",
+        "pl": "Break-even:",
+        "de": "Break-even:",
+        "fr": "À l’équilibre :",
+    },
     "AlgorithmWorkspaceHistoricalSummaryDialog.maxDrawdown": {
         "uk": "Макс. просадка:",
         "de": "Max. Drawdown:",

@@ -35,6 +35,7 @@ from core.workspace_chart import (
     WORKSPACE_CHART_ROLE_INDICATOR_HISTOGRAM,
     WORKSPACE_CHART_ROLE_INDICATOR_LINE,
     WORKSPACE_CHART_ROLE_PRICE_OVERLAY,
+    WorkspaceChartProjectionPoint,
     WorkspaceChartSeries,
     WorkspaceChartSeriesPoint,
 )
@@ -167,10 +168,18 @@ ALLIGATOR_REASON_DEFERRED_ARMED = "ALLIGATOR_DEFERRED_ARMED"
 ALLIGATOR_REASON_DEFERRED_RELEASE = "ALLIGATOR_DEFERRED_RELEASE"
 ALLIGATOR_REASON_OPENING_COLLAPSE = "ALLIGATOR_OPENING_COLLAPSE_REJECT"
 ALLIGATOR_REASON_WEAK_OPENING = "ALLIGATOR_WEAK_OPENING_REJECT"
-ALLIGATOR_REASON_VOLATILITY_SPIKE = (
-    "ALLIGATOR_VOLATILITY_SPIKE_DETERIORATION_REJECT"
-)
+ALLIGATOR_REASON_VOLATILITY_SPIKE = "ALLIGATOR_VOLATILITY_SPIKE_DETERIORATION_REJECT"
 ALLIGATOR_REASON_OVEREXTENDED = "ALLIGATOR_OVEREXTENDED_TREND_REJECT"
+ALLIGATOR_REASON_STOCHASTIC_CURRENT_BAR_CROSS = (
+    "ALLIGATOR_STOCHASTIC_CURRENT_BAR_CROSS_REJECT"
+)
+
+CANDIDATE_F_STOCHASTIC_TIMEFRAME = "M15"
+CANDIDATE_F_STOCHASTIC_K_PERIOD = 14
+CANDIDATE_F_STOCHASTIC_K_SMOOTHING = 1
+CANDIDATE_F_STOCHASTIC_D_PERIOD = 3
+CANDIDATE_F_STOCHASTIC_MIDLINE = 50.0
+CANDIDATE_F_STOCHASTIC_EPSILON = 1e-12
 
 ALLIGATOR_DEFERRED_SIGNAL_TYPE = "MACD_DEFERRED_RELEASE"
 ALLIGATOR_DEFERRED_SOURCE_REASON_CODE = "MACD_DEFERRED_RELEASE"
@@ -441,6 +450,63 @@ class WorkspaceCandidateFLifecycleEvent:
     filter_context: WorkspaceSignalFilterContext | None
 
 
+class _WorkspaceCandidateFStochasticState:
+    """Causal canonical Stochastic 14/1/3 для completed M15 bars."""
+
+    def __init__(self) -> None:
+        self._events: list[WorkspaceMarketEvent] = []
+        self._k_values: list[float] = []
+        self._previous_k: float | None = None
+        self._previous_d: float | None = None
+        self.current_cross: str | None = None
+        self.reset()
+
+    def reset(self) -> None:
+        self._events = []
+        self._k_values = []
+        self._previous_k = None
+        self._previous_d = None
+        self.current_cross = None
+
+    def update(self, event: WorkspaceMarketEvent) -> None:
+        """Оновити стан лише одним causal completed M15 event."""
+        self.current_cross = None
+        if event.timeframe != CANDIDATE_F_STOCHASTIC_TIMEFRAME:
+            return
+        self._events.append(event)
+        if len(self._events) > CANDIDATE_F_STOCHASTIC_K_PERIOD:
+            del self._events[0]
+        if len(self._events) < CANDIDATE_F_STOCHASTIC_K_PERIOD:
+            return
+
+        highest = max(float(item.high) for item in self._events)
+        lowest = min(float(item.low) for item in self._events)
+        width = highest - lowest
+        percent_k = (
+            CANDIDATE_F_STOCHASTIC_MIDLINE
+            if width <= CANDIDATE_F_STOCHASTIC_EPSILON
+            else 100.0 * (float(event.close) - lowest) / width
+        )
+        self._k_values.append(percent_k)
+        if len(self._k_values) > CANDIDATE_F_STOCHASTIC_D_PERIOD:
+            del self._k_values[0]
+        if len(self._k_values) < CANDIDATE_F_STOCHASTIC_D_PERIOD:
+            self._previous_k = percent_k
+            return
+
+        percent_d = math.fsum(self._k_values) / CANDIDATE_F_STOCHASTIC_D_PERIOD
+        previous_k = self._previous_k
+        previous_d = self._previous_d
+        if previous_k is not None and previous_d is not None:
+            epsilon = CANDIDATE_F_STOCHASTIC_EPSILON
+            if previous_k <= previous_d + epsilon and percent_k > percent_d + epsilon:
+                self.current_cross = "UP"
+            elif previous_k >= previous_d - epsilon and percent_k < percent_d - epsilon:
+                self.current_cross = "DOWN"
+        self._previous_k = percent_k
+        self._previous_d = percent_d
+
+
 class _MovingAverageState:
     """Детермінований стан SMA, EMA або SMMA."""
 
@@ -668,9 +734,7 @@ class WorkspaceAlligatorFilter:
 
             center = (jaw + teeth + lips) / 3.0
             opening = max(jaw, teeth, lips) - min(jaw, teeth, lips)
-            reference_index = (
-                current_index + horizon - ALLIGATOR_REGIME_LOOKBACK_BARS
-            )
+            reference_index = current_index + horizon - ALLIGATOR_REGIME_LOOKBACK_BARS
             previous_center: float | None = None
             if reference_index >= 0:
                 previous_center = self._observations[reference_index].center
@@ -712,6 +776,39 @@ class WorkspaceAlligatorFilter:
                 )
             )
         return tuple(result)
+
+    def chart_forward_line_values(
+        self,
+    ) -> dict[str, tuple[WorkspaceChartProjectionPoint, ...]]:
+        """Повернути chart-only хвостики ліній за їх shift без future data."""
+        latest = self.latest_observation
+        if latest is None or not self.active or not latest.warmed_up:
+            return {}
+
+        specs = (
+            ("ALLIGATOR_JAW", self._jaw_history, self.runtime_profile.jaw_shift),
+            (
+                "ALLIGATOR_TEETH",
+                self._teeth_history,
+                self.runtime_profile.teeth_shift,
+            ),
+            ("ALLIGATOR_LIPS", self._lips_history, self.runtime_profile.lips_shift),
+        )
+        result: dict[str, tuple[WorkspaceChartProjectionPoint, ...]] = {}
+        for series_code, history, shift in specs:
+            points: list[WorkspaceChartProjectionPoint] = []
+            for horizon in range(1, shift + 1):
+                value = _shifted_value(history, shift - horizon)
+                if value is None:
+                    continue
+                points.append(
+                    WorkspaceChartProjectionPoint(
+                        horizon_bars=horizon,
+                        value=float(value),
+                    )
+                )
+            result[series_code] = tuple(points)
+        return result
 
     def diagnostic_observation_history(
         self,
@@ -1061,14 +1158,13 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
         self._higher_timeframe_synchronized = True
         self._armed_candidate: _WorkspaceArmedMacdCandidate | None = None
         self._candidate_prior_ranges: list[float] = []
+        self._candidate_f_stochastic = _WorkspaceCandidateFStochasticState()
         self.deferred_releases: list[WorkspaceDeferredMacdRelease] = []
         self.deferred_cancelled_opposite_cross = 0
         self.deferred_cancelled_opposite_alligator = 0
         self.deferred_cancelled_macd_invalid = 0
         self.deferred_expired = 0
-        self._candidate_f_lifecycle_events: list[
-            WorkspaceCandidateFLifecycleEvent
-        ] = []
+        self._candidate_f_lifecycle_events: list[WorkspaceCandidateFLifecycleEvent] = []
         self.started = False
 
     def configure(
@@ -1152,6 +1248,7 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
             self._higher_timeframe_synchronized = True
         self._armed_candidate = None
         self._candidate_prior_ranges = []
+        self._candidate_f_stochastic.reset()
         self.deferred_releases = []
         self.deferred_cancelled_opposite_cross = 0
         self.deferred_cancelled_opposite_alligator = 0
@@ -1164,8 +1261,11 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
         self,
         event: WorkspaceMarketEvent,
     ) -> WorkspaceSignalOutput:
+        candidate_f_active = self._candidate_f_active()
+        if candidate_f_active:
+            self._candidate_f_stochastic.update(event)
         base_output = self._base_signal_output(event)
-        if not self._candidate_f_active():
+        if not candidate_f_active:
             return base_output
         return self._candidate_f_output(event, base_output)
 
@@ -1196,9 +1296,7 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
         """
         signal_filter = self.signal_filter
         observation = (
-            signal_filter.latest_observation
-            if signal_filter is not None
-            else None
+            signal_filter.latest_observation if signal_filter is not None else None
         )
         filter_context = (
             _workspace_alligator_filter_context(
@@ -1364,6 +1462,7 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
             event,
             prior_range,
         )
+        guarded = self._apply_candidate_f_stochastic_gate(guarded)
         event_range = float(event.high - event.low)
         if event_range > 0.0:
             self._candidate_prior_ranges.append(event_range)
@@ -1629,6 +1728,27 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
             )
         return tuple(guarded)
 
+    def _apply_candidate_f_stochastic_gate(
+        self,
+        proposals: tuple[WorkspaceSignalProposal, ...],
+    ) -> tuple[WorkspaceSignalProposal, ...]:
+        """Відхилити existing Candidate F ALLOW лише на CURRENT_BAR cross."""
+        cross = self._candidate_f_stochastic.current_cross
+        if cross is None:
+            return proposals
+        return tuple(
+            (
+                _candidate_f_reject(
+                    proposal,
+                    ALLIGATOR_REASON_STOCHASTIC_CURRENT_BAR_CROSS,
+                    f"stochastic_profile=14/1/3; cross={cross}; bars_since_cross=0",
+                )
+                if proposal.filter_decision == WORKSPACE_SIGNAL_FILTER_ALLOW
+                else proposal
+            )
+            for proposal in proposals
+        )
+
     def _update_alligator(
         self,
         event: WorkspaceMarketEvent,
@@ -1776,6 +1896,13 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
             ("ALLIGATOR_TEETH", "Teeth"),
             ("ALLIGATOR_LIPS", "Lips"),
         )
+        latest = signal_filter.latest_observation
+        visible_latest = signal_filter.observation_available_at(timestamps[-1])
+        projection_map = (
+            signal_filter.chart_forward_line_values()
+            if latest is not None and visible_latest is latest
+            else {}
+        )
         result: list[WorkspaceChartSeries] = []
         for series_code, label in series_specs:
             points = tuple(point_lists[series_code])
@@ -1790,6 +1917,7 @@ class WorkspaceMacdAlligatorReplayAlgorithm(WorkspaceAlgorithm):
                     profile_uid=signal_filter.profile_uid,
                     profile_revision=signal_filter.profile_revision,
                     points=points,
+                    projection_points=projection_map.get(series_code, ()),
                 )
             )
         return tuple(result)
@@ -1942,15 +2070,9 @@ def _candidate_f_active_age(
     direction: str,
 ) -> int:
     regime = (
-        ALLIGATOR_REGIME_TREND_UP
-        if direction == "BUY"
-        else ALLIGATOR_REGIME_TREND_DOWN
+        ALLIGATOR_REGIME_TREND_UP if direction == "BUY" else ALLIGATOR_REGIME_TREND_DOWN
     )
-    state = (
-        ALLIGATOR_STATE_BULLISH
-        if direction == "BUY"
-        else ALLIGATOR_STATE_BEARISH
-    )
+    state = ALLIGATOR_STATE_BULLISH if direction == "BUY" else ALLIGATOR_STATE_BEARISH
     count = 0
     for observation in reversed(observations):
         if not (
@@ -1998,9 +2120,7 @@ def _candidate_f_reject(
         proposal,
         filter_decision=WORKSPACE_SIGNAL_FILTER_REJECT,
         filter_reason_code=reason_code,
-        reason=(
-            f"{proposal.reason}; {reason_code}: {detail}"
-        ).strip("; "),
+        reason=f"{proposal.reason}; {reason_code}: {detail}".strip("; "),
     )
 
 

@@ -204,25 +204,35 @@ class Ui_AlgorithmWorkspaceHistoricalSummaryDialog(object):
 
         self.gridResult.addWidget(self.lblLosers, 3, 3, 1, 1)
 
+        self.lblBreakEvenCaption = QLabel(self.grpResult)
+        self.lblBreakEvenCaption.setObjectName(u"lblBreakEvenCaption")
+
+        self.gridResult.addWidget(self.lblBreakEvenCaption, 4, 0, 1, 1)
+
+        self.lblBreakEven = QLabel(self.grpResult)
+        self.lblBreakEven.setObjectName(u"lblBreakEven")
+
+        self.gridResult.addWidget(self.lblBreakEven, 4, 1, 1, 1)
+
         self.lblMaxDrawdownCaption = QLabel(self.grpResult)
         self.lblMaxDrawdownCaption.setObjectName(u"lblMaxDrawdownCaption")
 
-        self.gridResult.addWidget(self.lblMaxDrawdownCaption, 4, 0, 1, 1)
+        self.gridResult.addWidget(self.lblMaxDrawdownCaption, 5, 0, 1, 1)
 
         self.lblMaxDrawdown = QLabel(self.grpResult)
         self.lblMaxDrawdown.setObjectName(u"lblMaxDrawdown")
 
-        self.gridResult.addWidget(self.lblMaxDrawdown, 4, 1, 1, 1)
+        self.gridResult.addWidget(self.lblMaxDrawdown, 5, 1, 1, 1)
 
         self.lblAverageTradeCaption = QLabel(self.grpResult)
         self.lblAverageTradeCaption.setObjectName(u"lblAverageTradeCaption")
 
-        self.gridResult.addWidget(self.lblAverageTradeCaption, 4, 2, 1, 1)
+        self.gridResult.addWidget(self.lblAverageTradeCaption, 5, 2, 1, 1)
 
         self.lblAverageTrade = QLabel(self.grpResult)
         self.lblAverageTrade.setObjectName(u"lblAverageTrade")
 
-        self.gridResult.addWidget(self.lblAverageTrade, 4, 3, 1, 1)
+        self.gridResult.addWidget(self.lblAverageTrade, 5, 3, 1, 1)
 
 
         self.verticalLayout.addWidget(self.grpResult)
@@ -408,6 +418,8 @@ class Ui_AlgorithmWorkspaceHistoricalSummaryDialog(object):
         self.lblWinners.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"\u2014", None))
         self.lblLosersCaption.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"[AlgorithmWorkspaceHistoricalSummaryDialog.losers]", None))
         self.lblLosers.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"\u2014", None))
+        self.lblBreakEvenCaption.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"[AlgorithmWorkspaceHistoricalSummaryDialog.breakEven]", None))
+        self.lblBreakEven.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"\u2014", None))
         self.lblMaxDrawdownCaption.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"[AlgorithmWorkspaceHistoricalSummaryDialog.maxDrawdown]", None))
         self.lblMaxDrawdown.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"\u2014", None))
         self.lblAverageTradeCaption.setText(QCoreApplication.translate("AlgorithmWorkspaceHistoricalSummaryDialog", u"[AlgorithmWorkspaceHistoricalSummaryDialog.averageTrade]", None))

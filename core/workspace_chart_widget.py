@@ -1120,10 +1120,13 @@ class WorkspaceCandlestickCanvas(QWidget):
             price_low = min(price_low, snapshot.current_ask)
             price_high = max(price_high, snapshot.current_ask)
         overlay_values = tuple(
-            point.value
+            value
             for series in snapshot.series
             if series.role == WORKSPACE_CHART_ROLE_PRICE_OVERLAY
-            for point in series.points
+            for value in (
+                *(point.value for point in series.points),
+                *(point.value for point in series.projection_points),
+            )
         )
         if overlay_values:
             price_low = min(price_low, min(overlay_values))
@@ -1269,6 +1272,25 @@ class WorkspaceCandlestickCanvas(QWidget):
                 if previous is not None and local_index == previous[0] + 1:
                     painter.drawLine(QLineF(previous[1], previous[2], x, y))
                 previous = (local_index, x, y)
+
+            if previous is None or not series.projection_points:
+                continue
+            factual_last_x = previous[1]
+            projection_previous_x = factual_last_x
+            projection_previous_y = previous[2]
+            for point in series.projection_points:
+                x = factual_last_x + slot_width * point.horizon_bars
+                y = price_y(point.value)
+                painter.drawLine(
+                    QLineF(
+                        projection_previous_x,
+                        projection_previous_y,
+                        x,
+                        y,
+                    )
+                )
+                projection_previous_x = x
+                projection_previous_y = y
         self._draw_overlay_legend(painter, plot, overlays)
 
     def _draw_overlay_legend(

@@ -30,6 +30,7 @@ from core.workspace_indicator_profile import (
     normalize_workspace_indicator_profile_bindings,
 )
 from engine.runtime_constants import (
+    DEFAULT_WORKSPACE_PROFIT_DRAWDOWN_CLOSE_PERCENT,
     NEW_WORKSPACE_MACD_CROSS_ANGLE_MODEL,
     NEW_WORKSPACE_MACD_CROSS_MIN_ABC_ANGLE,
     NEW_WORKSPACE_MACD_SIGNAL_MODE,
@@ -100,7 +101,7 @@ WORKSPACE_PANELS = (
 DEFAULT_PROFIT_PROTECTION = {
     "enabled": True,
     "activation_mode": "AFTER_SPREAD",
-    "max_profit_drawdown_percent": 30.0,
+    "max_profit_drawdown_percent": DEFAULT_WORKSPACE_PROFIT_DRAWDOWN_CLOSE_PERCENT,
     "minimum_profit": 0.0,
 }
 
