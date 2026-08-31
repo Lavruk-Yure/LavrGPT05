@@ -1,16 +1,16 @@
-# LGE Runtime 07 — RoadMap101–104
+# LGE Runtime 07 — RoadMap101–105
 
 ## MACD Quality, Alligator Regime та Candidate F
 
 Дата початку: 2026-08-17  
 Дата базового checkpoint: 2026-08-21  
-Дата актуалізації: 2026-08-28
+Дата актуалізації: 2026-08-31
 
 ---
 
 # 1. Призначення MD7
 
-`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101.
+`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-105.
 
 RoadMap101 продовжив стабілізований Historical Replay після RoadMap100 і був
 присвячений не механічному підбору PnL, а побудові причинно-часової логіки
@@ -1016,13 +1016,14 @@ Donchian                         -> already researched structural boundary refer
 семантики через ризик repaint/look-ahead. Volume Profile відкласти: він більше
 залежить від feed/session semantics і не є першим кандидатом для canonical LGE.
 
-Цей порядок є історичним boundary RoadMap104. Поточну production-істину після
-його завершення задає RoadMap105 у розділі 24. Жоден із BBW / AC / Stochastic /
-DMI/ADX не перенесений у production logic.
+Цей порядок є історичним boundary RoadMap104. На момент його завершення жоден
+із BBW / AC / Stochastic / DMI/ADX не був перенесений у production logic.
+Поточну production-істину після RoadMap105 задає розділ 24; пізніше прийнятий
+Stochastic CURRENT_BAR reject зафіксовано окремо в 24.4.
 
 ---
 
-# 24. RoadMap105 — current production exit-stack truth
+# 24. RoadMap105 — current production truth
 
 RoadMap105 очистив production exit stack після експериментів RoadMap104 і
 зафіксував фактичну runtime-істину Candidate F.
@@ -1108,3 +1109,65 @@ broker_execution_attempted=False
 completed market events only
 ```
 
+## 24.4. Candidate F Stochastic CURRENT_BAR entry gate
+
+У production прийнято вузьке правило Stochastic `14/1/3` для actual registered
+Candidate F `WorkspaceRuntime` (`WorkspaceMacdAlligatorReplayAlgorithm`): стан
+оновлюється causal лише completed `M15` bars. Якщо K/D cross виникає саме на
+поточному completed `M15` signal bar, уже дозволений Candidate F entry
+перетворюється на `REJECT`. Усі інші Stochastic states цим правилом не
+змінюються; look-ahead відсутній. Donchian production gate лишається `False`.
+
+T105-17 підтвердив chronology/runtime truth:
+
+```text
+chronology_defect=False
+future_bars_used=False
+same_subclass_control_run=True
+workspace_algorithm_type_contract=True
+```
+
+T105-18 підтвердив actual registered production path без test-only wrapper.
+Канонічні production metrics після інтеграції:
+
+```text
+2025:
+trades=42
+wins=30
+losses=11
+break_even=1
+net=+4.03
+PF=1.5424
+DD=3.58
+PD=36
+SL=4
+TP=2
+SESSION=0
+
+2026:
+trades=18
+wins=15
+losses=2
+break_even=1
+net=+3.68
+PF=3.7669
+DD=1.20
+PD=16
+SL=1
+TP=1
+SESSION=0
+```
+
+Незмінні production contracts: `PD=35%`,
+`SL=max(signal_bar_range, spread*10)`, `TP=2R`, negative-PD recovery та
+production exit logic не змінені. Regression виконується лише на completed
+market events, без broker requests або broker execution attempts:
+
+```text
+T105_18_STOCHASTIC_CURRENT_BAR_PRODUCTION_REGRESSION=OK
+broker_requests=0
+broker_execution_attempted=False
+completed_market_events_only=True
+no_look_ahead=True
+production_exit_logic_changed=False
+```
