@@ -20,13 +20,10 @@ def main() -> None:
     compile(minimal, "tests/__init__.py", "exec")
     compile(regular, "sample_package/__init__.py", "exec")
     assert '"""Пакет tests."""' in minimal
-    regular_docstring = (
-        '"""Ініціалізаційний модуль пакету '
-        'sample_package."""'
-    )
+    regular_docstring = '"""Ініціалізаційний модуль пакету ' 'sample_package."""'
     assert regular_docstring in regular
-    assert 'from .alpha import *  # noqa' in regular
-    assert 'from .beta import *  # noqa' in regular
+    assert "from .alpha import *  # noqa" in regular
+    assert "from .beta import *  # noqa" in regular
 
     print("Init Generator result")
     print("  minimal_docstring_closed=True")

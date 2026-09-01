@@ -77,9 +77,7 @@ def main() -> None:
     assert ib_paper.currency == "USD"
 
     ctrader_accounts = catalog.list_accounts("CTRADER")
-    ctrader_modes = {
-        item.account_id: item.account_mode for item in ctrader_accounts
-    }
+    ctrader_modes = {item.account_id: item.account_mode for item in ctrader_accounts}
     assert ctrader_modes["111"] == WORKSPACE_ACCOUNT_MODE_DEMO
     assert ctrader_modes["222"] == WORKSPACE_ACCOUNT_MODE_LIVE
     ctrader_demo = catalog.find_account("CTRADER", "111")
@@ -95,10 +93,7 @@ def main() -> None:
     print(f"  ib_accounts={len(ib_accounts)}")
     print(f"  ctrader_accounts={len(ctrader_accounts)}")
     print(f"  ib_balance={ib_paper.balance} {ib_paper.currency}")
-    print(
-        f"  ctrader_balance={ctrader_demo.balance} "
-        f"{ctrader_demo.currency}"
-    )
+    print(f"  ctrader_balance={ctrader_demo.balance} " f"{ctrader_demo.currency}")
     print(f"  symbols={len(symbols)}")
     print("ALGORITHM_WORKSPACE_CATALOG_CHECK=OK")
 

@@ -33,8 +33,7 @@ def _create_backup() -> Path:
     BACKUP_DIRECTORY.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     backup_path = (
-        BACKUP_DIRECTORY
-        / f"demo_before_ib_virtual_leg_close_recovery_{timestamp}.db"
+        BACKUP_DIRECTORY / f"demo_before_ib_virtual_leg_close_recovery_{timestamp}.db"
     )
     _copy_database_snapshot(DB_PATH, backup_path)
     return backup_path
@@ -124,9 +123,7 @@ def main() -> int:
         print(f"  side={seed.get('logical_side')}")
         print(f"  volume={seed.get('logical_volume')}")
         print(f"  close_order_id={close_order_id}")
-        confirmation = input(
-            "Для підтвердження введіть RECOVER: "
-        ).strip().upper()
+        confirmation = input("Для підтвердження введіть RECOVER: ").strip().upper()
 
         if confirmation != "RECOVER":
             print("Відновлення скасовано користувачем.")
@@ -142,20 +139,14 @@ def main() -> int:
             position_uid=position_uid,
             close_order_id=close_order_id,
         )
-        persisted = engine.repository.get_ib_virtual_position_leg(
-            position_uid
-        )
+        persisted = engine.repository.get_ib_virtual_position_leg(position_uid)
 
-        if persisted is None or persisted.get("leg_status") != (
-            IB_LEG_STATUS_CLOSED
-        ):
+        if persisted is None or persisted.get("leg_status") != (IB_LEG_STATUS_CLOSED):
             raise RuntimeError("Recovered persisted leg is not CLOSED")
 
-        active_orders = (
-            engine.repository.get_ib_virtual_position_leg_orders(
-                position_uid=position_uid,
-                active_only=True,
-            )
+        active_orders = engine.repository.get_ib_virtual_position_leg_orders(
+            position_uid=position_uid,
+            active_only=True,
         )
         active_roles = {str(row["order_role"]) for row in active_orders}
 
@@ -175,9 +166,7 @@ def main() -> int:
         if close_ids != {close_order_id}:
             raise RuntimeError("Recovered close order history differs")
 
-        open_seeds = (
-            engine.repository.get_open_ib_virtual_position_leg_seeds()
-        )
+        open_seeds = engine.repository.get_open_ib_virtual_position_leg_seeds()
         persistence = dict(result.get("persistence") or {})
 
         print("IB virtual-leg Close recovery result")
@@ -185,18 +174,12 @@ def main() -> int:
         print(f"  close_order_id={close_order_id}")
         print(f"  already_recovered={result.get('already_recovered')}")
         print(f"  leg_status={persisted.get('leg_status')}")
-        print(
-            "  remaining_volume="
-            f"{persisted.get('remaining_volume')}"
-        )
+        print("  remaining_volume=" f"{persisted.get('remaining_volume')}")
         print(
             "  cash_fx_virtual_observation_offset="
             f"{result.get('cash_fx_virtual_observation_offset')}"
         )
-        print(
-            "  persistence_legs_written="
-            f"{persistence.get('legs_written')}"
-        )
+        print("  persistence_legs_written=" f"{persistence.get('legs_written')}")
         print(f"  active_order_mappings={len(active_orders)}")
         print(f"  order_history_rows={len(history)}")
         print(f"  total_open_seeds={len(open_seeds)}")

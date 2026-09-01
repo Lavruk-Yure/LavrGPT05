@@ -314,15 +314,12 @@ def main() -> None:
     print(
         "  pip_sizes="
         + ",".join(
-            f"{symbol}:{pip_size:g}"
-            for symbol, pip_size in SYMBOL_PIP_SIZES.items()
+            f"{symbol}:{pip_size:g}" for symbol, pip_size in SYMBOL_PIP_SIZES.items()
         )
     )
     print(
         "  abc_value_scales="
-        + ",".join(
-            f"{symbol}:{abc_scales[symbol]:g}" for symbol in SYMBOL_PIP_SIZES
-        )
+        + ",".join(f"{symbol}:{abc_scales[symbol]:g}" for symbol in SYMBOL_PIP_SIZES)
     )
     print(f"  inverse_abc_scale_matches_pip={inverse_scale_matches_pip}")
     print("  history_inventory:")
@@ -360,24 +357,19 @@ def main() -> None:
     print(f"  default_history_spread_raw={DEFAULT_WORKSPACE_HISTORY_SPREAD:.8f}")
     print(
         "  default_history_spread_pips="
-        + ",".join(
-            f"{symbol}:{spread_pips[symbol]:.4f}"
-            for symbol in SYMBOL_PIP_SIZES
-        )
+        + ",".join(f"{symbol}:{spread_pips[symbol]:.4f}" for symbol in SYMBOL_PIP_SIZES)
     )
     print(f"  default_history_spread_symbol_safe={spread_symbol_safe}")
     print(
         "  macd_prominence_pip_equivalent="
         + ",".join(
-            f"{symbol}:{prominence_pips[symbol]:.6f}"
-            for symbol in SYMBOL_PIP_SIZES
+            f"{symbol}:{prominence_pips[symbol]:.6f}" for symbol in SYMBOL_PIP_SIZES
         )
     )
     print(
         "  macd_distance_pip_equivalent="
         + ",".join(
-            f"{symbol}:{distance_pips[symbol]:.6f}"
-            for symbol in SYMBOL_PIP_SIZES
+            f"{symbol}:{distance_pips[symbol]:.6f}" for symbol in SYMBOL_PIP_SIZES
         )
     )
     print(

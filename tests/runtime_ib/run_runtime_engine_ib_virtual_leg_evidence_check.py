@@ -133,9 +133,7 @@ def _require_equal(
     Перевірити точну рівність.
     """
     if actual != expected:
-        raise AssertionError(
-            f"{message}: expected={expected!r}, actual={actual!r}"
-        )
+        raise AssertionError(f"{message}: expected={expected!r}, actual={actual!r}")
 
 
 def main() -> int:

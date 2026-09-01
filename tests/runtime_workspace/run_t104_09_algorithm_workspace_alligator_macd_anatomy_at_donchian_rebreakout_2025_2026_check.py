@@ -136,9 +136,7 @@ def _anatomy(run: Any, candidate: Any, row: Any) -> RebreakoutAnatomy:
         outcome=str(row.reentry_trade.close_reason),
         opening=float(alligator.normalized_opening),
         opening_delta=float(alligator.normalized_opening_delta),
-        directional_center_slope=float(
-            alligator.directional_normalized_center_slope
-        ),
+        directional_center_slope=float(alligator.directional_normalized_center_slope),
         directional_center_slope_delta=float(
             alligator.directional_normalized_center_slope_delta
         ),
@@ -190,47 +188,31 @@ def _summary(rows: list[RebreakoutAnatomy]) -> dict[str, Any]:
         "events": len(rows),
         "median_opening": _median([row.opening for row in rows]),
         "median_opening_delta": _median([row.opening_delta for row in rows]),
-        "median_center_slope": _median(
-            [row.directional_center_slope for row in rows]
-        ),
+        "median_center_slope": _median([row.directional_center_slope for row in rows]),
         "median_center_slope_delta": _median(
             [row.directional_center_slope_delta for row in rows]
         ),
-        "median_lips_jaw": _median(
-            [row.directional_lips_jaw for row in rows]
-        ),
+        "median_lips_jaw": _median([row.directional_lips_jaw for row in rows]),
         "mouth_contracting": sum(row.mouth_contracting for row in rows),
-        "center_direction_broken": sum(
-            row.center_direction_broken for row in rows
-        ),
+        "center_direction_broken": sum(row.center_direction_broken for row in rows),
         "lips_jaw_broken": sum(row.lips_jaw_broken for row in rows),
         "full_order_holds": sum(row.full_order_holds for row in rows),
         "regime_aligned": sum(row.regime_aligned for row in rows),
         "regimes": Counter(row.regime for row in rows),
         "phases": Counter(row.phase for row in rows),
-        "median_histogram": _median(
-            [row.directional_histogram for row in rows]
-        ),
-        "median_histogram_delta": _median(
-            [row.histogram_delta for row in rows]
-        ),
-        "median_macd_slope": _median(
-            [row.directional_macd_slope for row in rows]
-        ),
+        "median_histogram": _median([row.directional_histogram for row in rows]),
+        "median_histogram_delta": _median([row.histogram_delta for row in rows]),
+        "median_macd_slope": _median([row.directional_macd_slope for row in rows]),
         "median_previous_macd_slope": _median(
             [row.previous_directional_macd_slope for row in rows]
         ),
         "histogram_aligned": sum(row.histogram_aligned for row in rows),
         "histogram_expanding": sum(row.histogram_expanding for row in rows),
-        "macd_slope_favorable": sum(
-            row.macd_slope_favorable for row in rows
-        ),
+        "macd_slope_favorable": sum(row.macd_slope_favorable for row in rows),
         "alligator_structure_favorable": sum(
             row.alligator_structure_favorable for row in rows
         ),
-        "macd_momentum_favorable": sum(
-            row.macd_momentum_favorable for row in rows
-        ),
+        "macd_momentum_favorable": sum(row.macd_momentum_favorable for row in rows),
         "alligator_and_macd_favorable": sum(
             row.alligator_and_macd_favorable for row in rows
         ),
@@ -320,9 +302,7 @@ def main() -> int:
     print("  t104_08_reentry_logic_changed=False")
     print("  anatomy_event=COMPLETED_M15_DONCHIAN_REBREAKOUT_SIGNAL_BAR")
     print("  outcome_groups=REENTRY_TAKE_PROFIT_VS_STOP_LOSS")
-    print(
-        "  alligator_metrics=OPENING_DELTA_CENTER_SLOPE_LINE_ORDER_REGIME_PHASE"
-    )
+    print("  alligator_metrics=OPENING_DELTA_CENTER_SLOPE_LINE_ORDER_REGIME_PHASE")
     print("  macd_metrics=HISTOGRAM_DELTA_MACD_SLOPE")
     print("  structural_boolean_tests_use_zero_sign_only=True")
     print("  active_regime_macd_consensus_is_structural_not_tuned=True")
@@ -344,14 +324,10 @@ def main() -> int:
             f"{_summary_text(data['TAKE_PROFIT'])}"
         )
         print(
-            f"  {window.label}/STOP_LOSS_ANATOMY="
-            f"{_summary_text(data['STOP_LOSS'])}"
+            f"  {window.label}/STOP_LOSS_ANATOMY=" f"{_summary_text(data['STOP_LOSS'])}"
         )
         if data["OTHER"]["events"]:
-            print(
-                f"  {window.label}/OTHER_ANATOMY="
-                f"{_summary_text(data['OTHER'])}"
-            )
+            print(f"  {window.label}/OTHER_ANATOMY=" f"{_summary_text(data['OTHER'])}")
 
     assert all(
         results[window.label]["TAKE_PROFIT"]["events"]

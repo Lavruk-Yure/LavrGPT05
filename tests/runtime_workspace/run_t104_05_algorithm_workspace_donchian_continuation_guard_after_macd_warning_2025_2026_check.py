@@ -154,10 +154,7 @@ def _simulate_guard(
         if not warning_armed:
             continue
 
-        if (
-            policy == POLICY_CONTINUATION_GUARD
-            and snapshot.favorable_breakout
-        ):
+        if policy == POLICY_CONTINUATION_GUARD and snapshot.favorable_breakout:
             warning_armed = False
             favorable_resets += 1
             if first_reset_index is None:
@@ -270,10 +267,13 @@ def _paired_diagnostics(
 
 
 def _paired_text(data: dict[str, Any]) -> str:
-    reasons = "|".join(
-        f"{key}:{value}"
-        for key, value in sorted(data["baseline_exit_reasons"].items())
-    ) or "NONE"
+    reasons = (
+        "|".join(
+            f"{key}:{value}"
+            for key, value in sorted(data["baseline_exit_reasons"].items())
+        )
+        or "NONE"
+    )
     return (
         f"warning_trades:{data['warning_trades']},"
         f"exit_trades:{data['exit_trades']},"
@@ -360,8 +360,7 @@ def _run_window(window: Any) -> dict[str, Any]:
     for event_type in EVENT_TYPES:
         for policy in POLICIES:
             variants[(event_type, policy)] = tuple(
-                _simulate_guard(run, item, event_type, policy)
-                for item in candidates
+                _simulate_guard(run, item, event_type, policy) for item in candidates
             )
     return {
         "run": run,
@@ -408,9 +407,7 @@ def main() -> int:
             f"invalidated:{data['invalidated']},timeout:{data['timed_out']},"
             f"aligned_at_start_not_used:{data['aligned_at_start']}"
         )
-        print(
-            f"  {window.label}/SLTP_BASELINE={_summary_text(_summary(baseline))}"
-        )
+        print(f"  {window.label}/SLTP_BASELINE={_summary_text(_summary(baseline))}")
         for event_type in EVENT_TYPES:
             plain = data["variants"][(event_type, POLICY_ARM_THEN_MIDLINE)]
             guarded = data["variants"][(event_type, POLICY_CONTINUATION_GUARD)]

@@ -164,8 +164,7 @@ def main() -> None:
         and chart.macd_canvas.hover_value is None
     )
     time_label_routes_bottom = (
-        not chart.canvas.time_label_visible
-        and chart.macd_canvas.time_label_visible
+        not chart.canvas.time_label_visible and chart.macd_canvas.time_label_visible
     )
     candle_ohlc_available = (
         price_event is not None
@@ -192,11 +191,9 @@ def main() -> None:
     )
     right_macd_value_available = chart.macd_canvas.hover_value is not None
     macd_values = chart.macd_canvas.hovered_values
-    factual_macd_values_available = (
-        len(macd_values) == 3
-        and {label for label, _value in macd_values}
-        == {"MACD", "Signal", "Histogram"}
-    )
+    factual_macd_values_available = len(macd_values) == 3 and {
+        label for label, _value in macd_values
+    } == {"MACD", "Signal", "Histogram"}
     canvas_hint_not_obscuring_data = (
         not chart.canvas.toolTip()
         and not chart.macd_canvas.toolTip()

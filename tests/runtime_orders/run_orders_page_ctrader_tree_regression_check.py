@@ -95,10 +95,7 @@ def main() -> int:
         print(f"  child_rows={item.childCount()}")
         print(f"  stable_key={item.data(COL_ID, ROLE_STABLE_KEY)}")
         print(f"  current_price={item.text(COL_CURRENT)}")
-        print(
-            "  reconciliation="
-            f"{item.text(COL_RECONCILIATION)}"
-        )
+        print("  reconciliation=" f"{item.text(COL_RECONCILIATION)}")
         print(f"  pnl_summary={page.ui.lblPnlSummary.text()}")
         print(f"  spin_min_height={page.ui.spinLots.minimumHeight()}")
         print("ORDERS_PAGE_CTRADER_TREE_REGRESSION_CHECK=OK")

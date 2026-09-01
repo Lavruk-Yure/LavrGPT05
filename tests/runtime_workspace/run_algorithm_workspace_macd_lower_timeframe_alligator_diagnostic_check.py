@@ -287,9 +287,7 @@ def summarize_timeframes(
     m15_events: tuple[WorkspaceMarketEvent, ...],
 ) -> tuple[TimeframeDiagnostic, ...]:
     """Підсумувати allow/reject і directional-hit rate по timeframe."""
-    event_index = {
-        event.timestamp: index for index, event in enumerate(m15_events)
-    }
+    event_index = {event.timestamp: index for index, event in enumerate(m15_events)}
     assert len(event_index) == len(m15_events)
     reports: list[TimeframeDiagnostic] = []
     for timeframe in ("M15", "M5", "M1"):
@@ -338,14 +336,12 @@ def main() -> None:
         flush=True,
     )
     if not M1_FILE.is_file():
-        raise FileNotFoundError(
-            "Real EURUSD M1 history is required: " + str(M1_FILE)
-        )
+        raise FileNotFoundError("Real EURUSD M1 history is required: " + str(M1_FILE))
 
     print("Lower-Timeframe Alligator: loading M1 and calculating ...", flush=True)
     m1_events = load_m1_events()
-    decisions, m15_events, classic_crosses, quality_accept = (
-        build_diagnostic_decisions(m1_events)
+    decisions, m15_events, classic_crosses, quality_accept = build_diagnostic_decisions(
+        m1_events
     )
     reports = summarize_timeframes(decisions, m15_events)
 
@@ -383,10 +379,7 @@ def main() -> None:
     print("  production_signal_logic_changed=False")
     print("  broker_requests=0")
     print("  broker_execution_attempted=False")
-    print(
-        "ALGORITHM_WORKSPACE_MACD_LOWER_TIMEFRAME_ALLIGATOR_"
-        "DIAGNOSTIC_CHECK=OK"
-    )
+    print("ALGORITHM_WORKSPACE_MACD_LOWER_TIMEFRAME_ALLIGATOR_" "DIAGNOSTIC_CHECK=OK")
 
 
 if __name__ == "__main__":

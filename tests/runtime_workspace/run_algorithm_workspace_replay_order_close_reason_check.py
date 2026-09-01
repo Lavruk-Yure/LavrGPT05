@@ -163,10 +163,13 @@ def main() -> None:
     columns = _order_columns()
     assert len(columns) == 12
     assert columns[9][0] == "AlgorithmWorkspaceWindow.colCloseReason"
-    assert translation_override_for_key(
-        "AlgorithmWorkspaceWindow.colCloseReason",
-        "uk",
-    ) == "Причина закриття"
+    assert (
+        translation_override_for_key(
+            "AlgorithmWorkspaceWindow.colCloseReason",
+            "uk",
+        )
+        == "Причина закриття"
+    )
 
     area_source = AREA_PATH.read_text(encoding="utf-8")
     assert "self._display_text(order.close_reason)" in area_source

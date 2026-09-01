@@ -209,9 +209,7 @@ def _positive_float(value: object, field_name: str) -> float:
         else:
             raise TypeError
     except (TypeError, ValueError) as exc:
-        raise WorkspaceParametersError(
-            f"{field_name} must be a number"
-        ) from exc
+        raise WorkspaceParametersError(f"{field_name} must be a number") from exc
     if not math.isfinite(normalized) or normalized <= 0.0:
         raise WorkspaceParametersError(f"{field_name} must be positive")
     return normalized
@@ -232,13 +230,9 @@ def _non_negative_int(value: object, field_name: str) -> int:
         else:
             raise TypeError
     except (TypeError, ValueError) as exc:
-        raise WorkspaceParametersError(
-            f"{field_name} must be an integer"
-        ) from exc
+        raise WorkspaceParametersError(f"{field_name} must be an integer") from exc
     if normalized < 0:
-        raise WorkspaceParametersError(
-            f"{field_name} cannot be negative"
-        )
+        raise WorkspaceParametersError(f"{field_name} cannot be negative")
     return normalized
 
 
@@ -252,16 +246,8 @@ def _bounded_float(
     maximum_inclusive: bool,
 ) -> float:
     normalized = _positive_float(value, field_name)
-    minimum_valid = (
-        normalized >= minimum
-        if minimum_inclusive
-        else normalized > minimum
-    )
-    maximum_valid = (
-        normalized <= maximum
-        if maximum_inclusive
-        else normalized < maximum
-    )
+    minimum_valid = normalized >= minimum if minimum_inclusive else normalized > minimum
+    maximum_valid = normalized <= maximum if maximum_inclusive else normalized < maximum
     if not minimum_valid or not maximum_valid:
         left = "[" if minimum_inclusive else "("
         right = "]" if maximum_inclusive else ")"

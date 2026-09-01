@@ -89,9 +89,7 @@ def main() -> None:
             workspace.parameters[WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_KEY]
         )
         stored_distance = float(
-            workspace.parameters[
-                WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY
-            ]
+            workspace.parameters[WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY]
         )
         _assert_close(stored_prominence, expected[0])
         _assert_close(stored_distance, expected[1])
@@ -116,11 +114,7 @@ def main() -> None:
         0.000015,
     )
     _assert_close(
-        float(
-            restored.parameters[
-                WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY
-            ]
-        ),
+        float(restored.parameters[WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY]),
         0.00005,
     )
     persisted_runtime = _runtime_thresholds(restored)
@@ -144,11 +138,7 @@ def main() -> None:
         NEW_WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE,
     )
     _assert_close(
-        float(
-            non_forex.parameters[
-                WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY
-            ]
-        ),
+        float(non_forex.parameters[WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY]),
         NEW_WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE,
     )
 

@@ -125,7 +125,7 @@ def _donchian_snapshot(run: Any, direction: str, index: int) -> DonchianSnapshot
     """
     if index < DONCHIAN_PERIOD:
         return None
-    reference = run.events[index - DONCHIAN_PERIOD:index]
+    reference = run.events[index - DONCHIAN_PERIOD : index]
     assert len(reference) == DONCHIAN_PERIOD
     upper = max(float(item.high) for item in reference)
     lower = min(float(item.low) for item in reference)
@@ -252,12 +252,15 @@ def _first_early_event_index(
     _, stop_price, take_price = _protection_prices(run, candidate)
     for index in range(candidate.entry_index, len(run.events)):
         event = run.events[index]
-        if _protection_touched(
-            event,
-            candidate.direction,
-            stop_price,
-            take_price,
-        ) is not None:
+        if (
+            _protection_touched(
+                event,
+                candidate.direction,
+                stop_price,
+                take_price,
+            )
+            is not None
+        ):
             return None
         if _early_event_matches(run, candidate.direction, index, event_type):
             return index
@@ -376,9 +379,12 @@ def _paired_diagnostics(
 
 
 def _paired_text(data: dict[str, Any]) -> str:
-    reasons = "|".join(
-        f"{key}:{value}" for key, value in sorted(data["baseline_reasons"].items())
-    ) or "NONE"
+    reasons = (
+        "|".join(
+            f"{key}:{value}" for key, value in sorted(data["baseline_reasons"].items())
+        )
+        or "NONE"
+    )
     return (
         f"events:{data['events']},"
         f"improved:{data['improved']},worsened:{data['worsened']},"
@@ -461,9 +467,7 @@ def main() -> int:
             f"invalidated:{data['invalidated']},timeout:{data['timed_out']},"
             f"aligned_at_start_not_used:{data['aligned_at_start']}"
         )
-        print(
-            f"  {window.label}/SLTP_BASELINE={_summary_text(_summary(baseline))}"
-        )
+        print(f"  {window.label}/SLTP_BASELINE={_summary_text(_summary(baseline))}")
         for event_type, groups in data["snapshots"].items():
             for group in ("STOP_LOSS", "TAKE_PROFIT", "OTHER"):
                 if groups[group]["events"] == 0:
@@ -475,9 +479,7 @@ def main() -> int:
         for variant in VARIANTS:
             rows = data["variants"][variant]
             trades = tuple(item.trade for item in rows)
-            print(
-                f"  {window.label}/{variant}={_summary_text(_summary(trades))}"
-            )
+            print(f"  {window.label}/{variant}={_summary_text(_summary(trades))}")
             print(
                 f"  {window.label}/{variant}_PAIRED="
                 f"{_paired_text(_paired_diagnostics(baseline, rows))}"

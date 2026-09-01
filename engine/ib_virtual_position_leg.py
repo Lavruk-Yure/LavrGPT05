@@ -834,8 +834,7 @@ def reconcile_ib_virtual_position_legs(
         group_cash_fx_managed_observation_only[broker_position_id] = (
             broker_position_id in cash_fx_group_ids
             and status == IB_RECONCILIATION_STATUS_RECONCILED
-            and abs(broker_residual_signed_volume)
-            <= IB_POSITION_QUANTITY_ABS_TOLERANCE
+            and abs(broker_residual_signed_volume) <= IB_POSITION_QUANTITY_ABS_TOLERANCE
             and _cash_fx_position_observation_is_managed_close_flow(
                 legs=group_legs,
                 position_rows=position_rows,
@@ -1118,9 +1117,7 @@ def reconcile_ib_virtual_position_legs(
             group_broker_residual_evidence_statuses
         ),
         group_external_exposures=group_external_exposures,
-        group_cash_fx_managed_observation_only=(
-            group_cash_fx_managed_observation_only
-        ),
+        group_cash_fx_managed_observation_only=(group_cash_fx_managed_observation_only),
     )
 
 
@@ -2382,9 +2379,7 @@ def _reconcile_cash_fx_virtual_position(
     external_execution_present, external_execution_signed_volume = (
         _cash_fx_external_execution_summary(legs, group_executions)
     )
-    persisted_residual_signed_volume = _cash_fx_persisted_residual_signed_volume(
-        legs
-    )
+    persisted_residual_signed_volume = _cash_fx_persisted_residual_signed_volume(legs)
 
     if external_execution_present:
         broker_residual_signed_volume = external_execution_signed_volume

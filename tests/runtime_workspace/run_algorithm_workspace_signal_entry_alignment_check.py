@@ -80,13 +80,9 @@ def signal(timestamp: datetime, direction: str) -> WorkspaceSignalRecord:
         signal_type="MACD_CROSS",
         direction=direction,
         strength=0.0002,
-        macd_state=(
-            "MACD_CROSS_UP" if direction == "BUY" else "MACD_CROSS_DOWN"
-        ),
+        macd_state=("MACD_CROSS_UP" if direction == "BUY" else "MACD_CROSS_DOWN"),
         alligator_confirmation=(
-            "SAME_TIMEFRAME_BULLISH"
-            if direction == "BUY"
-            else "SAME_TIMEFRAME_BEARISH"
+            "SAME_TIMEFRAME_BULLISH" if direction == "BUY" else "SAME_TIMEFRAME_BEARISH"
         ),
         spread_status="OK",
         accepted=True,

@@ -124,9 +124,7 @@ def main() -> None:
 
     contextual_manager = create_in_memory_lang_manager()
     contextual_strings = getattr(contextual_manager, "_strings")
-    contextual_key = (
-        "AlgorithmWorkspaceParametersDialog.alligatorDisabled"
-    )
+    contextual_key = "AlgorithmWorkspaceParametersDialog.alligatorDisabled"
     contextual_strings[contextual_key] = {
         "en": "Disabled",
         "uk": "З інвалідністю",

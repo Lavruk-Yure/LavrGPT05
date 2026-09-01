@@ -188,9 +188,7 @@ def main() -> None:
         disabled_line,
     )
     disabled_variants = journal_search_variants("2026-02-02 03:00:00")
-    assert any(
-        variant in disabled_search_text for variant in disabled_variants
-    )
+    assert any(variant in disabled_search_text for variant in disabled_variants)
     assert "signal-disabled-alligator" in disabled_search_text
 
     market_entry = WorkspaceJournalEntry(
@@ -234,26 +232,38 @@ def main() -> None:
     )
     summary_positions = journal_summary_positions(summary_text, summary_marker)
     assert len(summary_positions) == 3
-    assert journal_summary_target_position(
-        summary_positions,
-        summary_positions[0],
-        "PAGE_DOWN",
-    ) == summary_positions[1]
-    assert journal_summary_target_position(
-        summary_positions,
-        summary_positions[1] + 8,
-        "PAGE_UP",
-    ) == summary_positions[1]
-    assert journal_summary_target_position(
-        summary_positions,
-        summary_positions[1],
-        "HOME",
-    ) == summary_positions[0]
-    assert journal_summary_target_position(
-        summary_positions,
-        summary_positions[1],
-        "END",
-    ) == summary_positions[-1]
+    assert (
+        journal_summary_target_position(
+            summary_positions,
+            summary_positions[0],
+            "PAGE_DOWN",
+        )
+        == summary_positions[1]
+    )
+    assert (
+        journal_summary_target_position(
+            summary_positions,
+            summary_positions[1] + 8,
+            "PAGE_UP",
+        )
+        == summary_positions[1]
+    )
+    assert (
+        journal_summary_target_position(
+            summary_positions,
+            summary_positions[1],
+            "HOME",
+        )
+        == summary_positions[0]
+    )
+    assert (
+        journal_summary_target_position(
+            summary_positions,
+            summary_positions[1],
+            "END",
+        )
+        == summary_positions[-1]
+    )
 
     row_dates = (
         date(2025, 1, 3),

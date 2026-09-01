@@ -215,9 +215,7 @@ def main() -> int:
     setup_logging()
 
     parser = argparse.ArgumentParser(
-        description=(
-            "Генератор __init__.py для підпакетів LavrGPT05"
-        )
+        description=("Генератор __init__.py для підпакетів LavrGPT05")
     )
     parser.add_argument(
         "--force",
@@ -226,23 +224,15 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    print(
-        "🔧 Генерація __init__.py у підпакетах проєкту: "
-        f"{PROJECT_ROOT}"
-    )
-    print(
-        "⚙️  Кореневий __init__.py не читається "
-        "і не змінюється."
-    )
+    print("🔧 Генерація __init__.py у підпакетах проєкту: " f"{PROJECT_ROOT}")
+    print("⚙️  Кореневий __init__.py не читається " "і не змінюється.")
 
     created = 0
     updated = 0
     skipped = 0
 
     folders = list_all_python_folders(PROJECT_ROOT)
-    print(
-        f"📁 Знайдено {len(folders)} папок для перевірки.\n"
-    )
+    print(f"📁 Знайдено {len(folders)} папок для перевірки.\n")
 
     for folder in folders:
         modules = list_python_modules(folder)

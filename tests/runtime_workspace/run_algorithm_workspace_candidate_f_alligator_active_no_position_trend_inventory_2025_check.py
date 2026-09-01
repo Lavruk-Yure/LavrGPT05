@@ -131,8 +131,7 @@ def _bucket(active_bars: int) -> str:
 
 def _position_is_open(trades, timestamp: datetime) -> bool:
     return any(
-        trade.entry_timestamp <= timestamp < trade.close_timestamp
-        for trade in trades
+        trade.entry_timestamp <= timestamp < trade.close_timestamp for trade in trades
     )
 
 
@@ -238,8 +237,8 @@ def _collect_inventory() -> tuple[TrendInventoryRow, ...]:
 
     trades = execution.trade_diagnostics()
     trade_signal_timestamps = {trade.signal_timestamp for trade in trades}
-    records_by_timestamp: dict[datetime, list[WorkspaceSignalRecord]] = (
-        defaultdict(list)
+    records_by_timestamp: dict[datetime, list[WorkspaceSignalRecord]] = defaultdict(
+        list
     )
     for record in runtime.historical_signal_records:
         records_by_timestamp[record.timestamp].append(record)
@@ -251,9 +250,7 @@ def _collect_inventory() -> tuple[TrendInventoryRow, ...]:
         assert direction is not None
         assert all(_active_direction(item) == direction for item in run)
         no_position_observations = tuple(
-            item
-            for item in run
-            if not _position_is_open(trades, item.timestamp)
+            item for item in run if not _position_is_open(trades, item.timestamp)
         )
         if not no_position_observations:
             continue
@@ -267,12 +264,10 @@ def _collect_inventory() -> tuple[TrendInventoryRow, ...]:
             for record in records_by_timestamp.get(timestamp, ())
         )
         source_reasons = [
-            str(record.source_reason_code or "").strip()
-            for record in current_records
+            str(record.source_reason_code or "").strip() for record in current_records
         ]
         filter_reasons = [
-            str(record.filter_reason_code or "").strip()
-            for record in current_records
+            str(record.filter_reason_code or "").strip() for record in current_records
         ]
         lifecycle_actions = [
             str(record.candidate_f_lifecycle_action or "").strip()

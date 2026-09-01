@@ -169,9 +169,7 @@ def main() -> None:
     )
     assert dialog_merged.parameters["macd_signal_enabled"] is False
     assert dialog_merged.parameters["macd_signal_mode"] == "LINEAR"
-    assert dialog_merged.parameters["macd_cross_angle_model"] == (
-        "ABC_REALTIME_SCALED"
-    )
+    assert dialog_merged.parameters["macd_cross_angle_model"] == ("ABC_REALTIME_SCALED")
     assert dialog_merged.parameters["macd_cross_min_abc_angle"] == 2.25
     assert dialog_merged.parameters["alligator_filter_enabled"] is True
     assert dialog_merged.parameters["alligator_confirmation"] == "HIGHER_2"
@@ -204,9 +202,7 @@ def main() -> None:
         assert restored.parameters["future_parameter"] == "KEEP"
         assert restored.parameters["macd_signal_enabled"] is False
         assert restored.parameters["macd_signal_mode"] == "LINEAR"
-        assert restored.parameters["macd_cross_angle_model"] == (
-            "ABC_REALTIME_SCALED"
-        )
+        assert restored.parameters["macd_cross_angle_model"] == ("ABC_REALTIME_SCALED")
         assert restored.parameters["macd_cross_min_abc_angle"] == 2.25
         assert restored.parameters["alligator_filter_enabled"] is True
         assert restored.parameters["alligator_confirmation"] == "HIGHER_2"

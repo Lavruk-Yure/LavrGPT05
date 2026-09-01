@@ -290,9 +290,7 @@ def _build_plan(
         take_distance=take_distance,
         stop_source=stop_source,
         take_source=take_source,
-        fallback_used=(
-            stop_source == "PRODUCTION" or take_source == "PRODUCTION"
-        ),
+        fallback_used=(stop_source == "PRODUCTION" or take_source == "PRODUCTION"),
     )
     return CounterfactualPlan(
         protection=protection,
@@ -341,11 +339,7 @@ def _change_metrics(
             and delta > 1e-9
         ):
             tp_added += 1
-        if (
-            tp_changed
-            and baseline.final_profit > 0.0
-            and delta < -1e-9
-        ):
+        if tp_changed and baseline.final_profit > 0.0 and delta < -1e-9:
             tp_lost_existing_profit += 1
     return (
         changed,
@@ -439,9 +433,8 @@ def _compact_trade(
 ) -> str:
     trade = _trade_for_uid(result, baseline.signal_uid)
     plan = result.plans[baseline.signal_uid]
-    changed = (
-        ("S" if plan.stop_source == "SURVIVAL_ZONE" else "-")
-        + ("T" if plan.take_source == "SURVIVAL_ZONE" else "-")
+    changed = ("S" if plan.stop_source == "SURVIVAL_ZONE" else "-") + (
+        "T" if plan.take_source == "SURVIVAL_ZONE" else "-"
     )
     return f"{trade.close_reason}/{trade.final_profit:+.2f}/{changed}"
 
@@ -502,9 +495,7 @@ def _write_csv(
                             f"{result.final_profit - baseline.final_profit:+.4f}"
                         ),
                         "focus_case": (
-                            "YES"
-                            if baseline.signal_timestamp in FOCUS_CASES
-                            else "NO"
+                            "YES" if baseline.signal_timestamp in FOCUS_CASES else "NO"
                         ),
                     }
                 )
@@ -516,9 +507,7 @@ def _assert_variant_contracts(variants: tuple[VariantResult, ...]) -> None:
         assert len(result.trades) == 59
         assert result.changed_trades <= 59
         assert (
-            result.improved_trades
-            + result.worsened_trades
-            + result.unchanged_trades
+            result.improved_trades + result.worsened_trades + result.unchanged_trades
             == 59
         )
         for plan in result.plans.values():
@@ -638,9 +627,7 @@ def main() -> None:
     output_csv = _write_csv(baseline_trades, variant_tuple)
 
     focus_trades = tuple(
-        trade
-        for trade in baseline_trades
-        if trade.signal_timestamp in FOCUS_CASES
+        trade for trade in baseline_trades if trade.signal_timestamp in FOCUS_CASES
     )
     assert len(focus_trades) == len(FOCUS_CASES)
 
@@ -652,8 +639,7 @@ def main() -> None:
     assert not broker_execution_attempted
 
     print(
-        "Algorithm Workspace Candidate F Survival-aware Structural SL/TP "
-        "2025 result"
+        "Algorithm Workspace Candidate F Survival-aware Structural SL/TP " "2025 result"
     )
     print("  mode=PRODUCTION_6K_SURVIVAL_AWARE_STRUCTURAL_SL_TP_COUNTERFACTUAL_ONLY")
     print("  production_logic_changed=False")

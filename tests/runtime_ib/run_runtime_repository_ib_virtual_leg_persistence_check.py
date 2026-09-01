@@ -42,9 +42,7 @@ def _count_rows(
     connection: sqlite3.Connection,
     table_name: str,
 ) -> int:
-    row = connection.execute(
-        f"SELECT COUNT(*) FROM {table_name}"
-    ).fetchone()
+    row = connection.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()
     return int(row[0])
 
 
@@ -244,9 +242,7 @@ def main() -> int:
         )
 
         leg_row = repository.get_ib_virtual_position_leg(position_uid)
-        all_orders = repository.get_ib_virtual_position_leg_orders(
-            position_uid
-        )
+        all_orders = repository.get_ib_virtual_position_leg_orders(position_uid)
         active_orders = repository.get_ib_virtual_position_leg_orders(
             position_uid,
             active_only=True,
@@ -256,13 +252,10 @@ def main() -> int:
             raise AssertionError("Persisted IB virtual leg was not found")
 
         active_by_role = {
-            str(row["order_role"]): str(row["broker_order_id"])
-            for row in active_orders
+            str(row["order_role"]): str(row["broker_order_id"]) for row in active_orders
         }
         old_take_profit = next(
-            row
-            for row in all_orders
-            if str(row["broker_order_id"]) == "112"
+            row for row in all_orders if str(row["broker_order_id"]) == "112"
         )
 
         if str(leg_row["take_profit_order_id"]) != "115":
@@ -284,9 +277,7 @@ def main() -> int:
         if int(old_take_profit["is_active"]) != 0:
             raise AssertionError("Replaced take-profit order lost history state")
 
-        foreign_key_rows = connection.execute(
-            "PRAGMA foreign_key_check"
-        ).fetchall()
+        foreign_key_rows = connection.execute("PRAGMA foreign_key_check").fetchall()
 
         if foreign_key_rows:
             raise AssertionError("IB virtual-leg persistence has FK violations")
@@ -300,10 +291,7 @@ def main() -> int:
             f"{_count_rows(connection, 'ib_virtual_position_leg_orders')}"
         )
         print(f"  active_orders={active_by_role}")
-        print(
-            "  replaced_take_profit_active="
-            f"{bool(old_take_profit['is_active'])}"
-        )
+        print("  replaced_take_profit_active=" f"{bool(old_take_profit['is_active'])}")
         print(f"  foreign_key_violations={len(foreign_key_rows)}")
         print("RUNTIME_REPOSITORY_IB_VIRTUAL_LEG_PERSISTENCE_CHECK=OK")
 

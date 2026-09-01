@@ -228,9 +228,7 @@ def _workspace(window: ReplayWindow) -> AlgorithmWorkspace:
             "macd_signal_enabled": True,
             "macd_signal_mode": "EXTENDED",
             "alligator_filter_enabled": True,
-            "alligator_confirmation": (
-                WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME
-            ),
+            "alligator_confirmation": (WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME),
             "spread_limit": SPREAD_LIMIT_PIPS * pip_size,
             "warmup_bars": 3,
             "macd_extremum_min_prominence": (
@@ -370,10 +368,7 @@ def main() -> None:
     assert resolve_forex_pip_size(SYMBOL) == 0.0001
     assert resolve_workspace_history_default_spread(SYMBOL) == 0.00012
     assert resolve_new_workspace_macd_extremum_min_prominence(SYMBOL) == 0.000015
-    assert (
-        resolve_new_workspace_macd_extremum_to_cross_min_distance(SYMBOL)
-        == 0.000050
-    )
+    assert resolve_new_workspace_macd_extremum_to_cross_min_distance(SYMBOL) == 0.000050
 
     results: dict[str, RunMetrics] = {}
     for window in WINDOWS:

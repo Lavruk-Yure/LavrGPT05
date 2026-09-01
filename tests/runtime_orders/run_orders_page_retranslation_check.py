@@ -94,8 +94,7 @@ def main() -> None:
     ]
 
     assert headers == expected, (
-        f"Translated headers differ: expected={expected!r}, "
-        f"actual={headers!r}"
+        f"Translated headers differ: expected={expected!r}, " f"actual={headers!r}"
     )
     assert page.ui.btnModifySlTp.text() == "Zmień SL/TP"
     assert page.ui.lblPositionFilter.text() == "Filtr"
@@ -128,8 +127,7 @@ def main() -> None:
 
     for column_index in range(page.ui.tblOpenPositions.columnCount()):
         assert (
-            header.sectionResizeMode(column_index)
-            == QHeaderView.ResizeMode.Interactive
+            header.sectionResizeMode(column_index) == QHeaderView.ResizeMode.Interactive
         )
 
     assert header.stretchLastSection()
@@ -161,10 +159,7 @@ def main() -> None:
     print(f"  pnl_summary={page.ui.lblPnlSummary.text()}")
     print(f"  spin_min_height={page.ui.spinLots.minimumHeight()}")
     print(f"  orders_status_stretch={page.ui.statusLayout.stretch(0)}")
-    print(
-        "  status_spacer_width="
-        f"{page.ui.statusSpacer.sizeHint().width()}"
-    )
+    print("  status_spacer_width=" f"{page.ui.statusSpacer.sizeHint().width()}")
     print("ORDERS_PAGE_RETRANSLATION_CHECK=OK")
 
     page.close()

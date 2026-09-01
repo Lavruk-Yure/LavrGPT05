@@ -167,13 +167,9 @@ def _build_abc_diagnostic(
     fraction = min(1.0, max(0.0, fraction))
 
     cross_value_macd = macd_before + fraction * (macd_after - macd_before)
-    cross_value_signal = signal_before + fraction * (
-        signal_after - signal_before
-    )
+    cross_value_signal = signal_before + fraction * (signal_after - signal_before)
     cross_value = (cross_value_macd + cross_value_signal) / 2.0
-    cross_timestamp = previous.timestamp + timedelta(
-        seconds=elapsed_seconds * fraction
-    )
+    cross_timestamp = previous.timestamp + timedelta(seconds=elapsed_seconds * fraction)
     elapsed_units = elapsed_seconds * fraction / config.time_unit_seconds
     scale = config.indicator_value_scale
 

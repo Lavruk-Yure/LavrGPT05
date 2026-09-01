@@ -142,8 +142,7 @@ class IBPositionGroup:
         """Return whether the external exposure lacks a current observation."""
         return (
             self.broker_residual_present
-            and self.broker_residual_evidence_status
-            == IB_FX_EXTERNAL_EXPOSURE_STALE
+            and self.broker_residual_evidence_status == IB_FX_EXTERNAL_EXPOSURE_STALE
         )
 
     @property
@@ -172,10 +171,7 @@ class IBPositionGroup:
         )
 
         if persisted_virtual_fx_net:
-            return (
-                self.signed_open_leg_volume
-                + self.broker_residual_signed_volume
-            )
+            return self.signed_open_leg_volume + self.broker_residual_signed_volume
 
         if self.display_uses_reconciled_legs:
             return self.signed_open_leg_volume
@@ -248,9 +244,7 @@ class IBPositionGroup:
             "broker_entry_price": self.broker_entry_price,
             "broker_position_kind": self.broker_position_kind,
             "broker_residual_signed_volume": self.broker_residual_signed_volume,
-            "broker_residual_evidence_status": (
-                self.broker_residual_evidence_status
-            ),
+            "broker_residual_evidence_status": (self.broker_residual_evidence_status),
             "broker_residual_confirmation_required": (
                 self.broker_residual_confirmation_required
             ),
@@ -415,17 +409,15 @@ def build_ib_position_group_snapshot(
                 0.0,
             )
             broker_residual_evidence_status = (
-                reconciliation_snapshot
-                .group_broker_residual_evidence_statuses
-                .get(broker_position_id, "")
-            )
-            broker_residual_protective_orders = (
-                _external_protective_order_details(
-                    evidence_snapshot=evidence_snapshot,
-                    broker_position_id=broker_position_id,
-                    account_id=account_id,
-                    symbol_name=symbol_name,
+                reconciliation_snapshot.group_broker_residual_evidence_statuses.get(
+                    broker_position_id, ""
                 )
+            )
+            broker_residual_protective_orders = _external_protective_order_details(
+                evidence_snapshot=evidence_snapshot,
+                broker_position_id=broker_position_id,
+                account_id=account_id,
+                symbol_name=symbol_name,
             )
 
         groups.append(
@@ -440,12 +432,8 @@ def build_ib_position_group_snapshot(
                 broker_entry_price=broker_state["entry_price"],
                 broker_position_kind=broker_position_kind,
                 broker_residual_signed_volume=broker_residual_signed_volume,
-                broker_residual_evidence_status=(
-                    broker_residual_evidence_status
-                ),
-                broker_residual_protective_orders=(
-                    broker_residual_protective_orders
-                ),
+                broker_residual_evidence_status=(broker_residual_evidence_status),
+                broker_residual_protective_orders=(broker_residual_protective_orders),
                 currency=broker_state["currency"],
                 pnl_currency=broker_state["pnl_currency"],
                 current_price=broker_state["current_price"],
@@ -484,9 +472,7 @@ def _external_protective_order_details(
     snapshots. ``perm_id`` remains the preferred stable identifier when the
     API reports ``order_id=0`` for a foreign client.
     """
-    current_client_id = _optional_int(
-        evidence_snapshot.get("current_client_id")
-    )
+    current_client_id = _optional_int(evidence_snapshot.get("current_client_id"))
     details: list[dict[str, Any]] = []
 
     for source_row in evidence_snapshot.get("open_orders") or []:
@@ -522,9 +508,7 @@ def _external_protective_order_details(
         ):
             continue
 
-        quantity = _safe_float(
-            row.get("total_quantity", row.get("quantity"))
-        )
+        quantity = _safe_float(row.get("total_quantity", row.get("quantity")))
 
         if quantity <= IB_POSITION_QUANTITY_ABS_TOLERANCE:
             continue
@@ -737,10 +721,7 @@ def _group_reconciliation_state(
     if group_mode == IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS:
         return reconciliation_status, reconciliation_messages
 
-    if (
-        persisted_legs
-        and reconciliation_status == IB_RECONCILIATION_STATUS_BLOCKED
-    ):
+    if persisted_legs and reconciliation_status == IB_RECONCILIATION_STATUS_BLOCKED:
         return reconciliation_status, reconciliation_messages
 
     if len(position_rows) > 1:

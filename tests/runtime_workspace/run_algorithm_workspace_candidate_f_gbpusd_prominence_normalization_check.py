@@ -82,12 +82,8 @@ def main() -> None:
     accept_ratio_2025 = _ratio("2025", "macd_accept_rate")
     accept_ratio_2026 = _ratio("2026", "macd_accept_rate")
 
-    burden_ratio_2025 = (
-        gbp25.prominence_burden_vs_atr / eur25.prominence_burden_vs_atr
-    )
-    burden_ratio_2026 = (
-        gbp26.prominence_burden_vs_atr / eur26.prominence_burden_vs_atr
-    )
+    burden_ratio_2025 = gbp25.prominence_burden_vs_atr / eur25.prominence_burden_vs_atr
+    burden_ratio_2026 = gbp26.prominence_burden_vs_atr / eur26.prominence_burden_vs_atr
     equivalent_2025 = _equivalent_gbp_prominence("2025")
     equivalent_2026 = _equivalent_gbp_prominence("2026")
 
@@ -146,10 +142,7 @@ def main() -> None:
     print("  normalization_candidate=CAUSAL_M15_VOLATILITY_SCALE")
     print("  broker_requests=0")
     print("  broker_execution_attempted=False")
-    print(
-        "ALGORITHM_WORKSPACE_CANDIDATE_F_GBPUSD_"
-        "PROMINENCE_NORMALIZATION_CHECK=OK"
-    )
+    print("ALGORITHM_WORKSPACE_CANDIDATE_F_GBPUSD_" "PROMINENCE_NORMALIZATION_CHECK=OK")
 
 
 if __name__ == "__main__":

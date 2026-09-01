@@ -54,8 +54,7 @@ def _leg(
     """
     protection_status = (
         IB_PROTECTION_STATUS_COMPLETE
-        if stop_loss_order_id is not None
-        and take_profit_order_id is not None
+        if stop_loss_order_id is not None and take_profit_order_id is not None
         else IB_PROTECTION_STATUS_NONE
     )
     return IBVirtualPositionLeg(
@@ -193,9 +192,7 @@ def main() -> int:
         reconciliation_snapshot=reconciliation,
         evidence_snapshot=evidence,
     )
-    groups_by_id = {
-        group.broker_position_id: group for group in snapshot.groups
-    }
+    groups_by_id = {group.broker_position_id: group for group in snapshot.groups}
 
     if [group.broker_position_id for group in snapshot.groups] != [
         eurusd_id,
@@ -220,9 +217,7 @@ def main() -> int:
     if eurusd.broker_side != "BUY" or eurusd.broker_volume != 2000.0:
         raise AssertionError("EURUSD broker-net state mismatch")
 
-    if eurusd.broker_position_kind != (
-        IB_BROKER_POSITION_KIND_VIRTUAL_FX
-    ):
+    if eurusd.broker_position_kind != (IB_BROKER_POSITION_KIND_VIRTUAL_FX):
         raise AssertionError("EURUSD Virtual FX kind mismatch")
 
     if eurusd.broker_quantity_is_terminal_truth:
@@ -240,9 +235,7 @@ def main() -> int:
     if gbpusd.broker_position_present:
         raise AssertionError("GBPUSD zero-net broker row should be absent")
 
-    if gbpusd.reconciliation_status != (
-        IB_RECONCILIATION_STATUS_RECONCILED
-    ):
+    if gbpusd.reconciliation_status != (IB_RECONCILIATION_STATUS_RECONCILED):
         raise AssertionError("GBPUSD zero-net group status mismatch")
 
     if gbpusd.leg_operations_enabled:
@@ -257,9 +250,7 @@ def main() -> int:
     if usdjpy.legs:
         raise AssertionError("USDJPY broker-only group invented virtual legs")
 
-    if usdjpy.reconciliation_status != (
-        IB_RECONCILIATION_STATUS_UNRECONCILED
-    ):
+    if usdjpy.reconciliation_status != (IB_RECONCILIATION_STATUS_UNRECONCILED):
         raise AssertionError("USDJPY net-only status mismatch")
 
     if usdjpy.leg_operations_enabled:

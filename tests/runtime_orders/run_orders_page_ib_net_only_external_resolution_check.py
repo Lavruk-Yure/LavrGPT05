@@ -17,14 +17,24 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from core.orders_page import COL_ID, ROLE_ROW_KIND, ROW_KIND_GROUP, OrdersPage  # noqa: E402
-from engine.ib_position_group import IBPositionGroup, IBPositionGroupSnapshot  # noqa: E402
+from core.orders_page import (
+    COL_ID,
+    ROLE_ROW_KIND,
+    ROW_KIND_GROUP,
+    OrdersPage,
+)  # noqa: E402
+from engine.ib_position_group import (
+    IBPositionGroup,
+    IBPositionGroupSnapshot,
+)  # noqa: E402
 from engine.runtime_constants import (  # noqa: E402
     IB_BROKER_POSITION_KIND_VIRTUAL_FX,
     IB_POSITION_GROUP_MODE_NET_ONLY,
     IB_RECONCILIATION_STATUS_UNRECONCILED,
 )
-from tests.runtime_orders.orders_page_group_test_support import DummyLangManager  # noqa: E402
+from tests.runtime_orders.orders_page_group_test_support import (
+    DummyLangManager,
+)  # noqa: E402
 
 
 class RuntimeStub:
@@ -46,9 +56,7 @@ class RuntimeStub:
             unrealized_pnl=-2.93,
             group_mode=IB_POSITION_GROUP_MODE_NET_ONLY,
             reconciliation_status=IB_RECONCILIATION_STATUS_UNRECONCILED,
-            reconciliation_messages=(
-                "Broker net position has no LGE virtual legs",
-            ),
+            reconciliation_messages=("Broker net position has no LGE virtual legs",),
             legs=[],
         )
         self.snapshot = IBPositionGroupSnapshot(

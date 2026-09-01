@@ -58,9 +58,7 @@ class WorkspaceHistoricalEvaluationPolicy:
                 "horizon_bars must be a positive integer"
             )
         if not pnl_currency:
-            raise WorkspaceHistoricalEvaluationError(
-                "pnl_currency is required"
-            )
+            raise WorkspaceHistoricalEvaluationError("pnl_currency is required")
         object.__setattr__(self, "horizon_bars", horizon_bars)
         object.__setattr__(self, "fixed_volume", fixed_volume)
         object.__setattr__(self, "pnl_currency", pnl_currency)
@@ -318,12 +316,7 @@ def _build_trade(
     slippage_cost = 2.0 * slippage * volume
     commission_cost = policy.commission_per_trade
     net_profit = execution_profit - commission_cost
-    expected_net = (
-        gross_profit
-        - spread_cost
-        - slippage_cost
-        - commission_cost
-    )
+    expected_net = gross_profit - spread_cost - slippage_cost - commission_cost
     if not math.isclose(net_profit, expected_net, rel_tol=0.0, abs_tol=1e-9):
         raise WorkspaceHistoricalEvaluationError(
             "hypothetical execution cost decomposition is inconsistent"

@@ -57,11 +57,13 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
         workspace: AlgorithmWorkspace,
         lang_mgr: LangManager | None = None,
         parent: QWidget | None = None,
-        history_download: Callable[
-            [datetime, datetime, CTraderHistoryProgressCallback | None],
-            WorkspaceHistoryCsvExportResult,
-        ]
-        | None = None,
+        history_download: (
+            Callable[
+                [datetime, datetime, CTraderHistoryProgressCallback | None],
+                WorkspaceHistoryCsvExportResult,
+            ]
+            | None
+        ) = None,
         history_root: str | Path | None = None,
     ) -> None:
         super().__init__(parent)
@@ -69,9 +71,7 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
         self._lang_mgr = lang_mgr
         self._download = history_download
         self._writer = WorkspaceHistoryCsvWriter(history_root)
-        self._initial = WorkspaceHistoryDownloadSettings.from_workspace(
-            workspace
-        )
+        self._initial = WorkspaceHistoryDownloadSettings.from_workspace(workspace)
         self._downloaded_result: WorkspaceHistoryCsvExportResult | None = None
         self._requested_period_utc: tuple[datetime, datetime] | None = None
         self._download_started_utc: datetime | None = None
@@ -95,9 +95,7 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
 
         self.dt_start_date.dateChanged.connect(self._refresh_planned_path)
         self.dt_end_date.dateChanged.connect(self._refresh_planned_path)
-        self.cmb_timezone.currentTextChanged.connect(
-            self._refresh_planned_path
-        )
+        self.cmb_timezone.currentTextChanged.connect(self._refresh_planned_path)
         self.btn_download.clicked.connect(self._download_history)
         self.btn_use_for_replay.clicked.connect(self._accept_for_replay)
         self.btn_close.clicked.connect(self.reject)
@@ -270,9 +268,7 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
         self.dt_start_date.setDate(
             QDate(start_date.year, start_date.month, start_date.day)
         )
-        self.dt_end_date.setDate(
-            QDate(end_date.year, end_date.month, end_date.day)
-        )
+        self.dt_end_date.setDate(QDate(end_date.year, end_date.month, end_date.day))
         self.cmb_timezone.setCurrentText(self._initial.timezone)
         self.ui.lblBroker.setText(self._workspace.broker)
         self.ui.lblAccount.setText(self._workspace.account_id or "—")
@@ -413,14 +409,10 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
                 percent=percent,
                 requests=request_count,
                 bars=bar_count,
-                covered_start=covered_start.astimezone(UTC).strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
+                covered_start=covered_start.astimezone(UTC).strftime("%Y-%m-%d %H:%M"),
             )
         )
-        QApplication.processEvents(
-            QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents
-        )
+        QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
     def _set_completed_progress(
         self,
@@ -433,8 +425,7 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
         self.lbl_status.setText(
             self._tr(
                 "AlgorithmWorkspaceHistoryDownloadDialog.statusCompleted",
-                "Completed: {bars} bars in {requests} requests, "
-                "{first} — {last}.",
+                "Completed: {bars} bars in {requests} requests, " "{first} — {last}.",
             ).format(
                 bars=exported.bar_count,
                 requests=exported.request_count,
@@ -483,12 +474,8 @@ class AlgorithmWorkspaceHistoryDownloadDialog(QDialog):
                 )
 
         started = self._format_download_time_utc(self._download_started_utc)
-        finished = self._format_download_time_utc(
-            self._download_finished_utc
-        )
-        duration = format_history_download_duration(
-            self._download_elapsed_seconds
-        )
+        finished = self._format_download_time_utc(self._download_finished_utc)
+        duration = format_history_download_duration(self._download_elapsed_seconds)
 
         return self._tr(
             "AlgorithmWorkspaceHistoryDownloadDialog.completed",

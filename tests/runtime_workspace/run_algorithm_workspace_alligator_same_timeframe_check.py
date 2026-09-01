@@ -177,23 +177,14 @@ def _closes() -> tuple[float, ...]:
     closes.extend(1.2214 - index * 0.0006 for index in range(40))
 
     last_close = closes[-1]
-    closes.extend(
-        last_close + (index + 1) * 0.00045
-        for index in range(12)
-    )
+    closes.extend(last_close + (index + 1) * 0.00045 for index in range(12))
     last_close = closes[-1]
-    closes.extend(
-        last_close - (index + 1) * 0.0005
-        for index in range(25)
-    )
+    closes.extend(last_close - (index + 1) * 0.0005 for index in range(25))
     return tuple(closes)
 
 
 def _events() -> tuple[WorkspaceMarketEvent, ...]:
-    return tuple(
-        _event(index, close)
-        for index, close in enumerate(_closes())
-    )
+    return tuple(_event(index, close) for index, close in enumerate(_closes()))
 
 
 def _workspace(
@@ -221,9 +212,7 @@ def _workspace(
             "spread_limit": 0.00020,
         },
         replay_settings={"speed": speed},
-        indicator_profile_bindings=(
-            default_workspace_indicator_profile_bindings()
-        ),
+        indicator_profile_bindings=(default_workspace_indicator_profile_bindings()),
     )
 
 
@@ -243,9 +232,7 @@ def _run(
     replay_settings = dict(workspace.replay_settings)
     replay_settings["speed"] = speed
     run_workspace = replace(workspace, replay_settings=replay_settings)
-    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(
-        run_workspace.algorithm
-    )
+    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(run_workspace.algorithm)
     broker_probe = BrokerRequestProbe()
     runtime = WorkspaceRuntime(
         run_workspace,
@@ -391,14 +378,8 @@ def _assert_same_timeframe_phase_gate(
     assert not buy_starting.allowed
     assert not sell_ending.allowed
     assert not buy_flat.allowed
-    assert (
-        buy_starting.reason_code
-        == "ALLIGATOR_SAME_TIMEFRAME_BUY_STARTING_REJECT"
-    )
-    assert (
-        sell_ending.reason_code
-        == "ALLIGATOR_SAME_TIMEFRAME_SELL_ENDING_REJECT"
-    )
+    assert buy_starting.reason_code == "ALLIGATOR_SAME_TIMEFRAME_BUY_STARTING_REJECT"
+    assert sell_ending.reason_code == "ALLIGATOR_SAME_TIMEFRAME_SELL_ENDING_REJECT"
     assert buy_flat.reason_code == "ALLIGATOR_SAME_TIMEFRAME_BUY_REJECT"
 
 
@@ -439,8 +420,7 @@ def main() -> None:
         WORKSPACE_SIGNAL_FILTER_ALLOW,
     ]
     assert all(
-        record.filter_decision == WORKSPACE_SIGNAL_FILTER_REJECT
-        for record in rejected
+        record.filter_decision == WORKSPACE_SIGNAL_FILTER_REJECT for record in rejected
     )
     bullish_confirmation = ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME_BULLISH
     bearish_confirmation = ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME_BEARISH
@@ -450,15 +430,12 @@ def main() -> None:
     starting_sell = next(
         record
         for record in rejected
-        if record.filter_reason_code
-        == "ALLIGATOR_SAME_TIMEFRAME_SELL_STARTING_REJECT"
+        if record.filter_reason_code == "ALLIGATOR_SAME_TIMEFRAME_SELL_STARTING_REJECT"
     )
     assert starting_sell.alligator_confirmation == bearish_confirmation
     assert all(record.risk_execution_attempted is False for record in records)
     alligator_contexts = tuple(
-        record.filter_context
-        for record in records
-        if record.filter_context is not None
+        record.filter_context for record in records if record.filter_context is not None
     )
     assert alligator_contexts
     assert all(context.regime is not None for context in alligator_contexts)
@@ -469,13 +446,9 @@ def main() -> None:
         if context.regime != "ALLIGATOR_REGIME_WARMUP"
     )
     assert classified_contexts
+    assert all(context.normalized_slope is not None for context in classified_contexts)
     assert all(
-        context.normalized_slope is not None
-        for context in classified_contexts
-    )
-    assert all(
-        context.normalized_opening is not None
-        for context in classified_contexts
+        context.normalized_opening is not None for context in classified_contexts
     )
     assert journal_events.count("SIGNAL_ACCEPTED") == 1
     assert journal_events.count("SIGNAL_REJECTED") == 5
@@ -491,10 +464,7 @@ def main() -> None:
         in {WORKSPACE_SIGNAL_FILTER_ALLOW, WORKSPACE_SIGNAL_FILTER_REJECT}
         for entry in signal_journal
     )
-    assert all(
-        entry.details.get("filter_reason_code")
-        for entry in signal_journal
-    )
+    assert all(entry.details.get("filter_reason_code") for entry in signal_journal)
     assert broker_requests == 0
     assert run_10x[4] == 0
     assert run_step[4] == 0

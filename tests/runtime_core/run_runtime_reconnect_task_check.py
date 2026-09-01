@@ -93,8 +93,7 @@ def main() -> int:
     manual_task.run_once()
 
     print(
-        "manual_disconnect_reconnect_blocked="
-        f"{manual_service.reconnect_calls == 0}"
+        "manual_disconnect_reconnect_blocked=" f"{manual_service.reconnect_calls == 0}"
     )
 
     checks = [

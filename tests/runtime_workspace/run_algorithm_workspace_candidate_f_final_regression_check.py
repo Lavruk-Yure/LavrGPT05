@@ -108,9 +108,7 @@ def main() -> None:
             if stderr.strip():
                 print("--- stderr ---")
                 print(stderr.rstrip())
-            raise AssertionError(
-                f"Final Candidate F regression failed: {check.name}"
-            )
+            raise AssertionError(f"Final Candidate F regression failed: {check.name}")
 
     print("RoadMap101 Candidate F final regression result")
     for check, passed in results:

@@ -196,15 +196,12 @@ def main() -> None:
 
     results = tuple(_run_threshold(threshold) for threshold in THRESHOLDS)
     baseline = next(
-        result
-        for result in results
-        if result.threshold == BASELINE_THRESHOLD
+        result for result in results if result.threshold == BASELINE_THRESHOLD
     )
     _assert_baseline(baseline)
 
     assert all(
-        result.trades
-        == result.wins + result.losses + result.break_even
+        result.trades == result.wins + result.losses + result.break_even
         for result in results
     )
     assert all(
@@ -220,10 +217,7 @@ def main() -> None:
     assert all(
         math.isfinite(result.net)
         and math.isfinite(result.drawdown)
-        and (
-            math.isfinite(result.profit_factor)
-            or math.isinf(result.profit_factor)
-        )
+        and (math.isfinite(result.profit_factor) or math.isinf(result.profit_factor))
         for result in results
     )
 

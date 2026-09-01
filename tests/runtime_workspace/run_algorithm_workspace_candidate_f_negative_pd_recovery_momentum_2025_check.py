@@ -78,11 +78,7 @@ def _risk_usd(case: PairedRecoveryCase) -> float:
 
 
 def _momentum_case(pair: PairedRecoveryCase) -> MomentumCase:
-    cohort = (
-        COHORT_POSITIVE
-        if pair.step_1_r > NUMERIC_EPSILON
-        else COHORT_NONPOSITIVE
-    )
+    cohort = COHORT_POSITIVE if pair.step_1_r > NUMERIC_EPSILON else COHORT_NONPOSITIVE
     risk_usd = _risk_usd(pair)
     m1_abort_r = pair.mark_1_r
     m1_abort_usd = m1_abort_r * risk_usd
@@ -217,15 +213,12 @@ def main() -> None:
     pairs = build_paired_recovery_cases(runtime)
     cases = tuple(_momentum_case(pair) for pair in pairs)
     positive = tuple(case for case in cases if case.cohort == COHORT_POSITIVE)
-    nonpositive = tuple(
-        case for case in cases if case.cohort == COHORT_NONPOSITIVE
-    )
+    nonpositive = tuple(case for case in cases if case.cohort == COHORT_NONPOSITIVE)
 
     nonpositive_later_recovery = tuple(
         case
         for case in nonpositive
-        if case.pair.outcome == OUTCOME_RECOVERY
-        and case.pair.close_event_index > 1
+        if case.pair.outcome == OUTCOME_RECOVERY and case.pair.close_event_index > 1
     )
     positive_timeout = tuple(
         case for case in positive if case.pair.outcome == OUTCOME_TIMEOUT
@@ -242,9 +235,7 @@ def main() -> None:
         case.pair.baseline_close_usd for case in nonpositive
     )
     abort_nonpositive_m1_sum = sum(case.m1_abort_usd for case in nonpositive)
-    abort_nonpositive_6f_sum = sum(
-        case.pair.variant_close_usd for case in nonpositive
-    )
+    abort_nonpositive_6f_sum = sum(case.pair.variant_close_usd for case in nonpositive)
 
     broker_execution_attempted = any(
         bool(entry.details.get("broker_execution_attempted"))
@@ -277,8 +268,7 @@ def main() -> None:
     print("  cohorts=M1_STEP_POSITIVE;M1_STEP_NONPOSITIVE")
     print("  fixed_6f_policy=recovery_to_0R_or_timeout_after_3_completed_M1")
     print(
-        "  partition_counts="
-        f"positive:{len(positive)},nonpositive:{len(nonpositive)}"
+        "  partition_counts=" f"positive:{len(positive)},nonpositive:{len(nonpositive)}"
     )
     _cohort_summary("m1_step_positive", positive)
     _cohort_summary("m1_step_nonpositive", nonpositive)
@@ -290,9 +280,7 @@ def main() -> None:
         f"m1_abort:{abort_nonpositive_m1_sum:+.2f},"
         f"fixed_6f:{abort_nonpositive_6f_sum:+.2f}"
     )
-    abort_vs_baseline = (
-        abort_nonpositive_m1_sum - abort_nonpositive_baseline_sum
-    )
+    abort_vs_baseline = abort_nonpositive_m1_sum - abort_nonpositive_baseline_sum
     print(
         "    aggregate="
         f"abort_vs_baseline:{abort_vs_baseline:+.2f},"
@@ -306,10 +294,7 @@ def main() -> None:
         "    fixed_6f_positive_timeout_exception="
         f"{len(positive_timeout)}/{len(positive)}"
     )
-    print(
-        "  hybrid_diagnostic="
-        "positive_step_keep_6f;nonpositive_step_abort_at_M1"
-    )
+    print("  hybrid_diagnostic=" "positive_step_keep_6f;nonpositive_step_abort_at_M1")
     print(
         "    reconstructed_net="
         f"{hybrid_net:+.2f},delta_vs_baseline:{hybrid_delta_vs_baseline:+.2f},"

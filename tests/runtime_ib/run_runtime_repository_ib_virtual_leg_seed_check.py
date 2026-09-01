@@ -65,9 +65,7 @@ def _create_open_ib_position(
         trade_uid=trade_uid,
         broker_order_uid=broker_order_uid,
         broker="IB",
-        broker_position_id=(
-            f"IB:{account_id}:{symbol_name}"
-        ),
+        broker_position_id=(f"IB:{account_id}:{symbol_name}"),
         symbol=symbol_name,
         side=broker_snapshot_side,
         volume=broker_snapshot_volume,
@@ -143,10 +141,7 @@ def main() -> int:
     if [leg.parent_order_id for leg in legs] != [111, 114, 117, 120]:
         raise AssertionError("parent order ids mismatch")
 
-    logical_pairs = [
-        (leg.symbol_name, leg.side, leg.volume)
-        for leg in legs
-    ]
+    logical_pairs = [(leg.symbol_name, leg.side, leg.volume) for leg in legs]
     expected_pairs = [
         ("EURUSD", "BUY", 1000.0),
         ("EURUSD", "BUY", 2000.0),
@@ -173,14 +168,10 @@ def main() -> int:
         raise AssertionError("Trade logical SELL leg was not preserved")
 
     eurusd_signed = sum(
-        leg.signed_volume
-        for leg in legs
-        if leg.symbol_name == "EURUSD"
+        leg.signed_volume for leg in legs if leg.symbol_name == "EURUSD"
     )
     gbpusd_signed = sum(
-        leg.signed_volume
-        for leg in legs
-        if leg.symbol_name == "GBPUSD"
+        leg.signed_volume for leg in legs if leg.symbol_name == "GBPUSD"
     )
 
     print("RuntimeRepository IB virtual-leg seed result")

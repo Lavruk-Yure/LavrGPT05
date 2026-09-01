@@ -105,9 +105,7 @@ class MainAppWindow(QMainWindow):
         self._main_window_save_timer = QTimer(self)
         self._main_window_save_timer.setSingleShot(True)
         self._main_window_save_timer.setInterval(250)
-        self._main_window_save_timer.timeout.connect(
-            self._save_main_window_state
-        )
+        self._main_window_save_timer.timeout.connect(self._save_main_window_state)
         self._apply_saved_main_window_state()
 
         self.ui.lblMarketState.setVisible(False)
@@ -459,9 +457,7 @@ QToolButton#tbExit:pressed {
                 account_mode="DEMO",
             )
             if not ready:
-                logger.warning(
-                    "Startup AutoConnect cTrader: readiness timeout."
-                )
+                logger.warning("Startup AutoConnect cTrader: readiness timeout.")
                 runtime_engine.start_ctrader_reconnect_watch()
                 return
 
@@ -1088,9 +1084,7 @@ QToolButton#tbExit:pressed {
             state.get("window_state") or "NORMAL"
         ).upper()
         if self._saved_main_window_state == "MAXIMIZED":
-            self.setWindowState(
-                self.windowState() | Qt.WindowState.WindowMaximized
-            )
+            self.setWindowState(self.windowState() | Qt.WindowState.WindowMaximized)
 
     def _clamp_main_window_geometry(self, requested: QRect) -> QRect:
         screen = QApplication.screenAt(requested.center())
@@ -1116,10 +1110,7 @@ QToolButton#tbExit:pressed {
 
     def _prepare_workspace_restore_after_show(self) -> None:
         """Apply the saved main state before waiting for a stable MDI size."""
-        if (
-            self._saved_main_window_state == "MAXIMIZED"
-            and not self.isMaximized()
-        ):
+        if self._saved_main_window_state == "MAXIMIZED" and not self.isMaximized():
             self.showMaximized()
         QTimer.singleShot(50, self._wait_for_stable_workspace_layout)
 
@@ -1291,9 +1282,7 @@ QToolButton#tbExit:pressed {
             self._broker_health_timer,
         )
         return {
-            "main_timers_stopped": all(
-                not timer.isActive() for timer in timers
-            ),
+            "main_timers_stopped": all(not timer.isActive() for timer in timers),
             "shutdown_complete": self._shutdown_complete,
         }
 

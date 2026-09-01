@@ -85,12 +85,8 @@ class AlgorithmWorkspaceReplayDialog(QDialog):
         self.btn_browse.clicked.connect(self._browse_csv)
         self.btn_save.clicked.connect(self._save)
         self.btn_cancel.clicked.connect(self.reject)
-        self.cmb_source_type.currentIndexChanged.connect(
-            self._refresh_source_controls
-        )
-        self.chk_start_enabled.toggled.connect(
-            self.dt_start_utc.setEnabled
-        )
+        self.cmb_source_type.currentIndexChanged.connect(self._refresh_source_controls)
+        self.chk_start_enabled.toggled.connect(self.dt_start_utc.setEnabled)
         self.chk_end_enabled.toggled.connect(self.dt_end_utc.setEnabled)
 
         self._populate_choices()
@@ -116,9 +112,7 @@ class AlgorithmWorkspaceReplayDialog(QDialog):
             end_utc=end_utc,
             source_timezone=self.cmb_source_timezone.currentText().strip(),
             delimiter=str(self.cmb_delimiter.currentData()),
-            decimal_separator=str(
-                self.cmb_decimal_separator.currentData()
-            ),
+            decimal_separator=str(self.cmb_decimal_separator.currentData()),
             spread=self.spn_spread.value(),
             source_name=self.edt_source_name.text().strip(),
             source_timeframe=str(self.cmb_source_timeframe.currentData()),
@@ -385,10 +379,7 @@ class AlgorithmWorkspaceReplayDialog(QDialog):
         self.spn_initial_balance.setValue(values.initial_balance)
 
     def _refresh_source_controls(self, _index: int = -1) -> None:
-        is_csv = (
-            self.cmb_source_type.currentData()
-            == WORKSPACE_REPLAY_SOURCE_CSV
-        )
+        is_csv = self.cmb_source_type.currentData() == WORKSPACE_REPLAY_SOURCE_CSV
         self.edt_file_path.setEnabled(is_csv)
         self.btn_browse.setEnabled(is_csv)
         self.ui.grpRange.setEnabled(is_csv)
@@ -479,8 +470,7 @@ class AlgorithmWorkspaceReplayDialog(QDialog):
         )
         if detected.detected_timeframe is not None:
             period_text = (
-                f"{period_text}; timeframe={detected.detected_timeframe} "
-                "(auto)"
+                f"{period_text}; timeframe={detected.detected_timeframe} " "(auto)"
             )
         self.edt_file_path.setToolTip(period_text)
         return detected
@@ -515,10 +505,7 @@ class AlgorithmWorkspaceReplayDialog(QDialog):
 
     def _save(self) -> None:
         try:
-            if (
-                self.cmb_source_type.currentData()
-                == WORKSPACE_REPLAY_SOURCE_CSV
-            ):
+            if self.cmb_source_type.currentData() == WORKSPACE_REPLAY_SOURCE_CSV:
                 file_path = Path(self.edt_file_path.text().strip())
                 self._detect_csv_metadata(file_path, update_period=False)
             values = self.replay_values()

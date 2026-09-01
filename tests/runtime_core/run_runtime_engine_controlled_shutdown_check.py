@@ -49,9 +49,7 @@ def main() -> int:
             database_closed = True
 
         shutdown_events = sum(
-            1
-            for event in engine.events
-            if event.event_type.value == "SHUTDOWN"
+            1 for event in engine.events if event.event_type.value == "SHUTDOWN"
         )
 
         print("RuntimeEngine controlled shutdown result")

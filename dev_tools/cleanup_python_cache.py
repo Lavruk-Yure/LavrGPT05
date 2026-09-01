@@ -124,12 +124,10 @@ def cleanup_python_cache(
                 compiled_file.unlink()
 
         cache_directories_removed = sum(
-            not cache_directory.exists()
-            for cache_directory in cache_directories
+            not cache_directory.exists() for cache_directory in cache_directories
         )
         compiled_files_removed = sum(
-            not compiled_file.exists()
-            for compiled_file in compiled_files
+            not compiled_file.exists() for compiled_file in compiled_files
         )
 
     return PythonCacheCleanupResult(

@@ -165,8 +165,7 @@ class OrdersPage(QWidget):
             self.ui.tblOpenPositions,
             "orders_page.open_positions",
             tuple(
-                POSITION_TREE_COLUMN_WIDTHS[column]
-                for column in range(COLUMN_COUNT)
+                POSITION_TREE_COLUMN_WIDTHS[column] for column in range(COLUMN_COUNT)
             ),
         )
         self._connect_signals()
@@ -901,20 +900,14 @@ class OrdersPage(QWidget):
         except IBFxExternalExposureExecutionBlockedError as exc:
             logger.warning("Manual MARKET order blocked by LGE EXCLUSIVE.")
             exposure = exc.matching_exposure
-            account_id = (
-                exposure.account_id if exposure is not None else "—"
-            )
+            account_id = exposure.account_id if exposure is not None else "—"
             blocked_symbol = (
                 exposure.symbol_name if exposure is not None else symbol_name
             )
             side_text = exposure.side if exposure is not None else "—"
-            volume_text = (
-                f"{exposure.volume:g}" if exposure is not None else "—"
-            )
+            volume_text = f"{exposure.volume:g}" if exposure is not None else "—"
             evidence_text = self._format_external_exposure_evidence_status(
-                exposure.evidence_status
-                if exposure is not None
-                else exc.reason_code
+                exposure.evidence_status if exposure is not None else exc.reason_code
             )
             message = self._lang_mgr.tr(
                 "OrdersPage.msgExternalExposureOrderBlocked",
@@ -1070,9 +1063,7 @@ class OrdersPage(QWidget):
                 if callable(sync_groups):
                     snapshot = sync_groups()
                 else:
-                    snapshot = (
-                        self._runtime_engine.get_active_broker_position_groups()
-                    )
+                    snapshot = self._runtime_engine.get_active_broker_position_groups()
                 filter_state, warning_text = self._apply_ib_position_group_snapshot(
                     snapshot,
                     stable_key=stable_key,
@@ -1188,17 +1179,13 @@ class OrdersPage(QWidget):
 
         enabled = bool(item.data(COL_ID, ROLE_OPERATIONS_ENABLED))
         row_kind = str(item.data(COL_ID, ROLE_ROW_KIND) or "")
-        reconciliation_status = str(
-            item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or ""
-        ).strip().upper()
-        recovery_enabled = (
-            (
-                row_kind == ROW_KIND_LEG
-                and reconciliation_status
-                == IB_RECONCILIATION_STATUS_CLOSE_EVIDENCE_MISSING
-            )
-            or self._is_external_exposure_resolution_item(item)
+        reconciliation_status = (
+            str(item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or "").strip().upper()
         )
+        recovery_enabled = (
+            row_kind == ROW_KIND_LEG
+            and reconciliation_status == IB_RECONCILIATION_STATUS_CLOSE_EVIDENCE_MISSING
+        ) or self._is_external_exposure_resolution_item(item)
         self.ui.btnModifySlTp.setEnabled(enabled)
         self.ui.btnResolveReconciliation.setEnabled(recovery_enabled)
         self.ui.btnClosePosition.setEnabled(enabled)
@@ -1260,9 +1247,7 @@ class OrdersPage(QWidget):
             self._set_orders_status(text, warning=True)
             return
 
-        status = str(
-            item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or ""
-        ).strip()
+        status = str(item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or "").strip()
 
         if not status:
             self._retranslate_current_ib_status()
@@ -1446,15 +1431,11 @@ class OrdersPage(QWidget):
 
         yes_button = dialog.button(QMessageBox.StandardButton.Yes)
         if yes_button is not None:
-            yes_button.setText(
-                self._lang_mgr.tr("CommonConfirmDialog.btnYes", "Yes")
-            )
+            yes_button.setText(self._lang_mgr.tr("CommonConfirmDialog.btnYes", "Yes"))
 
         no_button = dialog.button(QMessageBox.StandardButton.No)
         if no_button is not None:
-            no_button.setText(
-                self._lang_mgr.tr("CommonConfirmDialog.btnNo", "No")
-            )
+            no_button.setText(self._lang_mgr.tr("CommonConfirmDialog.btnNo", "No"))
 
         return dialog
 
@@ -1500,9 +1481,7 @@ class OrdersPage(QWidget):
             )
             return
 
-        position_uid = str(
-            item.data(COL_ID, ROLE_POSITION_UID) or ""
-        ).strip()
+        position_uid = str(item.data(COL_ID, ROLE_POSITION_UID) or "").strip()
         symbol = str(item.data(COL_ID, ROLE_SYMBOL) or "").strip().upper()
         side = str(item.data(COL_ID, ROLE_SIDE) or "").strip().upper()
         volume = self._format_ib_units(item.data(COL_ID, ROLE_VOLUME))
@@ -1610,8 +1589,7 @@ class OrdersPage(QWidget):
                 )
             )
             sections.extend(
-                self._format_external_protective_order_line(order)
-                for order in orders
+                self._format_external_protective_order_line(order) for order in orders
             )
         else:
             sections.append(
@@ -1660,15 +1638,11 @@ class OrdersPage(QWidget):
             return False
 
         group_mode = str(item.data(COL_ID, ROLE_GROUP_MODE) or "")
-        broker_position_kind = str(
-            item.data(COL_ID, ROLE_BROKER_POSITION_KIND) or ""
+        broker_position_kind = str(item.data(COL_ID, ROLE_BROKER_POSITION_KIND) or "")
+        reconciliation_status = (
+            str(item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or "").strip().upper()
         )
-        reconciliation_status = str(
-            item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or ""
-        ).strip().upper()
-        volume = OrdersPage._finite_number(
-            item.data(COL_ID, ROLE_VOLUME)
-        )
+        volume = OrdersPage._finite_number(item.data(COL_ID, ROLE_VOLUME))
 
         return (
             group_mode == IB_POSITION_GROUP_MODE_NET_ONLY
@@ -1689,9 +1663,7 @@ class OrdersPage(QWidget):
         """Return whether a tree row is eligible for manual recovery."""
         return (
             str(item.data(COL_ID, ROLE_ROW_KIND) or "") == ROW_KIND_LEG
-            and str(
-                item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or ""
-            ).strip().upper()
+            and str(item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or "").strip().upper()
             == IB_RECONCILIATION_STATUS_CLOSE_EVIDENCE_MISSING
             and bool(str(item.data(COL_ID, ROLE_POSITION_UID) or "").strip())
         )
@@ -1974,15 +1946,9 @@ class OrdersPage(QWidget):
                     != ROW_KIND_BROKER_RESIDUAL
                 ):
                     continue
-                if (
-                    str(item.data(COL_ID, ROLE_ACCOUNT_ID) or "").strip()
-                    != account
-                ):
+                if str(item.data(COL_ID, ROLE_ACCOUNT_ID) or "").strip() != account:
                     continue
-                if (
-                    str(item.data(COL_ID, ROLE_SYMBOL) or "").strip().upper()
-                    != symbol
-                ):
+                if str(item.data(COL_ID, ROLE_SYMBOL) or "").strip().upper() != symbol:
                     continue
                 if self._tree_item_is_effectively_hidden(item):
                     continue
@@ -2091,9 +2057,7 @@ class OrdersPage(QWidget):
                         continue
 
                     any_child_visible = True
-                    child_kind = str(
-                        child.data(COL_ID, ROLE_ROW_KIND) or ""
-                    ).strip()
+                    child_kind = str(child.data(COL_ID, ROLE_ROW_KIND) or "").strip()
 
                     if child_kind == ROW_KIND_LEG:
                         visible_legs += 1
@@ -2152,12 +2116,8 @@ class OrdersPage(QWidget):
     ) -> None:
         """Accumulate one visible row without mixing PnL currencies."""
         group_mode = str(item.data(COL_ID, ROLE_GROUP_MODE) or "")
-        broker_position_kind = str(
-            item.data(COL_ID, ROLE_BROKER_POSITION_KIND) or ""
-        )
-        reconciliation_status = str(
-            item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or ""
-        )
+        broker_position_kind = str(item.data(COL_ID, ROLE_BROKER_POSITION_KIND) or "")
+        reconciliation_status = str(item.data(COL_ID, ROLE_RECONCILIATION_STATUS) or "")
         blocked_virtual_fx_observation = (
             group_mode == IB_POSITION_GROUP_MODE_NET_ONLY
             and broker_position_kind == IB_BROKER_POSITION_KIND_VIRTUAL_FX
@@ -2172,9 +2132,7 @@ class OrdersPage(QWidget):
         if value is None:
             return
 
-        currency = self._normalize_currency(
-            item.data(COL_ID, ROLE_PNL_CURRENCY)
-        )
+        currency = self._normalize_currency(item.data(COL_ID, ROLE_PNL_CURRENCY))
         totals[currency] = totals.get(currency, 0.0) + value
 
         if bool(item.data(COL_ID, ROLE_PNL_APPROXIMATE)):
@@ -2585,9 +2543,7 @@ class OrdersPage(QWidget):
 
         if not parts:
             self.ui.lblPnlSummary.setText("Σ PnL: —")
-            self.ui.lblPnlSummary.setToolTip(
-                "No trustworthy PnL value is available."
-            )
+            self.ui.lblPnlSummary.setToolTip("No trustworthy PnL value is available.")
             return
 
         self.ui.lblPnlSummary.setText(f"Σ PnL: {'; '.join(parts)}")
@@ -2611,16 +2567,14 @@ class OrdersPage(QWidget):
         """Return broker-declared PnL currency for a flat position."""
         raw_payload = getattr(position, "raw_payload", None) or {}
         return cls._normalize_currency(
-            raw_payload.get("pnl_currency")
-            or getattr(position, "currency", "")
+            raw_payload.get("pnl_currency") or getattr(position, "currency", "")
         )
 
     @classmethod
     def _ib_virtual_leg_pnl_currency(cls, group) -> str:
         """Return the quote currency used by price-difference PnL."""
         currency = cls._normalize_currency(
-            getattr(group, "pnl_currency", "")
-            or getattr(group, "currency", "")
+            getattr(group, "pnl_currency", "") or getattr(group, "currency", "")
         )
 
         if currency:
@@ -2956,9 +2910,7 @@ class OrdersPage(QWidget):
                 group_item.addChild(self._build_ib_leg_item(group, leg))
 
             if group.broker_residual_present:
-                group_item.addChild(
-                    self._build_ib_broker_residual_item(group)
-                )
+                group_item.addChild(self._build_ib_broker_residual_item(group))
 
             if open_legs or group.broker_residual_present:
                 group_item.setExpanded(True)
@@ -3003,10 +2955,8 @@ class OrdersPage(QWidget):
             and group.reconciliation_status == IB_RECONCILIATION_STATUS_BLOCKED
         )
         virtual_fx_group = (
-            group.broker_position_kind
-            == IB_BROKER_POSITION_KIND_VIRTUAL_FX
-            and group.group_mode
-            == IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS
+            group.broker_position_kind == IB_BROKER_POSITION_KIND_VIRTUAL_FX
+            and group.group_mode == IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS
         )
         broker_only_fallback = (
             group.group_mode == IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS
@@ -3079,8 +3029,7 @@ class OrdersPage(QWidget):
                 "CONFIRMED"
                 if (
                     group.group_mode == IB_POSITION_GROUP_MODE_NET_ONLY
-                    and group.broker_position_kind
-                    == IB_BROKER_POSITION_KIND_VIRTUAL_FX
+                    and group.broker_position_kind == IB_BROKER_POSITION_KIND_VIRTUAL_FX
                     and group.broker_position_present
                     and abs(float(group.broker_volume or 0.0)) > 0.0
                     and group.reconciliation_status
@@ -3091,8 +3040,7 @@ class OrdersPage(QWidget):
             ROLE_EXTERNAL_PROTECTIVE_ORDERS: tuple(
                 dict(order)
                 for order in (
-                    getattr(group, "broker_residual_protective_orders", ())
-                    or ()
+                    getattr(group, "broker_residual_protective_orders", ()) or ()
                 )
             ),
         }
@@ -3131,9 +3079,7 @@ class OrdersPage(QWidget):
             )
 
         if group.group_mode == IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS:
-            messages.append(
-                "Protection is defined separately for each virtual leg."
-            )
+            messages.append("Protection is defined separately for each virtual leg.")
 
         self._set_ib_item_tooltip(
             item,
@@ -3244,17 +3190,17 @@ class OrdersPage(QWidget):
         side = group.broker_residual_side
         volume = group.broker_residual_volume
         current_price = self._ib_virtual_leg_current_price(group, side)
-        exposure_status = str(
-            getattr(group, "broker_residual_evidence_status", "") or ""
-        ).strip().upper()
+        exposure_status = (
+            str(getattr(group, "broker_residual_evidence_status", "") or "")
+            .strip()
+            .upper()
+        )
         reconciliation_text = self._format_ib_reconciliation_status(
             group.reconciliation_status,
         )
         protective_orders = tuple(
             dict(order)
-            for order in (
-                getattr(group, "broker_residual_protective_orders", ()) or ()
-            )
+            for order in (getattr(group, "broker_residual_protective_orders", ()) or ())
         )
         stop_loss = self._single_external_order_price(
             protective_orders,
@@ -3504,8 +3450,7 @@ class OrdersPage(QWidget):
         )
         lines = [header]
         lines.extend(
-            self._format_external_protective_order_line(order)
-            for order in orders
+            self._format_external_protective_order_line(order) for order in orders
         )
         return "\n".join(lines)
 
@@ -3632,20 +3577,15 @@ class OrdersPage(QWidget):
             messages = []
 
         localized = [
-            self._localize_ib_reconciliation_message(message)
-            for message in messages
+            self._localize_ib_reconciliation_message(message) for message in messages
         ]
-        if str(item.data(COL_ID, ROLE_ROW_KIND) or "") == (
-            ROW_KIND_BROKER_RESIDUAL
-        ):
+        if str(item.data(COL_ID, ROLE_ROW_KIND) or "") == (ROW_KIND_BROKER_RESIDUAL):
             evidence_text = self._external_protective_orders_tooltip(item)
             if evidence_text:
                 localized.append(evidence_text)
 
         tooltip = "\n".join(message for message in localized if message)
-        all_columns = bool(
-            item.data(COL_ID, ROLE_TOOLTIP_ALL_COLUMNS)
-        )
+        all_columns = bool(item.data(COL_ID, ROLE_TOOLTIP_ALL_COLUMNS))
 
         if all_columns:
             for column_index in range(COLUMN_COUNT):
@@ -3696,9 +3636,7 @@ class OrdersPage(QWidget):
             ).format(value=text.removeprefix("trade_uid="))
 
         if text.startswith("leg_status="):
-            value = self._format_ib_leg_status(
-                text.removeprefix("leg_status=")
-            )
+            value = self._format_ib_leg_status(text.removeprefix("leg_status="))
             return self._lang_mgr.tr(
                 "OrdersPage.tooltipLegStatus",
                 "Leg status: {value}",
@@ -3982,9 +3920,7 @@ class OrdersPage(QWidget):
             match = pattern.fullmatch(text)
 
             if match is not None:
-                return self._lang_mgr.tr(key, fallback).format(
-                    **match.groupdict()
-                )
+                return self._lang_mgr.tr(key, fallback).format(**match.groupdict())
 
         return text
 

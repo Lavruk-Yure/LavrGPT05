@@ -75,14 +75,8 @@ def _very_fast_parameters() -> dict[str, object]:
 
 
 def _event(index: int) -> WorkspaceMarketEvent:
-    timestamp = datetime(2026, 1, 2, 0, 0, tzinfo=UTC) + timedelta(
-        minutes=15 * index
-    )
-    close = (
-        1.1000
-        + 0.0015 * math.sin(index * 0.35)
-        + 0.0003 * math.sin(index * 0.07)
-    )
+    timestamp = datetime(2026, 1, 2, 0, 0, tzinfo=UTC) + timedelta(minutes=15 * index)
+    close = 1.1000 + 0.0015 * math.sin(index * 0.35) + 0.0003 * math.sin(index * 0.07)
     open_value = close + (0.00008 if index % 2 == 0 else -0.00008)
     high = max(open_value, close) + 0.00020
     low = min(open_value, close) - 0.00020
@@ -223,9 +217,10 @@ def main() -> None:
         assert saved.parameters[WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_KEY] == (
             0.000005
         )
-        assert saved.parameters[
-            WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY
-        ] == 0.000050
+        assert (
+            saved.parameters[WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY]
+            == 0.000050
+        )
         assert saved_binding.profile_uid == revision_3.profile_uid
         assert saved_binding.profile_revision == 3
         assert saved_binding.profile.parameters == _very_fast_parameters()
@@ -249,9 +244,10 @@ def main() -> None:
         assert restored.parameters[WORKSPACE_MACD_EXTREMUM_MIN_PROMINENCE_KEY] == (
             0.000005
         )
-        assert restored.parameters[
-            WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY
-        ] == 0.000050
+        assert (
+            restored.parameters[WORKSPACE_MACD_EXTREMUM_TO_CROSS_MIN_DISTANCE_KEY]
+            == 0.000050
+        )
         assert restored_binding.profile_uid == saved_binding.profile_uid
         assert restored_binding.profile_revision == saved_binding.profile_revision
         assert restored_binding.profile.parameters == _very_fast_parameters()

@@ -182,10 +182,7 @@ def main() -> None:
             second.workspace_uid,
         ]
         assert manifest["active_workspace_uid"] == first.workspace_uid
-        assert all(
-            item.runtime_state == WORKSPACE_STATE_RESTORED
-            for item in restored
-        )
+        assert all(item.runtime_state == WORKSPACE_STATE_RESTORED for item in restored)
 
         restored_first = restored[0]
         restored_second = restored[1]
@@ -205,12 +202,8 @@ def main() -> None:
         assert restored_second.ui_state["window_state"] == "MAXIMIZED"
         assert restored_second.ui_state["active_panel"] == WORKSPACE_PANEL_POSITION
 
-        first_runtime = restored_controller.attach_workspace_runtime(
-            restored_first
-        )
-        second_runtime = restored_controller.attach_workspace_runtime(
-            restored_second
-        )
+        first_runtime = restored_controller.attach_workspace_runtime(restored_first)
+        second_runtime = restored_controller.attach_workspace_runtime(restored_second)
 
         assert first_runtime.context.restored_from_session
         assert second_runtime.context.restored_from_session
@@ -236,8 +229,7 @@ def main() -> None:
             for entry in first_runtime.journal
         )
         session_restored_logged = any(
-            entry.event == "SESSION_RESTORED"
-            for entry in first_runtime.journal
+            entry.event == "SESSION_RESTORED" for entry in first_runtime.journal
         )
         assert restore_transition
         assert session_restored_logged

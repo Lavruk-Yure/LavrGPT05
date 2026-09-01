@@ -92,9 +92,7 @@ def main() -> None:
         runtime.strategy_events[timestamp]
         for timestamp in sorted(runtime.strategy_events)
     )
-    event_index = {
-        event.timestamp: index for index, event in enumerate(events)
-    }
+    event_index = {event.timestamp: index for index, event in enumerate(events)}
     observations = _all_observations(trades, events, event_index)
     assert observations
 
@@ -153,8 +151,7 @@ def main() -> None:
             start = wick_episode[0]
             end = wick_episode[-1]
             close_runs_inside = sum(
-                start <= episode.start_index <= end
-                for episode in close_episodes
+                start <= episode.start_index <= end for episode in close_episodes
             )
             if close_runs_inside > 1:
                 wick_episode_splitting_close_runs += 1
@@ -173,9 +170,7 @@ def main() -> None:
         if observation.survival_state == "FLIPPED":
             flipped_count += 1
             durable = tuple(
-                episode
-                for episode in close_episodes
-                if episode.two_bar_hold_beyond
+                episode for episode in close_episodes if episode.two_bar_hold_beyond
             )
             if not durable:
                 flipped_requires_durable_break = False
@@ -183,9 +178,7 @@ def main() -> None:
                 flipped_requires_post_break_touch = False
             if durable:
                 touches = _touch_indices(events, signal_index, zone)
-                if not any(
-                    index > durable[-1].end_index for index in touches
-                ):
+                if not any(index > durable[-1].end_index for index in touches):
                     flipped_requires_post_break_touch = False
 
         if observation.effective_role == "INVALIDATED":
@@ -266,19 +259,12 @@ def main() -> None:
         )
     )
     print(
-        "  close_break_bar_implies_wick_break_bar="
-        f"{close_break_implies_wick_break}"
+        "  close_break_bar_implies_wick_break_bar=" f"{close_break_implies_wick_break}"
     )
     print(f"  hold1_implies_close_break={hold1_implies_close_break}")
     print(f"  hold2_implies_hold1={hold2_implies_hold1}")
-    print(
-        "  flipped_requires_durable_break="
-        f"{flipped_requires_durable_break}"
-    )
-    print(
-        "  flipped_requires_post_break_touch="
-        f"{flipped_requires_post_break_touch}"
-    )
+    print("  flipped_requires_durable_break=" f"{flipped_requires_durable_break}")
+    print("  flipped_requires_post_break_touch=" f"{flipped_requires_post_break_touch}")
     print(
         "  invalidated_has_no_effective_support_resistance_role="
         f"{invalidated_has_no_effective_sr_role}"

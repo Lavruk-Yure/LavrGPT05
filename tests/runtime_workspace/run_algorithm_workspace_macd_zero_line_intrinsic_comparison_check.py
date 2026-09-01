@@ -153,9 +153,7 @@ def _elapsed(value: float | None) -> str:
 
 def main() -> None:
     if not M1_FILE.is_file():
-        raise FileNotFoundError(
-            "Real EURUSD M1 history is required: " + str(M1_FILE)
-        )
+        raise FileNotFoundError("Real EURUSD M1 history is required: " + str(M1_FILE))
 
     completed: list[ZeroLineIntrinsicRunResult] = []
     for policy in MACD_ZERO_LINE_POLICIES:
@@ -206,14 +204,8 @@ def main() -> None:
     assert directional.signals == EXPECTED_DIRECTIONAL_SIGNALS
     assert opposite.signals == EXPECTED_OPPOSITE_SIGNALS
     assert directional.signals + opposite.signals == EXPECTED_TOTAL_SIGNALS
-    assert (
-        directional.buy_signals + opposite.buy_signals
-        == EXPECTED_BUY_SIGNALS
-    )
-    assert (
-        directional.sell_signals + opposite.sell_signals
-        == EXPECTED_SELL_SIGNALS
-    )
+    assert directional.buy_signals + opposite.buy_signals == EXPECTED_BUY_SIGNALS
+    assert directional.sell_signals + opposite.sell_signals == EXPECTED_SELL_SIGNALS
     assert directional.alligator_allow == 0
     assert directional.alligator_reject == 0
     assert opposite.alligator_allow == 0

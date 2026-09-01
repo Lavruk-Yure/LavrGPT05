@@ -1,6 +1,4 @@
-# core/algorithm_workspace_area.py — MDI UI та diagnostics algorithm WSP
-# -*- coding: utf-8 -*-
-"""MDI UI для algorithm workspace та їх runtime diagnostics.
+"""core/algorithm_workspace_area.py — MDI UI та diagnostics algorithm WSP.
 
 Модуль відображає Orders/Chart/Positions/Signals/Journal, Replay controls,
 параметри, фільтри та локалізовані snapshot-таблиці без прямого доступу до
@@ -50,7 +48,7 @@ from pathlib import Path
 from time import monotonic
 from typing import Any
 
-from PySide6.QtCore import QDate, QEvent, QObject, QRect, Qt, QTimer, Signal
+from PySide6.QtCore import QDate, QEvent, QObject, QRect, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QCloseEvent, QIcon, QKeyEvent, QMoveEvent, QResizeEvent
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -351,9 +349,7 @@ POSITION_TABLE_COLUMNS = (
 )
 
 ORDER_TABLE_WIDTHS = (110, 105, 60, 100, 74, 82, 82, 82, 86, 130, 145, 76)
-POSITION_TABLE_WIDTHS = (
-    54, 74, 82, 82, 72, 72, 74, 82, 82, 145, 145, 145, 84, 150
-)
+POSITION_TABLE_WIDTHS = (54, 74, 82, 82, 72, 72, 74, 82, 82, 145, 145, 145, 84, 150)
 
 SIGNAL_TABLE_COLUMNS = (
     ("AlgorithmWorkspaceWindow.colSignalTime", "Time"),
@@ -370,9 +366,7 @@ SIGNAL_TABLE_COLUMNS = (
     ("AlgorithmWorkspaceWindow.colReason", "Reason"),
 )
 
-SIGNAL_TABLE_WIDTHS = (
-    142, 96, 82, 92, 122, 168, 156, 176, 156, 82, 154, 340
-)
+SIGNAL_TABLE_WIDTHS = (142, 96, 82, 92, 122, 168, 156, 176, 156, 82, 154, 340)
 SIGNAL_TABLE_REASON_COLUMN = 11
 
 JOURNAL_CATEGORY_GROUPS = {
@@ -1171,15 +1165,9 @@ class AlgorithmWorkspaceWindow(QFrame):
         self.tbl_positions.itemSelectionChanged.connect(
             self._refresh_position_time_actions
         )
-        self.btn_position_go_signal.clicked.connect(
-            self._on_position_go_signal_clicked
-        )
-        self.btn_position_go_entry.clicked.connect(
-            self._on_position_go_entry_clicked
-        )
-        self.btn_position_date_jump.clicked.connect(
-            self._on_position_date_jump_clicked
-        )
+        self.btn_position_go_signal.clicked.connect(self._on_position_go_signal_clicked)
+        self.btn_position_go_entry.clicked.connect(self._on_position_go_entry_clicked)
+        self.btn_position_date_jump.clicked.connect(self._on_position_date_jump_clicked)
         self._refresh_position_time_actions()
         self._sync_position_date_jump(())
 
@@ -1268,21 +1256,11 @@ class AlgorithmWorkspaceWindow(QFrame):
             self.cmb_signal_reason_filter,
         ):
             combo.currentIndexChanged.connect(self._refresh_signal_view)
-        self.tbl_signals.itemSelectionChanged.connect(
-            self._refresh_signal_actions
-        )
-        self.btn_signal_go_position.clicked.connect(
-            self._on_signal_go_position_clicked
-        )
-        self.btn_signal_go_chart.clicked.connect(
-            self._on_signal_go_chart_clicked
-        )
-        self.btn_signal_go_journal.clicked.connect(
-            self._on_signal_go_journal_clicked
-        )
-        self.btn_signal_date_jump.clicked.connect(
-            self._on_signal_date_jump_clicked
-        )
+        self.tbl_signals.itemSelectionChanged.connect(self._refresh_signal_actions)
+        self.btn_signal_go_position.clicked.connect(self._on_signal_go_position_clicked)
+        self.btn_signal_go_chart.clicked.connect(self._on_signal_go_chart_clicked)
+        self.btn_signal_go_journal.clicked.connect(self._on_signal_go_journal_clicked)
+        self.btn_signal_date_jump.clicked.connect(self._on_signal_date_jump_clicked)
         self._refresh_signal_actions()
         self._sync_signal_date_jump(())
 
@@ -1556,14 +1534,8 @@ class AlgorithmWorkspaceWindow(QFrame):
             for record in self._signal_records
             if (
                 result_filter == WSP_FILTER_ALL
-                or (
-                    result_filter == WSP_FILTER_ACCEPTED
-                    and record.accepted
-                )
-                or (
-                    result_filter == WSP_FILTER_REJECTED
-                    and not record.accepted
-                )
+                or (result_filter == WSP_FILTER_ACCEPTED and record.accepted)
+                or (result_filter == WSP_FILTER_REJECTED and not record.accepted)
             )
             and (
                 direction_filter == WSP_FILTER_ALL
@@ -1595,9 +1567,7 @@ class AlgorithmWorkspaceWindow(QFrame):
     ) -> int | None:
         """Знайти перший рядок на дату, інакше найближчий наступний."""
         exact_rows = [
-            row
-            for row, row_date in enumerate(row_dates)
-            if row_date == target_date
+            row for row, row_date in enumerate(row_dates) if row_date == target_date
         ]
         if exact_rows:
             return exact_rows[0]
@@ -1679,10 +1649,7 @@ class AlgorithmWorkspaceWindow(QFrame):
 
     def _on_signal_date_jump_clicked(self) -> None:
         """Перейти до першого видимого signal на вибрану календарну дату."""
-        record_by_uid = {
-            record.signal_uid: record
-            for record in self._signal_records
-        }
+        record_by_uid = {record.signal_uid: record for record in self._signal_records}
         row_dates: list[date | None] = []
         for row in range(self.tbl_signals.rowCount()):
             item = self.tbl_signals.item(row, 0)
@@ -1692,9 +1659,7 @@ class AlgorithmWorkspaceWindow(QFrame):
                 else ""
             )
             record = record_by_uid.get(signal_uid)
-            row_dates.append(
-                record.timestamp.date() if record is not None else None
-            )
+            row_dates.append(record.timestamp.date() if record is not None else None)
         target_row = self._date_jump_target_row(
             tuple(row_dates),
             self._qdate_to_date(self.dte_signal_date_jump.date()),
@@ -1742,8 +1707,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         self.btn_signal_go_chart.setEnabled(has_record)
         self.btn_signal_go_journal.setEnabled(has_record)
         self.btn_signal_go_position.setEnabled(
-            has_record
-            and self._position_for_signal(record.signal_uid) is not None
+            has_record and self._position_for_signal(record.signal_uid) is not None
         )
 
     def _on_signal_go_position_clicked(self) -> None:
@@ -1762,9 +1726,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         ):
             self._set_combo_by_data(combo, WSP_FILTER_ALL)
         self._refresh_position_view()
-        self.tabs_workspace.setCurrentIndex(
-            INDEX_BY_PANEL[WORKSPACE_PANEL_POSITION]
-        )
+        self.tabs_workspace.setCurrentIndex(INDEX_BY_PANEL[WORKSPACE_PANEL_POSITION])
 
         for row in range(self.tbl_positions.rowCount()):
             item = self.tbl_positions.item(row, 0)
@@ -1800,9 +1762,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         self._set_combo_by_data(self.cmb_journal_category, "ALL")
         self._set_combo_by_data(self.cmb_journal_level, JOURNAL_LEVEL_ALL)
         self.tabs_workspace.setCurrentIndex(INDEX_BY_PANEL[WORKSPACE_PANEL_LOG])
-        self.edt_journal_search.setText(
-            self._signal_journal_search_text(record)
-        )
+        self.edt_journal_search.setText(self._signal_journal_search_text(record))
         self.edt_journal_search.setFocus()
         self._refresh_journal_view()
         scrollbar = self.ui.txtLog.verticalScrollBar()
@@ -1811,9 +1771,7 @@ class AlgorithmWorkspaceWindow(QFrame):
 
     def _refresh_position_view(self, *_args: object) -> None:
         self.frame_position_filters.setVisible(bool(self._owned_snapshot.positions))
-        pnl_filter = str(
-            self.cmb_position_pnl_filter.currentData() or WSP_FILTER_ALL
-        )
+        pnl_filter = str(self.cmb_position_pnl_filter.currentData() or WSP_FILTER_ALL)
         reason_filter = str(
             self.cmb_position_reason_filter.currentData() or WSP_FILTER_ALL
         )
@@ -1832,8 +1790,7 @@ class AlgorithmWorkspaceWindow(QFrame):
                 or self._position_close_reason_code(position) == reason_filter
             )
             and (
-                direction_filter == WSP_FILTER_ALL
-                or position.side == direction_filter
+                direction_filter == WSP_FILTER_ALL or position.side == direction_filter
             )
             and (
                 status_filter == WSP_FILTER_ALL
@@ -1856,8 +1813,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         dates = tuple(
             timestamp.date()
             for position in positions
-            if (timestamp := self._position_timestamp(position.opened_at))
-            is not None
+            if (timestamp := self._position_timestamp(position.opened_at)) is not None
         )
         self._sync_date_jump_widget(
             self.dte_position_date_jump,
@@ -1885,9 +1841,7 @@ class AlgorithmWorkspaceWindow(QFrame):
                 if position is not None
                 else None
             )
-            row_dates.append(
-                timestamp.date() if timestamp is not None else None
-            )
+            row_dates.append(timestamp.date() if timestamp is not None else None)
         target_row = self._date_jump_target_row(
             tuple(row_dates),
             self._qdate_to_date(self.dte_position_date_jump.date()),
@@ -1986,9 +1940,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         ):
             self._set_combo_by_data(combo, WSP_FILTER_ALL)
         self._refresh_signal_view()
-        self.tabs_workspace.setCurrentIndex(
-            INDEX_BY_PANEL[WORKSPACE_PANEL_SIGNALS]
-        )
+        self.tabs_workspace.setCurrentIndex(INDEX_BY_PANEL[WORKSPACE_PANEL_SIGNALS])
 
         for row in range(self.tbl_signals.rowCount()):
             item = self.tbl_signals.item(row, 0)
@@ -2007,9 +1959,7 @@ class AlgorithmWorkspaceWindow(QFrame):
             return
         timestamp = self._position_timestamp(position.opened_at)
         if timestamp is not None:
-            self.chart_timestamp_requested.emit(
-                self.workspace_uid, timestamp, False
-            )
+            self.chart_timestamp_requested.emit(self.workspace_uid, timestamp, False)
 
     def _refresh_order_view(self, *_args: object) -> None:
         self.frame_order_filters.setVisible(bool(self._owned_snapshot.orders))
@@ -2019,9 +1969,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         direction_filter = str(
             self.cmb_order_direction_filter.currentData() or WSP_FILTER_ALL
         )
-        pnl_filter = str(
-            self.cmb_order_pnl_filter.currentData() or WSP_FILTER_ALL
-        )
+        pnl_filter = str(self.cmb_order_pnl_filter.currentData() or WSP_FILTER_ALL)
         reason_filter = str(
             self.cmb_order_reason_filter.currentData() or WSP_FILTER_ALL
         )
@@ -2029,10 +1977,7 @@ class AlgorithmWorkspaceWindow(QFrame):
             order
             for order in self._owned_snapshot.orders
             if (status_filter == WSP_FILTER_ALL or order.status == status_filter)
-            and (
-                direction_filter == WSP_FILTER_ALL
-                or order.side == direction_filter
-            )
+            and (direction_filter == WSP_FILTER_ALL or order.side == direction_filter)
             and self._matches_pnl_filter(order.profit, pnl_filter)
             and (
                 reason_filter == WSP_FILTER_ALL
@@ -2318,18 +2263,14 @@ class AlgorithmWorkspaceWindow(QFrame):
         line: str,
     ) -> str:
         """Додати structured details до пошукового індексу без зміни Journal UI."""
-        detail_text = " ".join(
-            f"{key}={value}" for key, value in entry.details.items()
-        )
+        detail_text = " ".join(f"{key}={value}" for key, value in entry.details.items())
         return f"{line} {detail_text}".casefold()
 
     def _refresh_journal_view(self, *_args: object) -> None:
         category_filter = str(self.cmb_journal_category.currentData() or "ALL")
         level_filter = str(self.cmb_journal_level.currentData() or JOURNAL_LEVEL_ALL)
         show_market_ticks = self.chk_journal_market_ticks.isChecked()
-        search_variants = self._journal_search_variants(
-            self.edt_journal_search.text()
-        )
+        search_variants = self._journal_search_variants(self.edt_journal_search.text())
 
         visible_lines: list[str] = []
         allowed_categories = JOURNAL_CATEGORY_GROUPS.get(
@@ -3633,9 +3574,7 @@ class AlgorithmWorkspaceWindow(QFrame):
         if initial_balance is not None and balance is not None:
             realized_profit = balance - initial_balance
         self.ui.lblCurrentProfit.setText(
-            self._format_profit(realized_profit)
-            if realized_profit is not None
-            else "—"
+            self._format_profit(realized_profit) if realized_profit is not None else "—"
         )
         self.ui.lblPeakProfit.setText(format_workspace_balance(balance, currency))
         self.ui.lblProfitDrawdown.setText(format_workspace_balance(equity, currency))
@@ -3704,8 +3643,7 @@ class AlgorithmWorkspaceWindow(QFrame):
     ) -> None:
         """Дозволити SL/TP drag тільки у paused active Historical Replay."""
         replay_active = (
-            self._runtime_state
-            in {WORKSPACE_STATE_STARTING, WORKSPACE_STATE_RUNNING}
+            self._runtime_state in {WORKSPACE_STATE_STARTING, WORKSPACE_STATE_RUNNING}
             if active is None
             else bool(active)
         )
@@ -4042,6 +3980,9 @@ class AlgorithmMdiSubWindow(QMdiSubWindow):
         self._workspace_geometry_refresh_passes = 0
         self._workspace_geometry_refresh_maximized = False
         self._workspace_geometry_refresh_target = QRect()
+        self._workspace_tiled = False
+        self._normal_minimum_size = QSize()
+        self._normal_widget_minimum_size = QSize()
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
 
     def set_layout_locked(self, locked: bool) -> None:
@@ -4105,20 +4046,23 @@ class AlgorithmMdiSubWindow(QMdiSubWindow):
         )
 
     def restore_workspace_normal(self) -> None:
-        """Restore the geometry saved before MDI-safe maximization."""
+        """Відновити normal state після minimize або MDI-safe maximize."""
+        was_minimized = self.isMinimized()
         was_maximized = self._workspace_maximized or self.isMaximized()
-        if not was_maximized:
+        if not was_minimized and not was_maximized:
             return
         self._workspace_maximize_request_pending = False
         self._handling_workspace_maximize = True
+        geometry = QRect()
         try:
-            if self.isMaximized():
+            if self.isMinimized() or self.isMaximized():
                 self.showNormal()
-            geometry = QRect(self._normal_geometry_before_maximize)
-            self._workspace_maximized = False
-            self._normal_geometry_before_maximize = QRect()
-            if geometry.isValid() and geometry.width() > 0:
-                self.apply_system_geometry(geometry)
+            if was_maximized:
+                geometry = QRect(self._normal_geometry_before_maximize)
+                self._workspace_maximized = False
+                self._normal_geometry_before_maximize = QRect()
+                if geometry.isValid() and geometry.width() > 0:
+                    self.apply_system_geometry(geometry)
         finally:
             self._handling_workspace_maximize = False
         if geometry.isValid() and geometry.width() > 0:
@@ -4128,6 +4072,28 @@ class AlgorithmMdiSubWindow(QMdiSubWindow):
                 passes=2,
             )
         self.geometry_changed.emit(self.workspace_uid)
+
+    def set_workspace_tiled(self, tiled: bool) -> None:
+        """Перемкнути minimum-size contract між normal і tiled layout."""
+        tiled = bool(tiled)
+        if tiled == self._workspace_tiled:
+            return
+
+        widget = self.widget()
+        if tiled:
+            self._normal_minimum_size = QSize(self.minimumSize())
+            if widget is not None:
+                self._normal_widget_minimum_size = QSize(widget.minimumSize())
+                widget.setMinimumSize(0, 0)
+            self.setMinimumSize(0, 0)
+        else:
+            if self._normal_minimum_size.isValid():
+                self.setMinimumSize(self._normal_minimum_size)
+            if widget is not None and self._normal_widget_minimum_size.isValid():
+                widget.setMinimumSize(self._normal_widget_minimum_size)
+            self._normal_minimum_size = QSize()
+            self._normal_widget_minimum_size = QSize()
+        self._workspace_tiled = tiled
 
     def changeEvent(self, event: QEvent) -> None:
         super().changeEvent(event)
@@ -4754,11 +4720,13 @@ class AlgorithmWorkspaceArea(QWidget):
         return snapshot
 
     def cascade_windows(self) -> None:
+        """Розкласти normal WSP каскадом у межах актуального MDI viewport."""
         if self.btn_lock.isChecked():
             return
         for subwindow in self._subwindows.values():
             subwindow.restore_workspace_normal()
-        self.mdi.cascadeSubWindows()
+            subwindow.set_workspace_tiled(False)
+        self._cascade_workspaces_in_viewport()
         self._schedule_all_ui_state_save()
 
     def tile_windows(self) -> None:
@@ -4916,9 +4884,7 @@ class AlgorithmWorkspaceArea(QWidget):
         window.chart_visible_start_requested.connect(
             self._on_chart_visible_start_requested
         )
-        window.chart_timestamp_requested.connect(
-            self._on_chart_timestamp_requested
-        )
+        window.chart_timestamp_requested.connect(self._on_chart_timestamp_requested)
         window.chart_latest_requested.connect(self._on_chart_latest_requested)
         window.chart_protection_change_requested.connect(
             self._on_chart_protection_change_requested
@@ -5134,9 +5100,7 @@ class AlgorithmWorkspaceArea(QWidget):
             return
         window = self._windows.get(workspace_uid)
         if window is not None:
-            window.tabs_workspace.setCurrentIndex(
-                INDEX_BY_PANEL[WORKSPACE_PANEL_CHART]
-            )
+            window.tabs_workspace.setCurrentIndex(INDEX_BY_PANEL[WORKSPACE_PANEL_CHART])
         self._sync_workspace_runtime(workspace_uid)
         if window is not None:
             window.chart_widget.focus_timestamp(timestamp, exact=exact)
@@ -5320,9 +5284,7 @@ class AlgorithmWorkspaceArea(QWidget):
             self._replay_fast_ui_last_sync.pop(workspace_uid, None)
             return
 
-        next_remaining = (
-            None if remaining is None else remaining - processed_events
-        )
+        next_remaining = None if remaining is None else remaining - processed_events
         if processed_events <= 0 or (
             next_remaining is not None and next_remaining <= 0
         ):
@@ -6095,8 +6057,14 @@ class AlgorithmWorkspaceArea(QWidget):
 
         for subwindow in subwindows:
             subwindow.restore_workspace_normal()
+            subwindow.set_workspace_tiled(True)
 
-        viewport_rect = self.ui.mdiWorkspaces.viewport().rect()
+        mdi = self.ui.mdiWorkspaces
+        horizontal_policy = mdi.horizontalScrollBarPolicy()
+        vertical_policy = mdi.verticalScrollBarPolicy()
+        mdi.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        mdi.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        viewport_rect = mdi.viewport().rect()
         workspace_count = len(subwindows)
 
         columns = math.ceil(math.sqrt(workspace_count))
@@ -6136,6 +6104,78 @@ class AlgorithmWorkspaceArea(QWidget):
                     width,
                     height,
                 )
+
+        mdi.setHorizontalScrollBarPolicy(horizontal_policy)
+        mdi.setVerticalScrollBarPolicy(vertical_policy)
+
+    def _cascade_workspaces_in_viewport(self) -> None:
+        """Зберегти Qt cascade offsets і вмістити normalized frames у viewport."""
+        mdi = self.ui.mdiWorkspaces
+        subwindows = [
+            subwindow
+            for subwindow in mdi.subWindowList()
+            if subwindow.isVisible()
+        ]
+        if not subwindows:
+            return
+
+        horizontal_policy = mdi.horizontalScrollBarPolicy()
+        vertical_policy = mdi.verticalScrollBarPolicy()
+        mdi.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        mdi.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        try:
+            mdi.cascadeSubWindows()
+            viewport_rect = mdi.viewport().rect()
+            max_x_offset = max(
+                subwindow.geometry().x() - viewport_rect.x()
+                for subwindow in subwindows
+            )
+            max_y_offset = max(
+                subwindow.geometry().y() - viewport_rect.y()
+                for subwindow in subwindows
+            )
+            maximum_width = max(1, viewport_rect.width() - max_x_offset)
+            maximum_height = max(1, viewport_rect.height() - max_y_offset)
+            minimum_width = max(subwindow.minimumWidth() for subwindow in subwindows)
+            minimum_height = max(
+                subwindow.minimumHeight() for subwindow in subwindows
+            )
+            workspace_count = len(subwindows)
+            frame_width = self._cascade_preferred_extent(
+                maximum_width,
+                minimum_width,
+                workspace_count,
+            )
+            frame_height = self._cascade_preferred_extent(
+                maximum_height,
+                minimum_height,
+                workspace_count,
+            )
+
+            for subwindow in subwindows:
+                geometry = subwindow.geometry()
+                subwindow.setGeometry(
+                    geometry.x(),
+                    geometry.y(),
+                    frame_width,
+                    frame_height,
+                )
+        finally:
+            mdi.setHorizontalScrollBarPolicy(horizontal_policy)
+            mdi.setVerticalScrollBarPolicy(vertical_policy)
+
+    @staticmethod
+    def _cascade_preferred_extent(
+        maximum_extent: int,
+        minimum_extent: int,
+        workspace_count: int,
+    ) -> int:
+        """Зарезервувати одну WSP-частку простору між minimum і max-fit."""
+        if maximum_extent <= minimum_extent:
+            return maximum_extent
+        adjustable_extent = maximum_extent - minimum_extent
+        reserve = math.ceil(adjustable_extent / max(1, workspace_count))
+        return max(minimum_extent, maximum_extent - reserve)
 
     @staticmethod
     def _apply_subwindow_title(

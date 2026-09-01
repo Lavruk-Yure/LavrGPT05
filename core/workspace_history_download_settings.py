@@ -46,16 +46,12 @@ class WorkspaceHistoryDownloadSettings:
 
         symbol = str(self.symbol or "").strip().upper()
         if not symbol:
-            raise WorkspaceHistoryDownloadSettingsError(
-                "History symbol is required"
-            )
+            raise WorkspaceHistoryDownloadSettingsError("History symbol is required")
         object.__setattr__(self, "symbol", symbol)
 
         timeframe = str(self.timeframe or "").strip().upper()
         if not timeframe:
-            raise WorkspaceHistoryDownloadSettingsError(
-                "History timeframe is required"
-            )
+            raise WorkspaceHistoryDownloadSettingsError("History timeframe is required")
         try:
             get_timeframe(timeframe)
         except (KeyError, ValueError) as exc:
@@ -70,11 +66,7 @@ class WorkspaceHistoryDownloadSettings:
             raise WorkspaceHistoryDownloadSettingsError(
                 "History download dates must be set together"
             )
-        if (
-            start_date is not None
-            and end_date is not None
-            and start_date > end_date
-        ):
+        if start_date is not None and end_date is not None and start_date > end_date:
             raise WorkspaceHistoryDownloadSettingsError(
                 "History download start date must not be later than end date"
             )

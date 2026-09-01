@@ -152,16 +152,14 @@ class WorkspaceIndicatorProfile:
         )
         if (
             self.built_in
-            and self.source_reference
-            == WORKSPACE_INDICATOR_PROFILE_SOURCE_USER
+            and self.source_reference == WORKSPACE_INDICATOR_PROFILE_SOURCE_USER
         ):
             raise WorkspaceIndicatorProfileError(
                 "built-in profile cannot have USER source_reference"
             )
         if (
             not self.built_in
-            and self.source_reference
-            != WORKSPACE_INDICATOR_PROFILE_SOURCE_USER
+            and self.source_reference != WORKSPACE_INDICATOR_PROFILE_SOURCE_USER
         ):
             raise WorkspaceIndicatorProfileError(
                 "user profile must have USER source_reference"
@@ -577,17 +575,13 @@ def built_in_workspace_indicator_profile(
     for profile in built_in_workspace_indicator_profiles():
         if profile.profile_uid == normalized:
             return profile
-    raise WorkspaceIndicatorProfileError(
-        f"unknown built-in profile_uid: {normalized}"
-    )
+    raise WorkspaceIndicatorProfileError(f"unknown built-in profile_uid: {normalized}")
 
 
 def default_workspace_indicator_profile_bindings() -> dict[str, dict[str, object]]:
     """Повернути сумісні defaults для нового або legacy WSP."""
     macd = built_in_workspace_indicator_profile(MACD_PROFILE_UID_LGE_CLASSIC)
-    alligator = built_in_workspace_indicator_profile(
-        ALLIGATOR_PROFILE_UID_LGE_CLASSIC
-    )
+    alligator = built_in_workspace_indicator_profile(ALLIGATOR_PROFILE_UID_LGE_CLASSIC)
     return {
         WORKSPACE_MACD_PROFILE_BINDING_KEY: (
             WorkspaceIndicatorProfileBinding.from_profile(macd).to_storage_dict()
@@ -601,9 +595,7 @@ def default_workspace_indicator_profile_bindings() -> dict[str, dict[str, object
 def new_workspace_indicator_profile_bindings() -> dict[str, dict[str, object]]:
     """Повернути bindings для нового WSP без зміни legacy fallback."""
     macd = built_in_workspace_indicator_profile(MACD_PROFILE_UID_LGE_DEFAULT)
-    alligator = built_in_workspace_indicator_profile(
-        ALLIGATOR_PROFILE_UID_LGE_CLASSIC
-    )
+    alligator = built_in_workspace_indicator_profile(ALLIGATOR_PROFILE_UID_LGE_CLASSIC)
     return {
         WORKSPACE_MACD_PROFILE_BINDING_KEY: (
             WorkspaceIndicatorProfileBinding.from_profile(macd).to_storage_dict()
@@ -850,9 +842,7 @@ def _require_keys(
     missing = [key for key in keys if key not in data]
     if missing:
         joined = ", ".join(missing)
-        raise WorkspaceIndicatorProfileError(
-            f"{label} profile is incomplete: {joined}"
-        )
+        raise WorkspaceIndicatorProfileError(f"{label} profile is incomplete: {joined}")
 
 
 def _normalized_uuid(value: object) -> str:
@@ -876,9 +866,7 @@ def _normalized_choice(
 ) -> str:
     normalized = _required_text(value, field_name).upper()
     if normalized not in allowed:
-        raise WorkspaceIndicatorProfileError(
-            f"invalid {field_name}: {normalized}"
-        )
+        raise WorkspaceIndicatorProfileError(f"invalid {field_name}: {normalized}")
     return normalized
 
 
@@ -898,9 +886,7 @@ def _positive_int(value: object, field_name: str) -> int:
 def _non_negative_int(value: object, field_name: str) -> int:
     normalized = _strict_int(value, field_name)
     if normalized < 0:
-        raise WorkspaceIndicatorProfileError(
-            f"{field_name} cannot be negative"
-        )
+        raise WorkspaceIndicatorProfileError(f"{field_name} cannot be negative")
     return normalized
 
 

@@ -46,9 +46,7 @@ MODE = "RM106_T106_04_NO_CHANGE_PRODUCTION_TRUTH_REGRESSION_TEST_ONLY"
 def _assert_absent_optional_production_wiring() -> None:
     """Підтвердити відсутність Donchian gate і Supertrend execution wiring."""
 
-    algorithm_source = inspect.getsource(
-        WorkspaceMacdAlligatorReplayAlgorithm
-    ).upper()
+    algorithm_source = inspect.getsource(WorkspaceMacdAlligatorReplayAlgorithm).upper()
     assert "DONCHIAN" not in algorithm_source
 
     expected_close_reasons = (
@@ -69,8 +67,7 @@ def _assert_absent_optional_production_wiring() -> None:
         "WorkspaceCanonicalSupertrend",
     )
     assert all(
-        not hasattr(replay_execution, symbol)
-        for symbol in removed_execution_symbols
+        not hasattr(replay_execution, symbol) for symbol in removed_execution_symbols
     )
     assert not hasattr(WorkspaceReplayExecutionEngine, "on_completed_m15_bar")
     assert not hasattr(WorkspaceRuntime, "_apply_replay_sell_supertrend_exit")

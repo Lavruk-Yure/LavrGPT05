@@ -91,8 +91,7 @@ def main() -> None:
     horizontal_drag_pan = bool(pan_requests) and pan_requests[-1] < 10
 
     x_controls = (
-        widget.btn_zoom_out.text() == "X −"
-        and widget.btn_zoom_in.text() == "X +"
+        widget.btn_zoom_out.text() == "X −" and widget.btn_zoom_in.text() == "X +"
     )
     y_controls = (
         widget.btn_vertical_zoom_out.text() == "Y −"
@@ -123,9 +122,7 @@ def main() -> None:
         Qt.KeyboardModifier.ControlModifier,
     )
     app.processEvents()
-    keyboard_vertical_zoom = (
-        widget.canvas.vertical_scale < vertical_before_keyboard
-    )
+    keyboard_vertical_zoom = widget.canvas.vertical_scale < vertical_before_keyboard
 
     pan_requests.clear()
     QTest.keyClick(widget.canvas, Qt.Key.Key_Right)
@@ -135,9 +132,7 @@ def main() -> None:
     vertical_before_pan = widget.canvas.vertical_pan_ratio
     QTest.keyClick(widget.canvas, Qt.Key.Key_Down)
     app.processEvents()
-    keyboard_vertical_pan = (
-        widget.canvas.vertical_pan_ratio < vertical_before_pan
-    )
+    keyboard_vertical_pan = widget.canvas.vertical_pan_ratio < vertical_before_pan
 
     pan_requests.clear()
     QTest.keyClick(widget.canvas, Qt.Key.Key_Home)

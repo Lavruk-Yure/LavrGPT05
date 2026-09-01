@@ -153,10 +153,7 @@ def main() -> None:
     assert factual_three_series
     assert series["MACD_VALUE"].role == WORKSPACE_CHART_ROLE_INDICATOR_LINE
     assert series["MACD_SIGNAL"].role == WORKSPACE_CHART_ROLE_INDICATOR_LINE
-    assert (
-        series["MACD_HISTOGRAM"].role
-        == WORKSPACE_CHART_ROLE_INDICATOR_HISTOGRAM
-    )
+    assert series["MACD_HISTOGRAM"].role == WORKSPACE_CHART_ROLE_INDICATOR_HISTOGRAM
 
     source = algorithm.source
     assert source is not None
@@ -212,12 +209,9 @@ def main() -> None:
             break
     assert profile_metadata
 
-    histogram_values = [
-        point.value for point in series["MACD_HISTOGRAM"].points
-    ]
-    histogram_both_sides = (
-        any(value > 0.0 for value in histogram_values)
-        and any(value < 0.0 for value in histogram_values)
+    histogram_values = [point.value for point in series["MACD_HISTOGRAM"].points]
+    histogram_both_sides = any(value > 0.0 for value in histogram_values) and any(
+        value < 0.0 for value in histogram_values
     )
     assert histogram_both_sides
 
@@ -297,10 +291,7 @@ def main() -> None:
     print(f"  synchronized_viewport={synchronized_viewport}")
     print(f"  profile_metadata={profile_metadata}")
     print(f"  histogram_both_sides={histogram_both_sides}")
-    print(
-        "  full_history_navigation_preserved="
-        f"{full_history_navigation_preserved}"
-    )
+    print("  full_history_navigation_preserved=" f"{full_history_navigation_preserved}")
     print(f"  stopped_panel_preserved={bool(stopped_panel_preserved)}")
     print(f"  new_run_clears_stale_panel={new_run_clears_stale_panel}")
     print(f"  disabled_source_hidden={disabled_source_hidden}")

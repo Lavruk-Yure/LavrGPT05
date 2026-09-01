@@ -89,9 +89,7 @@ def _candidate_f_bindings() -> dict[str, dict[str, object]]:
     alligator = built_in_workspace_indicator_profile(
         ALLIGATOR_PROFILE_UID_LGE_CANDIDATE_F
     )
-    macd_binding = WorkspaceIndicatorProfileBinding.from_profile(
-        macd
-    ).to_storage_dict()
+    macd_binding = WorkspaceIndicatorProfileBinding.from_profile(macd).to_storage_dict()
     alligator_binding = WorkspaceIndicatorProfileBinding.from_profile(
         alligator
     ).to_storage_dict()
@@ -152,9 +150,9 @@ def main() -> None:
     ui_source = (
         PROJECT_ROOT / "ui" / "algorithm_workspace_parameters_dialog.ui"
     ).read_text(encoding="utf-8")
-    area_source = (
-        PROJECT_ROOT / "core" / "algorithm_workspace_area.py"
-    ).read_text(encoding="utf-8")
+    area_source = (PROJECT_ROOT / "core" / "algorithm_workspace_area.py").read_text(
+        encoding="utf-8"
+    )
     assert 'name="btnReplaySettings"' in ui_source
     assert "dialog.replay_settings_requested.connect(" in area_source
     assert "_open_replay_settings_from_parameters(" in area_source
@@ -185,9 +183,7 @@ def main() -> None:
         f"{key_prefix}executionVirtualReplayAuto": (
             "Historical Replay — віртуальне виконання (AUTO)"
         ),
-        f"{key_prefix}brokerExecutionDisabledReplay": (
-            "Вимкнено у Historical Replay"
-        ),
+        f"{key_prefix}brokerExecutionDisabledReplay": ("Вимкнено у Historical Replay"),
         f"{key_prefix}snapshotMarketContext": "Інструмент / таймфрейм",
         f"{key_prefix}snapshotActivePanel": "Збережена вкладка WSP",
         f"{key_prefix}snapshotDiagnosticSurfaces": "Діагностичні вкладки",
@@ -217,9 +213,7 @@ def main() -> None:
     assert "No parameters are defined" not in data_snapshot
     assert "Поточне джерело:" in data_snapshot
     expected_period = (
-        "Період Replay:\n"
-        "2026-08-12T00:00:00+00:00\n"
-        "2026-08-20T23:59:00+00:00"
+        "Період Replay:\n" "2026-08-12T00:00:00+00:00\n" "2026-08-20T23:59:00+00:00"
     )
     assert expected_period in data_snapshot
     assert "Початковий баланс:" in data_snapshot
@@ -297,10 +291,7 @@ def main() -> None:
         in execution_snapshot
     )
     assert "Вхід Replay: NEXT_BAR_OPEN" in execution_snapshot
-    assert (
-        "Виконання у брокера: Вимкнено у Historical Replay"
-        in execution_snapshot
-    )
+    assert "Виконання у брокера: Вимкнено у Historical Replay" in execution_snapshot
     assert not dialog.btn_replay_settings.isVisible()
 
     dialog.tree_parameters.setCurrentItem(

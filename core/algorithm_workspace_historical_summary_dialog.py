@@ -280,9 +280,7 @@ class AlgorithmWorkspaceHistoricalSummaryDialog(QDialog):
         self.ui.lblTimeframe.setText(summary.timeframe)
         self.ui.lblSourceTimeframe.setText(summary.source_timeframe)
         self.ui.lblCsvSelectionTime.setText(
-            format_replay_elapsed_duration(
-                summary.csv_selection_elapsed_seconds
-            )
+            format_replay_elapsed_duration(summary.csv_selection_elapsed_seconds)
         )
         self.ui.lblReplayTime.setText(
             format_replay_elapsed_duration(summary.replay_elapsed_seconds)
@@ -318,9 +316,7 @@ class AlgorithmWorkspaceHistoricalSummaryDialog(QDialog):
         self.ui.lblAlligator.setText(
             f"{signals.alligator_allow} / {signals.alligator_reject}"
         )
-        self.ui.lblRejects.setText(
-            f"{signals.warmup_rejects} / {signals.risk_rejects}"
-        )
+        self.ui.lblRejects.setText(f"{signals.warmup_rejects} / {signals.risk_rejects}")
         self.ui.lblMacdQuality.setText(
             f"{signals.macd_quality_accept} / {signals.macd_quality_reject}"
         )

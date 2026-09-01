@@ -84,9 +84,7 @@ def _protective_order(
     row = {
         "order_id": order_id,
         "parent_id": (
-            leg.parent_order_id
-            if parent_order_id is None
-            else parent_order_id
+            leg.parent_order_id if parent_order_id is None else parent_order_id
         ),
         "account": leg.account_id,
         "symbol": base_symbol,
@@ -190,9 +188,7 @@ def main() -> int:
         evidence_snapshot=gbpusd_evidence,
     ).groups[0]
 
-    if gbpusd_group.reconciliation_status != (
-        IB_RECONCILIATION_STATUS_RECONCILED
-    ):
+    if gbpusd_group.reconciliation_status != (IB_RECONCILIATION_STATUS_RECONCILED):
         raise AssertionError("Active protected CASH leg was not reconciled")
 
     if not gbpusd_group.leg_operations_enabled:
@@ -241,14 +237,10 @@ def main() -> int:
         evidence_snapshot=eurusd_evidence,
     ).groups[0]
 
-    if eurusd_group.group_mode != (
-        IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS
-    ):
+    if eurusd_group.group_mode != (IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS):
         raise AssertionError("Unresolved CASH group mode differs")
 
-    if eurusd_group.broker_position_kind != (
-        IB_BROKER_POSITION_KIND_VIRTUAL_FX
-    ):
+    if eurusd_group.broker_position_kind != (IB_BROKER_POSITION_KIND_VIRTUAL_FX):
         raise AssertionError("Persisted CASH group lost Virtual FX kind")
 
     if eurusd_group.reconciliation_status != (

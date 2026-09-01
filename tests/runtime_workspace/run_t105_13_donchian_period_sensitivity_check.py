@@ -111,7 +111,7 @@ class DonchianPeriodSensitivityRuntime(WorkspaceRuntime):
         if signal_event.timestamp != event.timestamp:
             return proposal
 
-        reference_timestamps = timestamps[-(self.donchian_period + 1):-1]
+        reference_timestamps = timestamps[-(self.donchian_period + 1) : -1]
         reference = tuple(
             self.strategy_events[timestamp] for timestamp in reference_timestamps
         )
@@ -125,9 +125,7 @@ class DonchianPeriodSensitivityRuntime(WorkspaceRuntime):
         close = float(signal_event.close)
         directional_breakout = (
             proposal.direction == "BUY" and close > upper + EPSILON
-        ) or (
-            proposal.direction == "SELL" and close < lower - EPSILON
-        )
+        ) or (proposal.direction == "SELL" and close < lower - EPSILON)
 
         if directional_breakout:
             self.donchian_allows += 1

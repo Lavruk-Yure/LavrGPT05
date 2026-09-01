@@ -77,13 +77,13 @@ def build_workspace_macd_signal_diagnostics(
         raise ValueError("weakest_limit must be positive")
 
     observation_indexes = {
-        observation.timestamp: index
-        for index, observation in enumerate(observations)
+        observation.timestamp: index for index, observation in enumerate(observations)
     }
     cross_observations = tuple(
         observation
         for observation in observations
-        if observation.state in {
+        if observation.state
+        in {
             MACD_STATE_CROSS_UP,
             MACD_STATE_CROSS_DOWN,
         }
@@ -91,11 +91,7 @@ def build_workspace_macd_signal_diagnostics(
 
     diagnostics: list[WorkspaceMacdSignalDiagnostic] = []
     for index, observation in enumerate(cross_observations):
-        direction = (
-            "BUY"
-            if observation.state == MACD_STATE_CROSS_UP
-            else "SELL"
-        )
+        direction = "BUY" if observation.state == MACD_STATE_CROSS_UP else "SELL"
         macd_value = _required_value(observation.macd_value, "macd_value")
         signal_value = _required_value(
             observation.signal_value,
@@ -129,17 +125,11 @@ def build_workspace_macd_signal_diagnostics(
     strengths = tuple(item.strength for item in signals)
     zero_sides = tuple(item.zero_side for item in signals)
     buy_below_zero = zero_sides.count(MACD_ZERO_SIDE_BUY_BELOW)
-    buy_at_or_above_zero = zero_sides.count(
-        MACD_ZERO_SIDE_BUY_AT_OR_ABOVE
-    )
+    buy_at_or_above_zero = zero_sides.count(MACD_ZERO_SIDE_BUY_AT_OR_ABOVE)
     sell_above_zero = zero_sides.count(MACD_ZERO_SIDE_SELL_ABOVE)
-    sell_at_or_below_zero = zero_sides.count(
-        MACD_ZERO_SIDE_SELL_AT_OR_BELOW
-    )
+    sell_at_or_below_zero = zero_sides.count(MACD_ZERO_SIDE_SELL_AT_OR_BELOW)
     opposite_zero_side_signals = buy_below_zero + sell_above_zero
-    directional_zero_side_signals = (
-        buy_at_or_above_zero + sell_at_or_below_zero
-    )
+    directional_zero_side_signals = buy_at_or_above_zero + sell_at_or_below_zero
 
     weakest_signals = tuple(
         sorted(
@@ -158,18 +148,10 @@ def build_workspace_macd_signal_diagnostics(
         sell_at_or_below_zero=sell_at_or_below_zero,
         opposite_zero_side_signals=opposite_zero_side_signals,
         directional_zero_side_signals=directional_zero_side_signals,
-        strength_lt_1e6=sum(
-            value < MACD_STRENGTH_TINY for value in strengths
-        ),
-        strength_lt_5e6=sum(
-            value < MACD_STRENGTH_VERY_WEAK for value in strengths
-        ),
-        strength_lt_1e5=sum(
-            value < MACD_STRENGTH_WEAK for value in strengths
-        ),
-        strength_ge_1e5=sum(
-            value >= MACD_STRENGTH_WEAK for value in strengths
-        ),
+        strength_lt_1e6=sum(value < MACD_STRENGTH_TINY for value in strengths),
+        strength_lt_5e6=sum(value < MACD_STRENGTH_VERY_WEAK for value in strengths),
+        strength_lt_1e5=sum(value < MACD_STRENGTH_WEAK for value in strengths),
+        strength_ge_1e5=sum(value >= MACD_STRENGTH_WEAK for value in strengths),
         reversal_within_1_bar=_reversal_count(signals, 1),
         reversal_within_2_bars=_reversal_count(signals, 2),
         reversal_within_4_bars=_reversal_count(signals, 4),
@@ -189,9 +171,7 @@ def _next_opposite_cross(
     direction: str,
 ) -> WorkspaceMacdObservation | None:
     opposite_state = (
-        MACD_STATE_CROSS_DOWN
-        if direction == "BUY"
-        else MACD_STATE_CROSS_UP
+        MACD_STATE_CROSS_DOWN if direction == "BUY" else MACD_STATE_CROSS_UP
     )
     for observation in observations[current_index + 1 :]:
         if observation.state == opposite_state:

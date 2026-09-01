@@ -294,9 +294,7 @@ def _table_columns(
     table_name: str,
 ) -> set[str]:
     """Return existing SQLite column names for one runtime table."""
-    rows = connection.execute(
-        f"PRAGMA table_info({table_name});"
-    ).fetchall()
+    rows = connection.execute(f"PRAGMA table_info({table_name});").fetchall()
     return {str(row[1]) for row in rows}
 
 

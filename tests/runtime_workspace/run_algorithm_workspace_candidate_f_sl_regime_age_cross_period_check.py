@@ -335,9 +335,7 @@ def _bucket_matrix(evidence: tuple[RegimeAgeEvidence, ...]) -> tuple[str, ...]:
         counts = Counter(item.outcome for item in matched)
         by_window = Counter(item.window for item in matched)
         pnl = sum(item.final_profit for item in matched)
-        sl_rate = (
-            counts[OUTCOME_STOP_LOSS] / len(matched) * 100.0 if matched else 0.0
-        )
+        sl_rate = counts[OUTCOME_STOP_LOSS] / len(matched) * 100.0 if matched else 0.0
         rows.append(
             "    "
             f"age={name}: n:{len(matched)},SL:{counts[OUTCOME_STOP_LOSS]},"

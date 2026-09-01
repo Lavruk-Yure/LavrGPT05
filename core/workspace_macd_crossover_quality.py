@@ -101,18 +101,14 @@ class WorkspaceMacdCrossoverQualityConfig:
         _positive_finite(self.abc_time_unit_seconds, "abc_time_unit_seconds")
         if normalized_model == WORKSPACE_MACD_CROSS_ANGLE_MODEL_ABC:
             if self.abc_indicator_value_scale is None:
-                raise ValueError(
-                    "ABC MACD angle requires abc_indicator_value_scale"
-                )
+                raise ValueError("ABC MACD angle requires abc_indicator_value_scale")
             _positive_finite(
                 self.abc_indicator_value_scale,
                 "abc_indicator_value_scale",
             )
             return
         if self.angle_reference_y_per_minute is None:
-            raise ValueError(
-                "Legacy MACD angle requires angle_reference_y_per_minute"
-            )
+            raise ValueError("Legacy MACD angle requires angle_reference_y_per_minute")
         _positive_finite(
             self.angle_reference_y_per_minute,
             "angle_reference_y_per_minute",
@@ -220,10 +216,7 @@ def chart_45_degree_reference_y_per_minute(
 
 def calibrated_macd_cross_angle_reference_y_per_minute() -> float:
     """Return the fixed RoadMap99 manual 45-degree calibration."""
-    return (
-        MACD_CROSS_45_Y_PER_M15_BAR
-        / MACD_CROSS_ANGLE_REFERENCE_MINUTES
-    )
+    return MACD_CROSS_45_Y_PER_M15_BAR / MACD_CROSS_ANGLE_REFERENCE_MINUTES
 
 
 def evaluate_workspace_macd_crossover_quality(
@@ -277,15 +270,11 @@ def build_workspace_macd_crossover_quality_diagnostics(
         window_5=sum(item.search_window == 5 for item in signals),
         window_7=sum(item.search_window == 7 for item in signals),
         extremum_not_found=sum(not item.extremum_found for item in signals),
-        prominence_pass=sum(
-            item.criterion_prominence_pass for item in signals
-        ),
+        prominence_pass=sum(item.criterion_prominence_pass for item in signals),
         distance_pass=sum(item.criterion_distance_pass for item in signals),
         angle_pass=sum(item.criterion_angle_pass for item in signals),
         final_quality_pass=sum(item.final_quality_pass for item in signals),
-        final_quality_reject=sum(
-            not item.final_quality_pass for item in signals
-        ),
+        final_quality_reject=sum(not item.final_quality_pass for item in signals),
         rejected_extremum_not_found=_reason_count(
             signals,
             MACD_QUALITY_REASON_EXTREMUM_NOT_FOUND,
@@ -473,10 +462,7 @@ def _is_local_extremum(
     current_value = _finite(current, "extremum_current")
     following_value = _finite(following, "extremum_following")
     if direction == "BUY":
-        return (
-            current_value < previous_value
-            and current_value <= following_value
-        )
+        return current_value < previous_value and current_value <= following_value
     return current_value > previous_value and current_value >= following_value
 
 
@@ -513,12 +499,8 @@ def _effective_cross_angle_degrees(
         reference_y_per_minute,
         "reference_y_per_minute",
     )
-    macd_angle = math.degrees(
-        math.atan(macd_slope_per_minute / reference)
-    )
-    signal_angle = math.degrees(
-        math.atan(signal_slope_per_minute / reference)
-    )
+    macd_angle = math.degrees(math.atan(macd_slope_per_minute / reference))
+    signal_angle = math.degrees(math.atan(signal_slope_per_minute / reference))
     return abs(macd_angle - signal_angle)
 
 

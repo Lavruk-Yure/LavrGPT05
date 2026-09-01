@@ -145,9 +145,7 @@ def main() -> int:
         prefix="lge_ib_virtual_leg_live_",
         ignore_cleanup_errors=True,
     )
-    runtime_db_path = (
-        Path(temporary_directory.name) / "demo_runtime_snapshot.db"
-    )
+    runtime_db_path = Path(temporary_directory.name) / "demo_runtime_snapshot.db"
     _copy_database_snapshot(
         source_path=DB_PATH,
         target_path=runtime_db_path,
@@ -172,12 +170,9 @@ def main() -> int:
             IB_LEG_STATUS_OPEN,
             IB_LEG_STATUS_PARTIALLY_CLOSED,
         }
-        open_legs = [
-            leg for leg in snapshot.legs if leg.leg_status in open_statuses
-        ]
+        open_legs = [leg for leg in snapshot.legs if leg.leg_status in open_statuses]
         closed_legs = [
-            leg for leg in snapshot.legs
-            if leg.leg_status == IB_LEG_STATUS_CLOSED
+            leg for leg in snapshot.legs if leg.leg_status == IB_LEG_STATUS_CLOSED
         ]
 
         print("IB virtual-leg live read-only result")

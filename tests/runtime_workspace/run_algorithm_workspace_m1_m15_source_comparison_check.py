@@ -50,9 +50,7 @@ def _macd_observations(events):
 
 def _comparison() -> WorkspaceHistoricalSourceComparison:
     if not M1_FILE.is_file():
-        raise FileNotFoundError(
-            "Real EURUSD M1 history is required: " + str(M1_FILE)
-        )
+        raise FileNotFoundError("Real EURUSD M1 history is required: " + str(M1_FILE))
     broker_data = WorkspaceCsvHistoryLoader().load(
         file_path=BROKER_M15_FILE,
         broker="IB",
@@ -97,8 +95,7 @@ def _signal_list(items) -> str:
     if not items:
         return "none"
     return ", ".join(
-        f"{item.timestamp.isoformat()} {item.direction}"
-        for item in items[:12]
+        f"{item.timestamp.isoformat()} {item.direction}" for item in items[:12]
     )
 
 
@@ -151,10 +148,7 @@ def main() -> None:
         f"{len(report.derived_only_signals)}: "
         f"{_signal_list(report.derived_only_signals)}"
     )
-    print(
-        "  direction_changed_signals="
-        f"{len(report.direction_changed_timestamps)}"
-    )
+    print("  direction_changed_signals=" f"{len(report.direction_changed_timestamps)}")
     print(f"  first_signal_difference={_timestamp(report.first_signal_difference)}")
     print("  all_signal_differences_have_prior_close_difference=True")
     print("  timestamp_alignment=True")

@@ -132,9 +132,7 @@ def build_workspace_profit_drawdown_comparison(
                 average_loser=summary.average_loser,
                 stop_loss_closes=summary.close_reason_count("STOP_LOSS"),
                 take_profit_closes=summary.close_reason_count("TAKE_PROFIT"),
-                profit_drawdown_closes=summary.close_reason_count(
-                    "PROFIT_DRAWDOWN"
-                ),
+                profit_drawdown_closes=summary.close_reason_count("PROFIT_DRAWDOWN"),
                 session_end_closes=summary.close_reason_count("SESSION_END"),
                 replay_elapsed_seconds=summary.replay_elapsed_seconds,
             )
@@ -226,7 +224,5 @@ def _finite_float(value: object, field_name: str) -> float:
             f"{field_name} must be numeric"
         ) from exc
     if not math.isfinite(number):
-        raise WorkspaceProfitDrawdownComparisonError(
-            f"{field_name} must be finite"
-        )
+        raise WorkspaceProfitDrawdownComparisonError(f"{field_name} must be finite")
     return number

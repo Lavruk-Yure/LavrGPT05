@@ -129,9 +129,7 @@ def main() -> None:
     assert combined.primary_reason == "runtime_state=RUNNING"
 
     with TemporaryDirectory() as temp_dir:
-        controller = AlgorithmWorkspaceController(
-            SessionRepository(Path(temp_dir))
-        )
+        controller = AlgorithmWorkspaceController(SessionRepository(Path(temp_dir)))
         workspace = controller.create_workspace(
             broker="IB",
             account_id="DUM513747",
@@ -142,9 +140,7 @@ def main() -> None:
             data_mode=WORKSPACE_DATA_MODE_REPLAY,
             control_mode=WORKSPACE_CONTROL_MODE_AUTO,
         )
-        managed_runtime = controller.ensure_workspace_runtime(
-            workspace.workspace_uid
-        )
+        managed_runtime = controller.ensure_workspace_runtime(workspace.workspace_uid)
         managed_runtime.context.active_orders_count = 1
         delete_blocked = False
         try:

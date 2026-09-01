@@ -103,9 +103,7 @@ def _momentum_favorable(metrics: tuple[float, ...]) -> bool:
     """Directional MACD consensus за знаком; threshold tuning відсутній."""
     histogram, histogram_delta, macd_slope, _ = metrics
     return bool(
-        histogram > EPSILON
-        and histogram_delta > EPSILON
-        and macd_slope > EPSILON
+        histogram > EPSILON and histogram_delta > EPSILON and macd_slope > EPSILON
     )
 
 
@@ -193,18 +191,14 @@ def _summary(rows: list[MomentumFreshnessAnatomy]) -> dict[str, Any]:
         "median_pullback_to_signal": _median(
             [row.pullback_to_signal_bars for row in rows]
         ),
-        "median_pullback_hist": _median(
-            [row.pullback_histogram for row in rows]
-        ),
+        "median_pullback_hist": _median([row.pullback_histogram for row in rows]),
         "median_pullback_hist_delta": _median(
             [row.pullback_histogram_delta for row in rows]
         ),
         "median_pullback_macd_slope": _median(
             [row.pullback_macd_slope for row in rows]
         ),
-        "median_pre_signal_hist": _median(
-            [row.pre_signal_histogram for row in rows]
-        ),
+        "median_pre_signal_hist": _median([row.pre_signal_histogram for row in rows]),
         "median_pre_signal_hist_delta": _median(
             [row.pre_signal_histogram_delta for row in rows]
         ),
@@ -215,24 +209,16 @@ def _summary(rows: list[MomentumFreshnessAnatomy]) -> dict[str, Any]:
         "median_signal_hist_delta": _median(
             [row.signal_histogram_delta for row in rows]
         ),
-        "median_signal_macd_slope": _median(
-            [row.signal_macd_slope for row in rows]
-        ),
+        "median_signal_macd_slope": _median([row.signal_macd_slope for row in rows]),
         "median_signal_previous_macd_slope": _median(
             [row.signal_previous_macd_slope for row in rows]
         ),
-        "median_histogram_trough": _median(
-            [row.histogram_trough for row in rows]
-        ),
+        "median_histogram_trough": _median([row.histogram_trough for row in rows]),
         "median_histogram_recovery": _median(
             [row.histogram_recovery_from_trough for row in rows]
         ),
-        "median_trough_to_signal": _median(
-            [row.trough_to_signal_bars for row in rows]
-        ),
-        "median_favorable_streak": _median(
-            [row.favorable_streak_bars for row in rows]
-        ),
+        "median_trough_to_signal": _median([row.trough_to_signal_bars for row in rows]),
+        "median_favorable_streak": _median([row.favorable_streak_bars for row in rows]),
         "median_favorable_streak_start_to_signal": _median(
             [row.favorable_streak_start_to_signal_bars for row in rows]
         ),
@@ -249,17 +235,13 @@ def _summary(rows: list[MomentumFreshnessAnatomy]) -> dict[str, Any]:
         "pre_signal_momentum_favorable": sum(
             row.pre_signal_momentum_favorable for row in rows
         ),
-        "signal_momentum_favorable": sum(
-            row.signal_momentum_favorable for row in rows
-        ),
+        "signal_momentum_favorable": sum(row.signal_momentum_favorable for row in rows),
         "fresh_restart_on_signal": sum(
-            row.signal_momentum_favorable
-            and not row.pre_signal_momentum_favorable
+            row.signal_momentum_favorable and not row.pre_signal_momentum_favorable
             for row in rows
         ),
         "already_favorable_before_signal": sum(
-            row.signal_momentum_favorable
-            and row.pre_signal_momentum_favorable
+            row.signal_momentum_favorable and row.pre_signal_momentum_favorable
             for row in rows
         ),
     }
@@ -386,8 +368,7 @@ def main() -> int:
         )
         if data["OTHER"]["events"]:
             print(
-                f"  {window.label}/OTHER_FRESHNESS="
-                f"{_summary_text(data['OTHER'])}"
+                f"  {window.label}/OTHER_FRESHNESS=" f"{_summary_text(data['OTHER'])}"
             )
 
     assert all(

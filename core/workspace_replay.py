@@ -348,9 +348,11 @@ class WorkspaceReplayService:
     ) -> WorkspaceReplaySession:
         """Create a synthetic or CSV-backed deterministic Replay session."""
         settings = dict(replay_settings or {})
-        source_type = str(
-            settings.get("source_type") or DEFAULT_WORKSPACE_REPLAY_SOURCE
-        ).strip().upper()
+        source_type = (
+            str(settings.get("source_type") or DEFAULT_WORKSPACE_REPLAY_SOURCE)
+            .strip()
+            .upper()
+        )
         if source_type == WORKSPACE_REPLAY_SOURCE_SYNTHETIC:
             return self.create_synthetic_session(
                 broker=broker,
@@ -365,9 +367,7 @@ class WorkspaceReplayService:
                 timeframe=timeframe,
                 replay_settings=settings,
             )
-        raise WorkspaceReplayError(
-            f"Unsupported Replay source_type: {source_type}"
-        )
+        raise WorkspaceReplayError(f"Unsupported Replay source_type: {source_type}")
 
     def create_historical_session(
         self,
@@ -384,9 +384,9 @@ class WorkspaceReplayService:
             raise WorkspaceReplayError(
                 "Historical Replay requires replay_settings.file_path"
             )
-        source_timeframe = str(
-            settings.get("source_timeframe") or timeframe
-        ).strip().upper()
+        source_timeframe = (
+            str(settings.get("source_timeframe") or timeframe).strip().upper()
+        )
         strategy_timeframe = str(timeframe or "").strip().upper()
         try:
             source = get_timeframe(source_timeframe)
@@ -414,8 +414,7 @@ class WorkspaceReplayService:
                     or DEFAULT_WORKSPACE_HISTORY_TIMEZONE
                 ),
                 delimiter=str(
-                    settings.get("delimiter")
-                    or DEFAULT_WORKSPACE_HISTORY_DELIMITER
+                    settings.get("delimiter") or DEFAULT_WORKSPACE_HISTORY_DELIMITER
                 ),
                 decimal_separator=str(
                     settings.get("decimal_separator")
@@ -597,9 +596,7 @@ class WorkspaceReplayService:
             low_price = min(open_price, close_price) - 0.00008
             bid = close_price - half_spread
             ask = close_price + half_spread
-            timestamp = start_utc + timedelta(
-                minutes=timeframe_minutes * index
-            )
+            timestamp = start_utc + timedelta(minutes=timeframe_minutes * index)
             bars.append(
                 WorkspaceMarketBar(
                     timestamp=timestamp,
@@ -660,9 +657,7 @@ class WorkspaceReplayService:
             try:
                 normalized = float(value_text)
             except ValueError as exc:
-                raise WorkspaceReplayError(
-                    f"{field_name} must be numeric"
-                ) from exc
+                raise WorkspaceReplayError(f"{field_name} must be numeric") from exc
         if normalized < 0.0 or (normalized == 0.0 and not allow_zero):
             raise WorkspaceReplayError(f"{field_name} must be positive")
         return normalized

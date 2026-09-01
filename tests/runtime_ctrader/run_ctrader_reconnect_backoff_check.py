@@ -90,14 +90,10 @@ def main() -> int:
 
     checks = {
         "backoff_sequence_60_120_300": (
-            first_backoff_blocks
-            and second_backoff_blocks
-            and third_backoff_blocks
+            first_backoff_blocks and second_backoff_blocks and third_backoff_blocks
         ),
         "fourth_attempt_recovers": (
-            service.reconnect_calls == 4
-            and task.reconnect_attempts == 4
-            and recovered
+            service.reconnect_calls == 4 and task.reconnect_attempts == 4 and recovered
         ),
         "success_resets_failure_count": failures_reset,
     }

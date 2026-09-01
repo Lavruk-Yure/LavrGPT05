@@ -130,9 +130,7 @@ def _stats(
         losses=losses,
         break_even=break_even,
         net=math.fsum(profits),
-        profit_factor=(
-            gross_profit / gross_loss if gross_loss > EPSILON else None
-        ),
+        profit_factor=(gross_profit / gross_loss if gross_loss > EPSILON else None),
         drawdown=_maximum_drawdown(trades),
         profit_drawdown=close_reasons["PROFIT_DRAWDOWN"],
         stop_loss=close_reasons["STOP_LOSS"],
@@ -158,12 +156,8 @@ def _month_segments(
 ) -> tuple[SegmentSpec, ...]:
     """Побудувати всі календарні місяці, яких торкається Replay period."""
 
-    cursor = period_start.replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0
-    )
-    final_month = period_end.replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0
-    )
+    cursor = period_start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    final_month = period_end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     segments: list[SegmentSpec] = []
     while cursor <= final_month:
         next_month = _next_month(cursor)
@@ -255,9 +249,7 @@ def _assert_partition(
 ) -> None:
     """Підтвердити, що кожна factual trade входить рівно в один segment."""
 
-    populations = tuple(
-        _segment_trades(trades, segment) for segment in segments
-    )
+    populations = tuple(_segment_trades(trades, segment) for segment in segments)
     partition_ids = tuple(
         trade.position_id for population in populations for trade in population
     )
@@ -311,9 +303,7 @@ def _assert_full_period(runtime: WorkspaceRuntime) -> None:
         rel_tol=0.0,
         abs_tol=EPSILON,
     )
-    assert stats.profit_drawdown == summary.close_reason_count(
-        "PROFIT_DRAWDOWN"
-    )
+    assert stats.profit_drawdown == summary.close_reason_count("PROFIT_DRAWDOWN")
     assert stats.stop_loss == summary.close_reason_count("STOP_LOSS")
     assert stats.take_profit == summary.close_reason_count("TAKE_PROFIT")
     assert stats.buy + stats.sell == stats.trades

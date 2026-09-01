@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 try:
     import PySide6  # noqa: F401
 except ModuleNotFoundError:
+
     class _FakeOpenModeFlag:
         ReadOnly = 1
 
@@ -93,9 +94,7 @@ def main() -> None:
     assert "drawdown = obsunięcie" in polish_context
     assert translation_override_for_key(key, "uk") == "Вимкнено"
     external_key = "OrdersPage.tooltipExternalExecutionResidual"
-    persisted_external_key = (
-        "OrdersPage.tooltipPersistedExternalExecutionResidual"
-    )
+    persisted_external_key = "OrdersPage.tooltipPersistedExternalExecutionResidual"
     assert "точними виконаннями поза ордерами LGE" in str(
         translation_override_for_key(external_key, "uk")
     )
@@ -115,9 +114,7 @@ def main() -> None:
         "OrdersPage.msgExternalExposureOrderBlocked",
     ):
         for language, (row_type, color_word) in guidance_expectations.items():
-            guidance = str(
-                translation_override_for_key(guidance_key, language)
-            )
+            guidance = str(translation_override_for_key(guidance_key, language))
             assert "BROKER" in guidance
             assert row_type in guidance
             assert color_word not in guidance.casefold()
@@ -264,9 +261,7 @@ def main() -> None:
         },
     }
     override_updates = apply_central_translation_overrides(catalog)
-    history_button_entry = catalog[
-        "AlgorithmWorkspaceWindow.btnHistoryDownload"
-    ]
+    history_button_entry = catalog["AlgorithmWorkspaceWindow.btnHistoryDownload"]
     replay_entry = catalog["AlgorithmWorkspaceWindow.btnReplaySettings"]
     assert isinstance(history_button_entry, dict)
     assert isinstance(replay_entry, dict)
@@ -277,9 +272,7 @@ def main() -> None:
     assert broker_data_entry["uk"] == "Дані брокера"
     assert replay_entry["uk"] == "Налаштування Replay"
     assert replay_entry["pl"] == "Ustawienia Replay"
-    history_title_entry = catalog[
-        "AlgorithmWorkspaceHistoryDownloadDialog.windowTitle"
-    ]
+    history_title_entry = catalog["AlgorithmWorkspaceHistoryDownloadDialog.windowTitle"]
     history_planned_entry = catalog[
         "AlgorithmWorkspaceHistoryDownloadDialog.lblPlannedFile"
     ]
@@ -289,55 +282,35 @@ def main() -> None:
     history_coverage_entry = catalog[
         "AlgorithmWorkspaceHistoryDownloadDialog.coverageStartsLater"
     ]
-    history_note_entry = catalog[
-        "AlgorithmWorkspaceHistoryDownloadDialog.note"
-    ]
-    ib_download_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.btnDownloadIb"
-    ]
+    history_note_entry = catalog["AlgorithmWorkspaceHistoryDownloadDialog.note"]
+    ib_download_entry = catalog["AlgorithmWorkspaceReplayDialog.btnDownloadIb"]
     download_progress_entry = catalog[
         "AlgorithmWorkspaceReplayDialog.downloadInProgress"
     ]
-    message_ok_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.messageOk"
-    ]
+    message_ok_entry = catalog["AlgorithmWorkspaceReplayDialog.messageOk"]
     invalid_end_datetime_entry = catalog[
         "AlgorithmWorkspaceReplayDialog.ibInvalidEndDateTime"
     ]
-    source_name_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.lblSourceName"
-    ]
-    download_group_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.grpDownloadRange"
-    ]
+    source_name_entry = catalog["AlgorithmWorkspaceReplayDialog.lblSourceName"]
+    download_group_entry = catalog["AlgorithmWorkspaceReplayDialog.grpDownloadRange"]
     download_start_entry = catalog[
         "AlgorithmWorkspaceReplayDialog.lblDownloadStartDate"
     ]
-    download_end_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.lblDownloadEndDate"
-    ]
+    download_end_entry = catalog["AlgorithmWorkspaceReplayDialog.lblDownloadEndDate"]
     download_timezone_entry = catalog[
         "AlgorithmWorkspaceReplayDialog.lblDownloadTimezone"
     ]
     invalid_download_timezone_entry = catalog[
         "AlgorithmWorkspaceReplayDialog.downloadTimezoneInvalid"
     ]
-    replay_range_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.grpRange"
-    ]
-    start_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.chkStartEnabled"
-    ]
-    end_entry = catalog[
-        "AlgorithmWorkspaceReplayDialog.chkEndEnabled"
-    ]
+    replay_range_entry = catalog["AlgorithmWorkspaceReplayDialog.grpRange"]
+    start_entry = catalog["AlgorithmWorkspaceReplayDialog.chkStartEnabled"]
+    end_entry = catalog["AlgorithmWorkspaceReplayDialog.chkEndEnabled"]
     note_entry = catalog["AlgorithmWorkspaceReplayDialog.note"]
     tab_entry = catalog["AlgorithmWorkspaceReplayDialog.delimiterTab"]
     position_entry = catalog["AlgorithmWorkspaceWindow.tabPosition"]
     running_entry = catalog["AlgorithmWorkspaceState.running"]
-    configured_entry = catalog[
-        "AlgorithmWorkspaceWindow.replayConfiguredTooltip"
-    ]
+    configured_entry = catalog["AlgorithmWorkspaceWindow.replayConfiguredTooltip"]
     completed_entry = catalog["AlgorithmReplayState.completed"]
     warmup_entry = catalog["AlgorithmWorkspaceStartupPhase.warmup"]
     ctrader_close_entry = catalog["CTraderConnectionDialog.btnClose"]
@@ -385,17 +358,13 @@ def main() -> None:
         "Завантаження історичних даних з {broker}..."
     )
     assert message_ok_entry["uk"] == "Зрозуміло"
-    assert invalid_end_datetime_entry["uk"].startswith(
-        "IB відхилив запит"
-    )
+    assert invalid_end_datetime_entry["uk"].startswith("IB відхилив запит")
     assert source_name_entry["uk"] == "Назва джерела:"
     assert source_name_entry["pl"] == "Nazwa źródła:"
     assert download_group_entry["uk"] == "Період завантаження історії"
     assert download_start_entry["uk"] == "Дата початку:"
     assert download_end_entry["uk"] == "Дата завершення:"
-    assert download_timezone_entry["uk"] == (
-        "Часовий пояс періоду завантаження:"
-    )
+    assert download_timezone_entry["uk"] == ("Часовий пояс періоду завантаження:")
     assert invalid_download_timezone_entry["uk"].startswith(
         "Невідомий часовий пояс завантаження історії"
     )

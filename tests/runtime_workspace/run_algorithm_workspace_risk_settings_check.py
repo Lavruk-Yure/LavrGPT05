@@ -121,9 +121,7 @@ def main() -> None:
         assert legacy_policy.max_daily_loss_percent == (
             DEFAULT_WORKSPACE_MAX_DAILY_LOSS_PERCENT
         )
-        assert legacy_policy.require_stop_loss is (
-            DEFAULT_WORKSPACE_REQUIRE_STOP_LOSS
-        )
+        assert legacy_policy.require_stop_loss is (DEFAULT_WORKSPACE_REQUIRE_STOP_LOSS)
 
         request = WorkspaceRiskRequest(
             timestamp=datetime(2026, 7, 30, 6, 30, tzinfo=UTC),
@@ -167,9 +165,7 @@ def main() -> None:
 
         invalid_boolean_blocked = False
         try:
-            WorkspaceRiskPolicy.from_risk_settings(
-                {"require_stop_loss": "False"}
-            )
+            WorkspaceRiskPolicy.from_risk_settings({"require_stop_loss": "False"})
         except ValueError:
             invalid_boolean_blocked = True
         assert invalid_boolean_blocked

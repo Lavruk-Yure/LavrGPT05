@@ -303,11 +303,7 @@ class WorkspaceCandidateFNegativePdRecoveryGuard(WorkspaceProfitDrawdownGuard):
         if pending is None:
             if not decision.close_requested:
                 return decision
-            if (
-                position.current_profit
-                + CANDIDATE_F_NEGATIVE_PD_NUMERIC_EPSILON
-                >= 0.0
-            ):
+            if position.current_profit + CANDIDATE_F_NEGATIVE_PD_NUMERIC_EPSILON >= 0.0:
                 return decision
             self.pending[position.position_id] = WorkspaceNegativePdRecoveryState(
                 position_id=position.position_id,
@@ -339,11 +335,7 @@ class WorkspaceCandidateFNegativePdRecoveryGuard(WorkspaceProfitDrawdownGuard):
         step = position.current_profit - pending.previous_profit
         pending.previous_profit = position.current_profit
 
-        if (
-            position.current_profit
-            + CANDIDATE_F_NEGATIVE_PD_NUMERIC_EPSILON
-            >= 0.0
-        ):
+        if position.current_profit + CANDIDATE_F_NEGATIVE_PD_NUMERIC_EPSILON >= 0.0:
             self.pending.pop(position.position_id, None)
             self.recovery_close_ids.add(position.position_id)
             return replace(
@@ -364,9 +356,7 @@ class WorkspaceCandidateFNegativePdRecoveryGuard(WorkspaceProfitDrawdownGuard):
             pending.completed_future_events
             == CANDIDATE_F_NEGATIVE_PD_EARLY_ABORT_EVENT_INDEX
         ):
-            second_step_nonpositive = (
-                step <= CANDIDATE_F_NEGATIVE_PD_NUMERIC_EPSILON
-            )
+            second_step_nonpositive = step <= CANDIDATE_F_NEGATIVE_PD_NUMERIC_EPSILON
             if pending.first_step_nonpositive and second_step_nonpositive:
                 self.pending.pop(position.position_id, None)
                 self.early_abort_close_ids.add(position.position_id)

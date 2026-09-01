@@ -170,10 +170,7 @@ def main() -> None:
     print("  default_spread_pips=1.2")
     print(
         "  default_spreads="
-        + ",".join(
-            f"{symbol}:{resolved[symbol]:g}"
-            for symbol in EXPECTED_SPREADS
-        )
+        + ",".join(f"{symbol}:{resolved[symbol]:g}" for symbol in EXPECTED_SPREADS)
     )
     print("  pip_normalized_default_spread_equal=True")
     print("  missing_workspace_spread_symbol_aware=True")

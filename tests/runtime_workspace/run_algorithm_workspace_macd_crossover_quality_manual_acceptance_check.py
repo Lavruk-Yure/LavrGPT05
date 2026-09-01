@@ -178,8 +178,7 @@ def main() -> None:
         )
         print(f"    criteria={_criteria(item)}")
         print(
-            f"    result=pass:{item.final_quality_pass} "
-            f"reason:{item.reason_code}"
+            f"    result=pass:{item.final_quality_pass} " f"reason:{item.reason_code}"
         )
 
     near_41 = diagnostics[datetime(2026, 1, 5, 9, 30, tzinfo=UTC)]

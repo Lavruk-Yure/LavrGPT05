@@ -249,8 +249,7 @@ def main() -> None:
     assert tooltip.startswith("Сигнал: 2026-08-21 09:00 UTC | BUY\n")
     assert "MACD Quality: PASS" in tooltip
     assert (
-        "Alligator: SAME_TIMEFRAME_BULLISH | Початок тренду вгору | STARTING"
-        in tooltip
+        "Alligator: SAME_TIMEFRAME_BULLISH | Початок тренду вгору | STARTING" in tooltip
     )
     assert "Candidate F: ARMED → CANCEL" in tooltip
     assert "Причина:" in tooltip
@@ -279,27 +278,20 @@ def main() -> None:
     assert "Сигнал: 2026-08-21 09:00 UTC | BUY" in detail
     assert "MACD Quality: PASS" in detail
     assert (
-        "Alligator: SAME_TIMEFRAME_BULLISH | Початок тренду вгору | STARTING"
-        in detail
+        "Alligator: SAME_TIMEFRAME_BULLISH | Початок тренду вгору | STARTING" in detail
     )
-    assert (
-        "Сила Alligator: slope=0.130000 | opening=0.490000 | active_age=0"
-        in detail
-    )
+    assert "Сила Alligator: slope=0.130000 | opening=0.490000 | active_age=0" in detail
     assert "Candidate F: ARMED → CANCEL" in detail
     assert (
         "Стан lifecycle: Тренд вгору | ACTIVE | active_age=3 | "
-        "slope=0.150000 | opening=0.580000"
-        in detail
+        "slope=0.150000 | opening=0.580000" in detail
     )
     assert "Причина lifecycle: З’явився протилежний сигнал MACD" in detail
     assert "Фільтр / guard:" in detail
     assert "Фінальне рішення: REJECT" in detail
     assert summary_footer in detail
     assert "*** ТЕХНІЧНА ДІАГНОСТИКА ***" in detail
-    assert detail.index(summary_footer) < detail.index(
-        "*** ТЕХНІЧНА ДІАГНОСТИКА ***"
-    )
+    assert detail.index(summary_footer) < detail.index("*** ТЕХНІЧНА ДІАГНОСТИКА ***")
     assert "Результат MACD Quality: PASS" in detail
     assert "Стан Alligator: SAME_TIMEFRAME_BULLISH" in detail
     assert "Стан observation Alligator: BULLISH" in detail
@@ -321,8 +313,7 @@ def main() -> None:
     assert "Профіль Alligator: alligator-lge-candidate-f (ревізія 1)" in detail
     assert f"Час спостереження: {BASE_TIME.isoformat()}" in detail
     assert (
-        "Доступно з: "
-        f"{(BASE_TIME + timedelta(minutes=15)).isoformat()}"
+        "Доступно з: " f"{(BASE_TIME + timedelta(minutes=15)).isoformat()}"
     ) in detail
     assert "raw_candidate_f_diagnostic=kept" in detail
     assert "→ CANCEL:" in presentation.reason_text
@@ -358,14 +349,20 @@ def main() -> None:
         candidate_f_lifecycle_timestamp=terminal_time,
         candidate_f_lifecycle_delay_bars=5,
     )
-    assert "ARMED → RELEASE" in build_workspace_signal_presentation(
-        released,
-        _uk_tr,
-    ).tooltip_text
-    assert "ARMED → EXPIRE" in build_workspace_signal_presentation(
-        expired,
-        _uk_tr,
-    ).tooltip_text
+    assert (
+        "ARMED → RELEASE"
+        in build_workspace_signal_presentation(
+            released,
+            _uk_tr,
+        ).tooltip_text
+    )
+    assert (
+        "ARMED → EXPIRE"
+        in build_workspace_signal_presentation(
+            expired,
+            _uk_tr,
+        ).tooltip_text
+    )
 
     release_reject = replace(
         updated,

@@ -610,9 +610,7 @@ def main() -> int:
                 stop_loss=INITIAL_SL,
                 take_profit=None,
             )
-            survivor_leg = engine.repository.get_ib_virtual_position_leg(
-                position_uid
-            )
+            survivor_leg = engine.repository.get_ib_virtual_position_leg(position_uid)
 
             if survivor_leg is None:
                 raise AssertionError("Survivor persistence leg is missing")
@@ -631,9 +629,7 @@ def main() -> int:
                 stop_loss=INITIAL_SL,
                 take_profit=INITIAL_TP,
             )
-            final_leg = engine.repository.get_ib_virtual_position_leg(
-                position_uid
-            )
+            final_leg = engine.repository.get_ib_virtual_position_leg(position_uid)
 
             if final_leg is None:
                 raise AssertionError("Final replacement pair is missing")
@@ -682,16 +678,11 @@ def main() -> int:
                 f"{create_result['post_modify_reconciliation_attempts']}"
             )
             print(
-                "  survivor_stop_loss_order_id="
-                f"{survivor_leg['stop_loss_order_id']}"
+                "  survivor_stop_loss_order_id=" f"{survivor_leg['stop_loss_order_id']}"
             )
+            print("  final_stop_loss_order_id=" f"{final_leg['stop_loss_order_id']}")
             print(
-                "  final_stop_loss_order_id="
-                f"{final_leg['stop_loss_order_id']}"
-            )
-            print(
-                "  final_take_profit_order_id="
-                f"{final_leg['take_profit_order_id']}"
+                "  final_take_profit_order_id=" f"{final_leg['take_profit_order_id']}"
             )
             print(
                 "  survivor_reconciliation_attempts="

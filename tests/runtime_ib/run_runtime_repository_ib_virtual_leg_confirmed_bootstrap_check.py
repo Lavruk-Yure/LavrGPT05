@@ -54,9 +54,7 @@ def _database_digest(connection: sqlite3.Connection) -> str:
 
     for (table_name,) in table_rows:
         quoted_name = str(table_name).replace('"', '""')
-        cursor = connection.execute(
-            f'SELECT * FROM "{quoted_name}" ORDER BY rowid'
-        )
+        cursor = connection.execute(f'SELECT * FROM "{quoted_name}" ORDER BY rowid')
         digest.update(str(table_name).encode("utf-8"))
 
         for row in cursor.fetchall():
@@ -355,20 +353,16 @@ def main() -> int:
         repository = RuntimeRepository(connection)
         legs, orders, closed_utc = _build_fixture(repository)
 
-        first_result = (
-            repository.bootstrap_confirmed_ib_virtual_position_leg_snapshot(
-                legs=legs,
-                order_mappings=orders,
-                closed_utc_by_position_uid=closed_utc,
-            )
+        first_result = repository.bootstrap_confirmed_ib_virtual_position_leg_snapshot(
+            legs=legs,
+            order_mappings=orders,
+            closed_utc_by_position_uid=closed_utc,
         )
         digest_after_first = _database_digest(connection)
-        repeat_result = (
-            repository.bootstrap_confirmed_ib_virtual_position_leg_snapshot(
-                legs=legs,
-                order_mappings=orders,
-                closed_utc_by_position_uid=closed_utc,
-            )
+        repeat_result = repository.bootstrap_confirmed_ib_virtual_position_leg_snapshot(
+            legs=legs,
+            order_mappings=orders,
+            closed_utc_by_position_uid=closed_utc,
         )
         digest_after_repeat = _database_digest(connection)
 
@@ -435,9 +429,7 @@ def main() -> int:
     print(f"  open_seeds={len(open_seeds)}")
     print(f"  repeat_idempotent={repeat_result['already_applied']}")
     print(f"  conflict_rejected={conflict_rejected}")
-    print(
-        "RUNTIME_REPOSITORY_IB_VIRTUAL_LEG_CONFIRMED_BOOTSTRAP_CHECK=OK"
-    )
+    print("RUNTIME_REPOSITORY_IB_VIRTUAL_LEG_CONFIRMED_BOOTSTRAP_CHECK=OK")
     return 0
 
 

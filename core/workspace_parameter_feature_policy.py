@@ -55,8 +55,7 @@ def workspace_parameter_feature_profile_for_edition(
     )
 
 
-def current_workspace_parameter_feature_profile(
-) -> WorkspaceParameterFeatureProfile:
+def current_workspace_parameter_feature_profile() -> WorkspaceParameterFeatureProfile:
     """Прочитати поточну edition з конфігурації та повернути feature profile."""
     license_block: Mapping[str, object] | None = None
     config = session_state.CURRENT_CONFIG

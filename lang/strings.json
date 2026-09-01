@@ -107,5 +107,9 @@
     "pl": "Break-even:",
     "de": "Break-even:",
     "fr": "À l’équilibre :"
+  },
+  "AlgorithmWorkspaceParametersDialog.logicLegacy": {
+    "en": "Legacy",
+    "uk": "Legacy"
   }
 }

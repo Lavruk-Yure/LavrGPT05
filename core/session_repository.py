@@ -83,8 +83,7 @@ class SessionRepository:
             raise SessionRepositoryError("workspace_order must be a list")
 
         normalized_order = [
-            normalize_workspace_uid(workspace_uid)
-            for workspace_uid in workspace_order
+            normalize_workspace_uid(workspace_uid) for workspace_uid in workspace_order
         ]
 
         active_workspace_uid = data.get("active_workspace_uid")
@@ -96,9 +95,7 @@ class SessionRepository:
             "layout_locked": bool(data.get("layout_locked", False)),
             "active_workspace_uid": active_workspace_uid,
             "workspace_order": normalized_order,
-            "main_window": self._normalize_main_window_state(
-                data.get("main_window")
-            ),
+            "main_window": self._normalize_main_window_state(data.get("main_window")),
             "table_column_widths": self._normalize_table_column_widths(
                 data.get("table_column_widths")
             ),
@@ -112,8 +109,7 @@ class SessionRepository:
             raise SessionRepositoryError("workspace_order must be a list")
 
         normalized_order = [
-            normalize_workspace_uid(workspace_uid)
-            for workspace_uid in workspace_order
+            normalize_workspace_uid(workspace_uid) for workspace_uid in workspace_order
         ]
 
         active_workspace_uid = manifest.get("active_workspace_uid")
@@ -187,9 +183,7 @@ class SessionRepository:
         """Прочитати workspace та відновити його як RESTORED."""
         path = self.workspace_path(workspace_uid)
         if not path.exists():
-            raise SessionRepositoryError(
-                f"Workspace file does not exist: {path.name}"
-            )
+            raise SessionRepositoryError(f"Workspace file does not exist: {path.name}")
         data = self._read_json(path)
         return AlgorithmWorkspace.from_storage_dict(data)
 

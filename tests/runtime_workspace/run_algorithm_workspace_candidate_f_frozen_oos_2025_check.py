@@ -245,28 +245,18 @@ def main() -> None:
     cancel_macd_invalid = algorithm.deferred_cancelled_macd_invalid
     cancel_opposite_alligator = algorithm.deferred_cancelled_opposite_alligator
     expires = algorithm.deferred_expired
-    cancels = (
-        cancel_opposite_macd
-        + cancel_macd_invalid
-        + cancel_opposite_alligator
-    )
+    cancels = cancel_opposite_macd + cancel_macd_invalid + cancel_opposite_alligator
 
     print("Algorithm Workspace Candidate F Frozen OOS 2025 result")
     print(f"  dataset={HISTORY_FILE.name}")
-    print(
-        "  requested_period="
-        f"{OOS_START_UTC} -> {OOS_END_UTC}"
-    )
+    print("  requested_period=" f"{OOS_START_UTC} -> {OOS_END_UTC}")
     print(
         "  actual_period="
         f"{summary.period_start.isoformat()} -> {summary.period_end.isoformat()}"
     )
     print("  candidate_f_frozen_before_run=True")
     print("  macd_profile=8/17/5 EMA Close")
-    print(
-        "  macd_quality="
-        "prominence:0.000015,distance:0.000050,ABC:2.25"
-    )
+    print("  macd_quality=" "prominence:0.000015,distance:0.000050,ABC:2.25")
     print(
         "  candidate_f="
         "confirm:4,ttl:5,collapse:-0.700,weak_age:2,weak_opening:0.500,"
@@ -296,8 +286,7 @@ def main() -> None:
     print(f"  stop_loss_closes={summary.close_reason_count('STOP_LOSS')}")
     print(f"  take_profit_closes={summary.close_reason_count('TAKE_PROFIT')}")
     print(
-        "  profit_drawdown_closes="
-        f"{summary.close_reason_count('PROFIT_DRAWDOWN')}"
+        "  profit_drawdown_closes=" f"{summary.close_reason_count('PROFIT_DRAWDOWN')}"
     )
     print(f"  session_end_closes={summary.close_reason_count('SESSION_END')}")
     print(f"  net_profit={summary.net_profit:+.2f}")

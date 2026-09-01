@@ -248,10 +248,7 @@ def _final_candidate_class(source_30, source_33, source_35):
             if len(history) < 3:
                 return output
             oldest = history[0]
-            if (
-                oldest.normalized_slope is None
-                or oldest.normalized_opening is None
-            ):
+            if oldest.normalized_slope is None or oldest.normalized_opening is None:
                 return output
 
             event_range = float(event.high - event.low)
@@ -394,9 +391,7 @@ def _run_candidate(
         )
 
         collapse_rejections = tuple(getattr(algorithm, "guard_rejections", ()))
-        structural_rejections = tuple(
-            getattr(algorithm, "structural_rejections", ())
-        )
+        structural_rejections = tuple(getattr(algorithm, "structural_rejections", ()))
         deferred_releases = tuple(getattr(algorithm, "deferred_releases", ()))
         broker_execution_attempted = any(
             bool(entry.details.get("broker_execution_attempted"))
@@ -411,9 +406,7 @@ def _run_candidate(
             winners=summary.winning_trades,
             losers=summary.losing_trades,
             stop_loss_closes=summary.close_reason_count("STOP_LOSS"),
-            profit_drawdown_closes=summary.close_reason_count(
-                "PROFIT_DRAWDOWN"
-            ),
+            profit_drawdown_closes=summary.close_reason_count("PROFIT_DRAWDOWN"),
             take_profit_closes=summary.close_reason_count("TAKE_PROFIT"),
             net_profit=summary.net_profit,
             maximum_drawdown=summary.maximum_drawdown,
@@ -429,16 +422,12 @@ def _run_candidate(
             cancelled_opposite_alligator=int(
                 getattr(algorithm, "cancelled_opposite_alligator", 0)
             ),
-            cancelled_macd_invalid=int(
-                getattr(algorithm, "cancelled_macd_invalid", 0)
-            ),
+            cancelled_macd_invalid=int(getattr(algorithm, "cancelled_macd_invalid", 0)),
             deferred_expired=int(getattr(algorithm, "expired", 0)),
             broker_execution_attempted=broker_execution_attempted,
         )
     finally:
-        workspace_alligator.ALLIGATOR_REGIME_TREND_START_CONFIRMATION_BARS = (
-            original
-        )
+        workspace_alligator.ALLIGATOR_REGIME_TREND_START_CONFIRMATION_BARS = original
 
 
 def _format_baseline(result) -> str:
@@ -600,16 +589,13 @@ def main() -> None:
     print("  source_chain=GREEN_ROADMAP101_30/33/35")
     print("  deferred_expiry_bars=5")
     print("  collapse_threshold=-0.700")
-    print(
-        "  weak_rule=active_age<=2 AND normalized_opening<0.500"
-    )
+    print("  weak_rule=active_age<=2 AND normalized_opening<0.500")
     print(
         "  spike_rule=range_ratio>=3.500 AND "
         "(opening_delta<-0.500 OR slope_delta<-0.010)"
     )
     print(
-        "  overextended_rule=normalized_slope>=0.200 AND "
-        "normalized_opening>=3.000"
+        "  overextended_rule=normalized_slope>=0.200 AND " "normalized_opening>=3.000"
     )
     print("  range_reference=MEAN_20_PREVIOUS_COMPLETED_M15_BARS")
 
@@ -620,18 +606,11 @@ def main() -> None:
         print(f"  {key}_a_current_3bar={_format_baseline(baseline)}")
         print(f"  {key}_f_final_candidate={_format_candidate(result)}")
         print(f"  {key}_f_minus_a={_format_delta(baseline, result)}")
+        print(f"  {key}_collapse_rejected=" f"{_format_collapse_rejections(result)}")
         print(
-            f"  {key}_collapse_rejected="
-            f"{_format_collapse_rejections(result)}"
+            f"  {key}_structural_rejected=" f"{_format_structural_rejections(result)}"
         )
-        print(
-            f"  {key}_structural_rejected="
-            f"{_format_structural_rejections(result)}"
-        )
-        print(
-            f"  {key}_deferred_lifecycle="
-            f"{_format_deferred_lifecycle(result)}"
-        )
+        print(f"  {key}_deferred_lifecycle=" f"{_format_deferred_lifecycle(result)}")
 
     print(f"  aggregate_a_current_3bar={_format_aggregate(baseline_total)}")
     print(f"  aggregate_f_final_candidate={_format_aggregate(candidate_total)}")

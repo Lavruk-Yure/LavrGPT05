@@ -325,9 +325,7 @@ class AlgorithmWorkspace:
                 else dict(parameters)
             ),
             risk_settings=dict(risk_settings or {}),
-            profit_protection=dict(
-                profit_protection or DEFAULT_PROFIT_PROTECTION
-            ),
+            profit_protection=dict(profit_protection or DEFAULT_PROFIT_PROTECTION),
             replay_settings=dict(replay_settings or {}),
             history_download_settings=dict(history_download_settings or {}),
             indicator_profile_bindings=(
@@ -358,9 +356,7 @@ class AlgorithmWorkspace:
             account_mode = infer_account_mode(broker, account_id)
 
         replay_settings = dict(data.get("replay_settings") or {})
-        history_download_settings = dict(
-            data.get("history_download_settings") or {}
-        )
+        history_download_settings = dict(data.get("history_download_settings") or {})
         if not history_download_settings:
             legacy_start = replay_settings.get("download_start_date")
             legacy_end = replay_settings.get("download_end_date")
@@ -392,9 +388,7 @@ class AlgorithmWorkspace:
             timeframe=str(data.get("timeframe") or ""),
             algorithm=str(data.get("algorithm") or ""),
             data_mode=normalize_legacy_data_mode(data.get("data_mode")),
-            control_mode=str(
-                data.get("control_mode") or WORKSPACE_CONTROL_MODE_SEMI
-            ),
+            control_mode=str(data.get("control_mode") or WORKSPACE_CONTROL_MODE_SEMI),
             parameters=dict(data.get("parameters") or {}),
             risk_settings=dict(data.get("risk_settings") or {}),
             profit_protection=dict(
@@ -431,12 +425,8 @@ class AlgorithmWorkspace:
             "risk_settings": dict(self.risk_settings),
             "profit_protection": dict(self.profit_protection),
             "replay_settings": dict(self.replay_settings),
-            "history_download_settings": dict(
-                self.history_download_settings
-            ),
-            "indicator_profile_bindings": dict(
-                self.indicator_profile_bindings
-            ),
+            "history_download_settings": dict(self.history_download_settings),
+            "indicator_profile_bindings": dict(self.indicator_profile_bindings),
             "ui_state": dict(self.ui_state),
             "has_started_once": self.has_started_once,
             "created_utc": self.created_utc,
@@ -479,9 +469,7 @@ class AlgorithmWorkspace:
             risk_settings,
             "risk_settings",
         )
-        self.profit_protection = self._normalize_profit_protection(
-            profit_protection
-        )
+        self.profit_protection = self._normalize_profit_protection(profit_protection)
         self.updated_utc = utc_now_iso()
 
     def set_indicator_profile_bindings(
@@ -490,9 +478,7 @@ class AlgorithmWorkspace:
     ) -> None:
         """Оновити відтворювані bindings профілів MACD та Alligator."""
         self.indicator_profile_bindings = (
-            normalize_workspace_indicator_profile_bindings(
-                indicator_profile_bindings
-            )
+            normalize_workspace_indicator_profile_bindings(indicator_profile_bindings)
         )
         self.updated_utc = utc_now_iso()
 
@@ -575,9 +561,7 @@ class AlgorithmWorkspace:
             return infer_account_mode(broker, account_id)
         normalized = text.upper()
         if normalized not in WORKSPACE_ACCOUNT_MODES:
-            raise AlgorithmWorkspaceError(
-                f"Invalid account_mode: {normalized}"
-            )
+            raise AlgorithmWorkspaceError(f"Invalid account_mode: {normalized}")
         return normalized
 
     @classmethod

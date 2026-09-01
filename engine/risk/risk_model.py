@@ -360,9 +360,7 @@ class WorkspaceRiskEvaluator:
             )
             if request.daily_realized_pnl is not None:
                 daily_loss_percent = (
-                    max(0.0, -request.daily_realized_pnl)
-                    / request.equity
-                    * 100.0
+                    max(0.0, -request.daily_realized_pnl) / request.equity * 100.0
                 )
         reason_code, reason_text = self._block_reason(
             request,

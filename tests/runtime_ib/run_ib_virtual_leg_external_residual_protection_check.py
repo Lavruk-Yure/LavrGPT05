@@ -113,7 +113,7 @@ def main() -> int:
                 "time": "20260803 09:30:00",
                 "order_id": 500,
                 "perm_id": 90500,
-            }
+            },
         ],
         "open_orders": [
             _protective_order(

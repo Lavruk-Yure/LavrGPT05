@@ -52,9 +52,7 @@ def _require_equal(
 ) -> None:
     """Require exact equality with a useful failure message."""
     if actual != expected:
-        raise AssertionError(
-            f"{message}: expected={expected!r}, actual={actual!r}"
-        )
+        raise AssertionError(f"{message}: expected={expected!r}, actual={actual!r}")
 
 
 def _require_true(value: bool, message: str) -> None:

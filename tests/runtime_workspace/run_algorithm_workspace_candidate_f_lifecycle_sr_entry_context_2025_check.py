@@ -146,10 +146,7 @@ def _lifecycle_bucket(item: Any) -> str:
     if item.ordering_stability_5 < 0.60 or item.efficiency_5 <= 0.0:
         return "LOW_CONTINUITY"
     late = item.same_regime_age >= 8
-    decay = (
-        item.efficiency_5 < 0.25
-        and item.macd_recovery_from_extreme_20 >= 0.50
-    )
+    decay = item.efficiency_5 < 0.25 and item.macd_recovery_from_extreme_20 >= 0.50
     if late and decay:
         return "LATE_DECAY"
     if late:
@@ -395,9 +392,7 @@ def _write_csv(contexts: tuple[EntryContext, ...]) -> Path:
                     ),
                     "regime_changes_8_causal": lifecycle.regime_changes_8,
                     "bars_since_flat_40_causal": lifecycle.bars_since_flat_40,
-                    "bars_since_opposite_40_causal": (
-                        lifecycle.bars_since_opposite_40
-                    ),
+                    "bars_since_opposite_40_causal": (lifecycle.bars_since_opposite_40),
                     "macd_recovery_from_extreme_20_causal": (
                         f"{lifecycle.macd_recovery_from_extreme_20:.6f}"
                     ),
@@ -614,8 +609,7 @@ def main() -> None:
         (
             "STOP_LT12_AND_TRANSITION",
             lambda row: (
-                row.stop_distance_bin == "<12"
-                and row.lifecycle_bucket == "TRANSITION"
+                row.stop_distance_bin == "<12" and row.lifecycle_bucket == "TRANSITION"
             ),
         ),
         (
@@ -661,8 +655,7 @@ def main() -> None:
         (
             "TRANSITION_AND_TAKE_NONE",
             lambda row: (
-                row.lifecycle_bucket == "TRANSITION"
-                and row.take_room_bin == "NONE"
+                row.lifecycle_bucket == "TRANSITION" and row.take_room_bin == "NONE"
             ),
         ),
         (

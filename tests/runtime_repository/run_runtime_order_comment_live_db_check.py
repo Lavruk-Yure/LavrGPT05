@@ -17,9 +17,7 @@ from engine.db.runtime_db import SCHEMA_VERSION  # noqa: E402
 def _column_names(connection: sqlite3.Connection, table_name: str) -> set[str]:
     return {
         str(row[1])
-        for row in connection.execute(
-            f"PRAGMA table_info({table_name});"
-        ).fetchall()
+        for row in connection.execute(f"PRAGMA table_info({table_name});").fetchall()
     }
 
 
@@ -36,9 +34,7 @@ def main() -> int:
     connection.row_factory = sqlite3.Row
 
     try:
-        schema_version = int(
-            connection.execute("PRAGMA user_version").fetchone()[0]
-        )
+        schema_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
         assert schema_version == SCHEMA_VERSION == 7
         assert "comment" in _column_names(connection, "trades")
         assert "broker_comment" in _column_names(
@@ -50,12 +46,8 @@ def main() -> int:
             "ib_virtual_position_leg_orders",
         )
 
-        integrity = str(
-            connection.execute("PRAGMA integrity_check").fetchone()[0]
-        )
-        foreign_key_rows = connection.execute(
-            "PRAGMA foreign_key_check"
-        ).fetchall()
+        integrity = str(connection.execute("PRAGMA integrity_check").fetchone()[0])
+        foreign_key_rows = connection.execute("PRAGMA foreign_key_check").fetchall()
         assert integrity == "ok"
         assert not foreign_key_rows
 

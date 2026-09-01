@@ -42,9 +42,7 @@ def _require_equal(
     Перевірити точну рівність.
     """
     if actual != expected:
-        raise AssertionError(
-            f"{message}: expected={expected!r}, actual={actual!r}"
-        )
+        raise AssertionError(f"{message}: expected={expected!r}, actual={actual!r}")
 
 
 def _build_contract() -> Contract:
@@ -166,10 +164,7 @@ def main() -> int:
             "  replacement_pair_survivor_leg="
             f"{plan['replacement_pair_survivor_leg']}"
         )
-        print(
-            "  replacement_pair_create_leg="
-            f"{plan['replacement_pair_create_leg']}"
-        )
+        print("  replacement_pair_create_leg=" f"{plan['replacement_pair_create_leg']}")
 
         _require_equal(plan["blocked"], False, "Planner blocked")
         _require_equal(
@@ -224,10 +219,7 @@ def main() -> int:
         oca_group = execution_package["oca_group"]
 
         print("Replacement pair preparation")
-        print(
-            "  order_ids="
-            f"{sorted(execution_package['operation_order_ids'])}"
-        )
+        print("  order_ids=" f"{sorted(execution_package['operation_order_ids'])}")
         print(f"  oca_group={oca_group!r}")
         print(
             "  staged_transmit="

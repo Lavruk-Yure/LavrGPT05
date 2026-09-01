@@ -328,23 +328,14 @@ def _assert_incomplete_higher_bucket_breaks_sync(
     assert algorithm.higher_timeframe_synchronized
 
     for index in range(354, 368):
-        assert (
-            _feed_public_algorithm_path(algorithm, _event(index, 1.2000))
-            is not None
-        )
+        assert _feed_public_algorithm_path(algorithm, _event(index, 1.2000)) is not None
         assert algorithm.higher_timeframe_synchronized
 
-    assert (
-        _feed_public_algorithm_path(algorithm, _event(368, 1.2000))
-        is None
-    )
+    assert _feed_public_algorithm_path(algorithm, _event(368, 1.2000)) is None
     assert not algorithm.higher_timeframe_synchronized
 
     for index in range(369, 384):
-        assert (
-            _feed_public_algorithm_path(algorithm, _event(index, 1.2000))
-            is None
-        )
+        assert _feed_public_algorithm_path(algorithm, _event(index, 1.2000)) is None
         assert not algorithm.higher_timeframe_synchronized
 
     recovered = _feed_public_algorithm_path(
@@ -359,9 +350,7 @@ def _assert_unavailable_pair_has_no_fallback(
     workspace: AlgorithmWorkspace,
 ) -> None:
     unavailable_workspace = replace(workspace, timeframe="H4")
-    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(
-        unavailable_workspace.algorithm
-    )
+    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(unavailable_workspace.algorithm)
     context = WorkspaceRuntimeContext.from_workspace(unavailable_workspace)
     blocked = False
     try:
@@ -381,9 +370,7 @@ def _assert_disabled_filter_ignores_stale_mode(
         timeframe="H4",
         parameters=parameters,
     )
-    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(
-        disabled_workspace.algorithm
-    )
+    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(disabled_workspace.algorithm)
     context = WorkspaceRuntimeContext.from_workspace(disabled_workspace)
     algorithm.configure(context, disabled_workspace.parameters)
     assert algorithm.signal_filter is not None
@@ -484,10 +471,13 @@ def main() -> None:
         ALLIGATOR_CONFIRMATION_HIGHER_2_BULLISH,
         ALLIGATOR_CONFIRMATION_HIGHER_2_BEARISH,
     ]
-    assert sum(
-        record.alligator_confirmation == ALLIGATOR_CONFIRMATION_HIGHER_2_WARMUP
-        for record in rejected
-    ) == 3
+    assert (
+        sum(
+            record.alligator_confirmation == ALLIGATOR_CONFIRMATION_HIGHER_2_WARMUP
+            for record in rejected
+        )
+        == 3
+    )
     assert all(
         record.filter_decision
         in {WORKSPACE_SIGNAL_FILTER_ALLOW, WORKSPACE_SIGNAL_FILTER_REJECT}

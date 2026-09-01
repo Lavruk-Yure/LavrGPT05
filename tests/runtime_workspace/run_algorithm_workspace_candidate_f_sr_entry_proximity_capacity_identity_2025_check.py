@@ -145,8 +145,7 @@ def _economically_same(left: Any, right: Any) -> bool:
         (left.final_profit, right.final_profit),
     )
     return all(
-        math.isclose(a, b, rel_tol=0.0, abs_tol=EPSILON)
-        for a, b in numeric_pairs
+        math.isclose(a, b, rel_tol=0.0, abs_tol=EPSILON) for a, b in numeric_pairs
     )
 
 
@@ -212,9 +211,9 @@ def _attribution(
     rejection_keys = tuple(
         _rejection_key(gated_runtime, item) for item in gate_rejections
     )
-    assert len(set(rejection_keys)) == len(rejection_keys), (
-        "gate rejection semantic key must be unique"
-    )
+    assert len(set(rejection_keys)) == len(
+        rejection_keys
+    ), "gate rejection semantic key must be unique"
     rejection_set = frozenset(rejection_keys)
 
     retained_keys = baseline_keys & full_keys
@@ -331,14 +330,8 @@ def main() -> None:
     print("  production_exit_policy_changed=False")
     print("  full_replay_capacity_attribution_only=True")
     print("  future_price_used=False")
-    print(
-        "  semantic_signal_key="
-        "SYMBOL|TIMEFRAME|SIGNAL_TIMESTAMP|DIRECTION"
-    )
-    print(
-        "  semantic_trade_key="
-        "SEMANTIC_SIGNAL_KEY|ENTRY_TIMESTAMP"
-    )
+    print("  semantic_signal_key=" "SYMBOL|TIMEFRAME|SIGNAL_TIMESTAMP|DIRECTION")
+    print("  semantic_trade_key=" "SEMANTIC_SIGNAL_KEY|ENTRY_TIMESTAMP")
     print(
         "  baseline="
         f"trades:{baseline_performance.trades},"
@@ -349,18 +342,9 @@ def main() -> None:
     )
     print("  independent_baseline_replay_identity:")
     print(f"    runtime_uid_overlap={determinism.uid_overlap}/59")
-    print(
-        "    semantic_signal_overlap="
-        f"{determinism.semantic_signal_overlap}/59"
-    )
-    print(
-        "    semantic_trade_overlap="
-        f"{determinism.semantic_trade_overlap}/59"
-    )
-    print(
-        "    economically_identical="
-        f"{determinism.economically_identical}/59"
-    )
+    print("    semantic_signal_overlap=" f"{determinism.semantic_signal_overlap}/59")
+    print("    semantic_trade_overlap=" f"{determinism.semantic_trade_overlap}/59")
+    print("    economically_identical=" f"{determinism.economically_identical}/59")
     print("  semantic_capacity_attribution:")
     for item in attributions:
         print(_attribution_line(item))
@@ -373,15 +357,9 @@ def main() -> None:
         "  runtime_uid_not_used_for_cross_replay_identity="
         f"{runtime_uid_not_used_for_cross_replay_identity}"
     )
-    print(
-        "  baseline_partition_invariant="
-        f"{baseline_partition_invariant}"
-    )
+    print("  baseline_partition_invariant=" f"{baseline_partition_invariant}")
     print(f"  full_partition_invariant={full_partition_invariant}")
-    print(
-        "  retained_trade_identity_stable="
-        f"{retained_trade_identity_stable}"
-    )
+    print("  retained_trade_identity_stable=" f"{retained_trade_identity_stable}")
     print("  completed_bars_only=True")
     print("  causal_survival_role_zones_only=True")
     print("  entry_gate_applied_to_production=False")

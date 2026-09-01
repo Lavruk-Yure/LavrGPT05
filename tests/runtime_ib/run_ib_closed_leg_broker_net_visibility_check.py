@@ -66,9 +66,7 @@ def _build_reconciliation() -> IBVirtualPositionLegReconciliationSnapshot:
             BROKER_POSITION_ID: IB_RECONCILIATION_STATUS_RECONCILED,
         },
         group_messages={
-            BROKER_POSITION_ID: (
-                "Historical closed LGE leg was reconciled",
-            ),
+            BROKER_POSITION_ID: ("Historical closed LGE leg was reconciled",),
         },
         unmapped_protective_order_ids=[],
         group_broker_residual_signed_volumes={BROKER_POSITION_ID: 0.0},
@@ -119,17 +117,13 @@ def main() -> int:
     if active_group.legs:
         raise AssertionError("Historical CLOSED legs leaked into NET_ONLY")
 
-    if active_group.reconciliation_status != (
-        IB_RECONCILIATION_STATUS_UNRECONCILED
-    ):
+    if active_group.reconciliation_status != (IB_RECONCILIATION_STATUS_UNRECONCILED):
         raise AssertionError("Broker NET reconciliation status differs")
 
     if not active_group.broker_position_present:
         raise AssertionError("Active broker row was lost")
 
-    if active_group.broker_position_kind != (
-        IB_BROKER_POSITION_KIND_VIRTUAL_FX
-    ):
+    if active_group.broker_position_kind != (IB_BROKER_POSITION_KIND_VIRTUAL_FX):
         raise AssertionError("IB CASH broker kind differs")
 
     if active_group.display_side != "BUY":
@@ -147,9 +141,7 @@ def main() -> int:
     )
     historical_group = historical_snapshot.groups[0]
 
-    if historical_group.group_mode != (
-        IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS
-    ):
+    if historical_group.group_mode != (IB_POSITION_GROUP_MODE_LGE_VIRTUAL_LEGS):
         raise AssertionError("Historical-only group mode changed")
 
     if historical_group.broker_position_present:

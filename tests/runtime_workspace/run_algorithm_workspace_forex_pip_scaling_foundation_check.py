@@ -32,10 +32,7 @@ def main() -> None:
     assert FOREX_STANDARD_PIP_SIZE == 0.0001
     assert FOREX_JPY_QUOTE_PIP_SIZE == 0.01
 
-    actual = {
-        symbol: resolve_forex_pip_size(symbol)
-        for symbol in EXPECTED_PIP_SIZES
-    }
+    actual = {symbol: resolve_forex_pip_size(symbol) for symbol in EXPECTED_PIP_SIZES}
     assert actual == EXPECTED_PIP_SIZES
 
     assert resolve_forex_pip_size("eurusd") == 0.0001
@@ -65,15 +62,13 @@ def main() -> None:
     print(
         "  pip_sizes="
         + ",".join(
-            f"{symbol}:{pip_size:g}"
-            for symbol, pip_size in EXPECTED_PIP_SIZES.items()
+            f"{symbol}:{pip_size:g}" for symbol, pip_size in EXPECTED_PIP_SIZES.items()
         )
     )
     print(
         "  abc_value_scales="
         + ",".join(
-            f"{symbol}:{value_scales[symbol]:g}"
-            for symbol in EXPECTED_PIP_SIZES
+            f"{symbol}:{value_scales[symbol]:g}" for symbol in EXPECTED_PIP_SIZES
         )
     )
     print("  inverse_abc_scale_matches_pip=True")

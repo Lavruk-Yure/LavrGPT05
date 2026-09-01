@@ -86,9 +86,7 @@ def _workspace() -> AlgorithmWorkspace:
             "macd_signal_enabled": True,
             "macd_signal_mode": "LINEAR",
             "alligator_filter_enabled": True,
-            "alligator_confirmation": (
-                WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME
-            ),
+            "alligator_confirmation": (WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME),
             "warmup_bars": 25,
             "spread_limit": 0.00020,
         },
@@ -169,15 +167,12 @@ def _elapsed(value: float | None) -> str:
 
 def main() -> None:
     if not M1_FILE.is_file():
-        raise FileNotFoundError(
-            "Real EURUSD M1 history is required: " + str(M1_FILE)
-        )
+        raise FileNotFoundError("Real EURUSD M1 history is required: " + str(M1_FILE))
 
     completed: list[ZeroLineRunResult] = []
     for policy in MACD_ZERO_LINE_POLICIES:
         print(
-            "MACD Zero-Line Comparison: running "
-            f"policy={policy} ...",
+            "MACD Zero-Line Comparison: running " f"policy={policy} ...",
             flush=True,
         )
         result = _run(policy)
@@ -220,14 +215,8 @@ def main() -> None:
     )
 
     assert directional.signals + opposite.signals == BASELINE_SIGNALS
-    assert (
-        directional.buy_signals + opposite.buy_signals
-        == BASELINE_BUY_SIGNALS
-    )
-    assert (
-        directional.sell_signals + opposite.sell_signals
-        == BASELINE_SELL_SIGNALS
-    )
+    assert directional.buy_signals + opposite.buy_signals == BASELINE_BUY_SIGNALS
+    assert directional.sell_signals + opposite.sell_signals == BASELINE_SELL_SIGNALS
     assert (
         directional.alligator_allow + opposite.alligator_allow
         == BASELINE_ALLIGATOR_ALLOW

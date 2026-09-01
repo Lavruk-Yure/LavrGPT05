@@ -167,10 +167,7 @@ def main() -> int:
     print("T104-12 Dominant Acceleration Stability result")
     print(f"  test_id={TEST_ID}")
     print(f"  roadmap_block={ROADMAP_BLOCK}")
-    print(
-        "  mode=RM104_T104_12_8C13_DOMINANT_ACCELERATION_STABILITY_"
-        "TEST_ONLY"
-    )
+    print("  mode=RM104_T104_12_8C13_DOMINANT_ACCELERATION_STABILITY_" "TEST_ONLY")
     print("  base_test_id=T104-11")
     print("  production_candidate_f_logic_changed=False")
     print("  production_entry_logic_changed=False")
@@ -238,9 +235,7 @@ def main() -> int:
     print("  causal_selection_unchanged_from_t104_11=True")
     print("  broker_requests=0")
     print("  broker_execution_attempted=False")
-    print(
-        "T104_12_ALGORITHM_WORKSPACE_DOMINANT_ACCELERATION_STABILITY_CHECK=OK"
-    )
+    print("T104_12_ALGORITHM_WORKSPACE_DOMINANT_ACCELERATION_STABILITY_CHECK=OK")
     return 0
 
 

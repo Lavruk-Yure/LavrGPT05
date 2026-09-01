@@ -37,9 +37,10 @@ def main() -> None:
     with TemporaryDirectory() as temp_dir:
         directory = Path(temp_dir)
         default_writer = WorkspaceHistoryCsvWriter()
-        assert default_writer.history_root == (
-            get_base_dir() / "data" / "history"
-        ).resolve()
+        assert (
+            default_writer.history_root
+            == (get_base_dir() / "data" / "history").resolve()
+        )
         repository = SessionRepository(directory / "Session")
         controller = AlgorithmWorkspaceController(repository)
         workspace = controller.create_workspace(
@@ -79,9 +80,7 @@ def main() -> None:
             custom,
         )
         persisted = repository.load_workspace(workspace.workspace_uid)
-        persisted_values = WorkspaceHistoryDownloadSettings.from_workspace(
-            persisted
-        )
+        persisted_values = WorkspaceHistoryDownloadSettings.from_workspace(persisted)
         assert persisted_values == custom
         assert "download_start_date" not in updated.replay_settings
         assert "download_end_date" not in updated.replay_settings

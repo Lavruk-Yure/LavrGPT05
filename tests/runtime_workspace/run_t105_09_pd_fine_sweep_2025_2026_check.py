@@ -229,9 +229,7 @@ def main() -> None:
         all_results.extend(results)
 
         baseline = next(
-            result
-            for result in results
-            if result.threshold == BASELINE_THRESHOLD
+            result for result in results if result.threshold == BASELINE_THRESHOLD
         )
         _assert_baseline(spec, baseline)
 
@@ -266,9 +264,9 @@ def main() -> None:
         )
         assert len(threshold_results) == len(PERIODS)
         combined_net = math.fsum(result.net for result in threshold_results)
-        mean_pf = math.fsum(
-            result.profit_factor for result in threshold_results
-        ) / len(threshold_results)
+        mean_pf = math.fsum(result.profit_factor for result in threshold_results) / len(
+            threshold_results
+        )
         worst_dd = max(result.drawdown for result in threshold_results)
         print(
             f"    threshold={threshold:.0f}% "

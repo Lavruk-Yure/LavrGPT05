@@ -160,9 +160,7 @@ def _run(
 ]:
     replay_settings = dict(workspace.replay_settings)
     replay_settings["speed"] = speed
-    replay_settings[
-        REPLAY_RISK_SETTING_DAILY_REALIZED_PNL
-    ] = daily_realized_pnl
+    replay_settings[REPLAY_RISK_SETTING_DAILY_REALIZED_PNL] = daily_realized_pnl
     run_workspace = replace(workspace, replay_settings=replay_settings)
     runtime = WorkspaceRuntime(
         run_workspace,
@@ -219,9 +217,7 @@ def main() -> None:
             ),
             "step": _run(workspace, speed=1, step_mode=True),
         }
-        baseline_records, baseline_journal, baseline_snapshot, chart_events = (
-            runs["1x"]
-        )
+        baseline_records, baseline_journal, baseline_snapshot, chart_events = runs["1x"]
         assert len(baseline_records) == 8
         assert chart_events == 8
         assert not baseline_records[0].accepted
@@ -246,9 +242,7 @@ def main() -> None:
             assert journal == baseline_journal
             assert snapshot == baseline_snapshot
             assert total_events == chart_events
-            assert all(
-                not record.risk_execution_attempted for record in records
-            )
+            assert all(not record.risk_execution_attempted for record in records)
 
         missing_records, missing_journal, missing_snapshot, _unused = _run(
             workspace,
@@ -264,8 +258,7 @@ def main() -> None:
             for record in missing_records[1:]
         )
         assert all(
-            record.risk_reason_code
-            == RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
+            record.risk_reason_code == RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
             for record in missing_records[1:]
         )
         assert len(missing_journal) == 7

@@ -106,22 +106,16 @@ def main() -> None:
         assert updated.risk_settings["risk_percent"] == 0.75
         assert updated.risk_settings["maximum_position_volume"] == 3000.0
         assert updated.risk_settings["future_risk"] == "KEEP"
-        assert updated.profit_protection[
-            "max_profit_drawdown_percent"
-        ] == 27.5
+        assert updated.profit_protection["max_profit_drawdown_percent"] == 27.5
         assert updated.profit_protection["minimum_profit"] == 20.0
         assert updated.profit_protection["future_profit_guard"] == "KEEP"
 
         persisted = repository.load_workspace(first.workspace_uid)
-        restored_values = WorkspaceAlgorithmParameters.from_workspace(
-            persisted
-        )
+        restored_values = WorkspaceAlgorithmParameters.from_workspace(persisted)
         assert restored_values == custom
 
         second_persisted = repository.load_workspace(second.workspace_uid)
-        assert WorkspaceAlgorithmParameters.from_workspace(
-            second_persisted
-        ) == defaults
+        assert WorkspaceAlgorithmParameters.from_workspace(second_persisted) == defaults
 
         runtime = controller.attach_workspace_runtime(persisted)
         assert runtime.context.runtime_state == WORKSPACE_STATE_STOPPED
@@ -129,9 +123,7 @@ def main() -> None:
         assert runtime.context.spread_limit == 0.00018
         assert runtime.context.profit_drawdown_close_percent == 27.5
         assert runtime.algorithm_parameters["macd_signal_mode"] == "EXTENDED"
-        assert runtime.algorithm_parameters["alligator_confirmation"] == (
-            "HIGHER_1"
-        )
+        assert runtime.algorithm_parameters["alligator_confirmation"] == ("HIGHER_1")
 
         controller.begin_workspace_runtime_start(first.workspace_uid)
         active_edit_blocked = False
@@ -149,12 +141,18 @@ def main() -> None:
         assert runtime.context.runtime_state == WORKSPACE_STATE_STOPPED
         controller.update_workspace_parameters(first.workspace_uid, custom)
 
-        assert WorkspaceAlgorithmParameters(
-            profit_drawdown_close_percent=1.0
-        ).profit_drawdown_close_percent == 1.0
-        assert WorkspaceAlgorithmParameters(
-            profit_drawdown_close_percent=100.0
-        ).profit_drawdown_close_percent == 100.0
+        assert (
+            WorkspaceAlgorithmParameters(
+                profit_drawdown_close_percent=1.0
+            ).profit_drawdown_close_percent
+            == 1.0
+        )
+        assert (
+            WorkspaceAlgorithmParameters(
+                profit_drawdown_close_percent=100.0
+            ).profit_drawdown_close_percent
+            == 100.0
+        )
 
         invalid_values_blocked = 0
         invalid_payloads = (
@@ -186,17 +184,11 @@ def main() -> None:
         print("Algorithm Workspace Parameters result")
         print(f"  workspace_uid={first.workspace_uid}")
         print(f"  macd_signal_mode={custom.macd_signal_mode}")
-        print(
-            "  alligator_confirmation="
-            f"{custom.alligator_confirmation}"
-        )
+        print("  alligator_confirmation=" f"{custom.alligator_confirmation}")
         print(f"  spread_limit={custom.spread_limit:.6f}")
         print(f"  warmup_bars={custom.warmup_bars}")
         print(f"  risk_percent={custom.risk_percent:.2f}%")
-        print(
-            "  maximum_position_volume="
-            f"{custom.maximum_position_volume:.2f}"
-        )
+        print("  maximum_position_volume=" f"{custom.maximum_position_volume:.2f}")
         print(
             "  profit_drawdown_close_percent="
             f"{custom.profit_drawdown_close_percent:.1f}%"

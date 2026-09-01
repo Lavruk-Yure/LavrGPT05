@@ -102,9 +102,9 @@ class WorkspaceTimeframeAggregator:
                     "timeframe buckets must be strictly ordered"
                 )
             self._last_boundary_crossed = True
-            skipped_buckets = int(
-                (bucket_start - self._bucket_start) // self._target_delta
-            ) - 1
+            skipped_buckets = (
+                int((bucket_start - self._bucket_start) // self._target_delta) - 1
+            )
             if skipped_buckets > 0:
                 self._dropped_incomplete_buckets += skipped_buckets
                 self._last_boundary_was_incomplete = True

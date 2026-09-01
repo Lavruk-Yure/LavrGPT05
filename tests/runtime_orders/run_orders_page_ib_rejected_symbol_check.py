@@ -55,9 +55,7 @@ class RejectedSymbolRuntimeEngine:
                 "control_mode": control_mode,
             }
         )
-        raise RuntimeError(
-            "IB contract details were not found for XAUUSD"
-        )
+        raise RuntimeError("IB contract details were not found for XAUUSD")
 
 
 def main() -> int:
@@ -69,9 +67,7 @@ def main() -> int:
     try:
         page.ui.cmbSymbol.addItem("XAUUSD")
         page.ui.cmbSymbol.setCurrentText("XAUUSD")
-        page.ui.cmbSide.setCurrentIndex(
-            page.ui.cmbSide.findData("BUY")
-        )
+        page.ui.cmbSide.setCurrentIndex(page.ui.cmbSide.findData("BUY"))
         page.ui.spinLots.setValue(0.01)
         page.ui.editStopLoss.clear()
         page.ui.editTakeProfit.clear()

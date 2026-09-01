@@ -691,12 +691,8 @@ class CTraderConnectionDialog(QDialog):
         відновлюється за стабільним внутрішнім account_id, а не за індексом
         або видимим trader login.
         """
-        current_account_id = str(
-            self.ui.comboAccountId.currentData() or ""
-        ).strip()
-        preferred_account_id = (
-            current_account_id or self._get_saved_account_id()
-        )
+        current_account_id = str(self.ui.comboAccountId.currentData() or "").strip()
+        preferred_account_id = current_account_id or self._get_saved_account_id()
 
         self.ui.comboAccountId.clear()
 
@@ -746,9 +742,7 @@ class CTraderConnectionDialog(QDialog):
                 account_id,
             )
 
-        preferred_index = self.ui.comboAccountId.findData(
-            preferred_account_id
-        )
+        preferred_index = self.ui.comboAccountId.findData(preferred_account_id)
         if preferred_index >= 0:
             self.ui.comboAccountId.setCurrentIndex(preferred_index)
 

@@ -115,9 +115,7 @@ def main() -> None:
         )
         assert quality_report_connected
 
-        startup_events = controller.advance_workspace_replay(
-            workspace.workspace_uid
-        )
+        startup_events = controller.advance_workspace_replay(workspace.workspace_uid)
         assert len(startup_events) == 2
         assert runtime.context.runtime_state == WORKSPACE_STATE_RUNNING
         assert runtime.context.warmup_complete
@@ -127,9 +125,7 @@ def main() -> None:
         assert controller.toggle_workspace_replay_pause(workspace.workspace_uid)
         stepped = controller.step_workspace_replay(workspace.workspace_uid)
         assert stepped is not None
-        assert not controller.toggle_workspace_replay_pause(
-            workspace.workspace_uid
-        )
+        assert not controller.toggle_workspace_replay_pause(workspace.workspace_uid)
         controller.set_workspace_replay_speed(workspace.workspace_uid, 5)
         controller.advance_workspace_replay(workspace.workspace_uid)
         assert session.completed

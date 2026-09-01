@@ -384,27 +384,63 @@ def _build_evidence() -> dict[str, Any]:
         ],
         "completed_orders": [
             _completed_order(
-                112, 111, "EUR", "SELL", "LMT", 1000.0, 1.151,
+                112,
+                111,
+                "EUR",
+                "SELL",
+                "LMT",
+                1000.0,
+                1.151,
                 "Cancelled",
             ),
             _completed_order(
-                113, 111, "EUR", "SELL", "STP", 1000.0, 1.144,
+                113,
+                111,
+                "EUR",
+                "SELL",
+                "STP",
+                1000.0,
+                1.144,
                 "Filled",
             ),
             _completed_order(
-                118, 117, "GBP", "SELL", "LMT", 3000.0, 1.361,
+                118,
+                117,
+                "GBP",
+                "SELL",
+                "LMT",
+                3000.0,
+                1.361,
                 "Cancelled",
             ),
             _completed_order(
-                119, 117, "GBP", "SELL", "STP", 3000.0, 1.349,
+                119,
+                117,
+                "GBP",
+                "SELL",
+                "STP",
+                3000.0,
+                1.349,
                 "Filled",
             ),
             _completed_order(
-                121, 120, "GBP", "BUY", "LMT", 2000.0, 1.349,
+                121,
+                120,
+                "GBP",
+                "BUY",
+                "LMT",
+                2000.0,
+                1.349,
                 "Filled",
             ),
             _completed_order(
-                122, 120, "GBP", "BUY", "STP", 2000.0, 1.359,
+                122,
+                120,
+                "GBP",
+                "BUY",
+                "STP",
+                2000.0,
+                1.359,
                 "Cancelled",
             ),
         ],
@@ -529,9 +565,7 @@ def _virtual_leg_state(engine: RuntimeEngine) -> dict[str, list[tuple]]:
         "ib_virtual_position_legs",
         "ib_virtual_position_leg_orders",
     ):
-        cursor = engine.connection.execute(
-            f"SELECT * FROM {table_name} ORDER BY id"
-        )
+        cursor = engine.connection.execute(f"SELECT * FROM {table_name} ORDER BY id")
         result[table_name] = [tuple(row) for row in cursor.fetchall()]
 
     return result
@@ -593,9 +627,7 @@ def main() -> int:
         snapshot = engine.get_open_runtime_position_legs()
         counts_after = _table_counts(engine)
 
-        legs_by_uid = {
-            leg.position_uid: leg for leg in snapshot.legs
-        }
+        legs_by_uid = {leg.position_uid: leg for leg in snapshot.legs}
         eurusd_id = f"IB:{ACCOUNT_ID}:EURUSD"
         gbpusd_id = f"IB:{ACCOUNT_ID}:GBPUSD"
 
@@ -605,14 +637,10 @@ def main() -> int:
         if service.evidence_calls != 1:
             raise AssertionError("Unexpected evidence service call count")
 
-        if snapshot.group_statuses[eurusd_id] != (
-            IB_RECONCILIATION_STATUS_RECONCILED
-        ):
+        if snapshot.group_statuses[eurusd_id] != (IB_RECONCILIATION_STATUS_RECONCILED):
             raise AssertionError("EURUSD group was not reconciled")
 
-        if snapshot.group_statuses[gbpusd_id] != (
-            IB_RECONCILIATION_STATUS_RECONCILED
-        ):
+        if snapshot.group_statuses[gbpusd_id] != (IB_RECONCILIATION_STATUS_RECONCILED):
             raise AssertionError("GBPUSD zero-net group was not reconciled")
 
         expected_statuses = [
@@ -622,14 +650,11 @@ def main() -> int:
             IB_LEG_STATUS_CLOSED,
         ]
         actual_statuses = [
-            legs_by_uid[position_uid].leg_status
-            for position_uid in position_uids
+            legs_by_uid[position_uid].leg_status for position_uid in position_uids
         ]
 
         if actual_statuses != expected_statuses:
-            raise AssertionError(
-                f"Unexpected leg statuses: {actual_statuses}"
-            )
+            raise AssertionError(f"Unexpected leg statuses: {actual_statuses}")
 
         remaining_leg = legs_by_uid[position_uids[1]]
 
@@ -652,12 +677,10 @@ def main() -> int:
             raise AssertionError("GBPUSD SELL close TP mapping mismatch")
 
         open_legs = [
-            leg for leg in snapshot.legs
-            if leg.leg_status == IB_LEG_STATUS_OPEN
+            leg for leg in snapshot.legs if leg.leg_status == IB_LEG_STATUS_OPEN
         ]
         closed_legs = [
-            leg for leg in snapshot.legs
-            if leg.leg_status == IB_LEG_STATUS_CLOSED
+            leg for leg in snapshot.legs if leg.leg_status == IB_LEG_STATUS_CLOSED
         ]
 
         orphan_evidence = _build_evidence()
@@ -667,9 +690,7 @@ def main() -> int:
         seeds = engine.repository.get_open_ib_virtual_position_leg_seeds(
             account_id=ACCOUNT_ID,
         )
-        seed_legs = build_ib_virtual_position_legs_from_repository_seeds(
-            seeds
-        )
+        seed_legs = build_ib_virtual_position_legs_from_repository_seeds(seeds)
         orphan_snapshot = reconcile_ib_virtual_position_legs(
             seed_legs,
             orphan_evidence,
@@ -681,9 +702,7 @@ def main() -> int:
             raise AssertionError("Closed-leg orphan order did not block group")
 
         foreign_client_evidence = _build_evidence()
-        foreign_client_evidence["completed_orders"][4][
-            "same_client_id"
-        ] = False
+        foreign_client_evidence["completed_orders"][4]["same_client_id"] = False
         foreign_client_snapshot = reconcile_ib_virtual_position_legs(
             seed_legs,
             foreign_client_evidence,
@@ -722,10 +741,8 @@ def main() -> int:
         if active_order_count != 6:
             raise AssertionError("Unexpected active virtual-leg order count")
 
-        persisted_open_seeds = (
-            engine.repository.get_open_ib_virtual_position_leg_seeds(
-                account_id=ACCOUNT_ID,
-            )
+        persisted_open_seeds = engine.repository.get_open_ib_virtual_position_leg_seeds(
+            account_id=ACCOUNT_ID,
         )
 
         if len(persisted_open_seeds) != 1:
@@ -765,9 +782,7 @@ def main() -> int:
 
         cash_fx_event_evidence = _build_cash_fx_stop_event_evidence()
         service.snapshot = cash_fx_event_evidence
-        cash_fx_event_result = (
-            engine.sync_reconciled_ib_virtual_position_legs()
-        )
+        cash_fx_event_result = engine.sync_reconciled_ib_virtual_position_legs()
         cash_fx_event_snapshot = cash_fx_event_result["snapshot"]
         cash_fx_event_leg = cash_fx_event_snapshot.legs[0]
 
@@ -782,10 +797,8 @@ def main() -> int:
         if cash_fx_event_leg.stop_loss_order_id != 116:
             raise AssertionError("CASH FX stop event order mapping mismatch")
 
-        event_open_seeds = (
-            engine.repository.get_open_ib_virtual_position_leg_seeds(
-                account_id=ACCOUNT_ID,
-            )
+        event_open_seeds = engine.repository.get_open_ib_virtual_position_leg_seeds(
+            account_id=ACCOUNT_ID,
         )
 
         if event_open_seeds:
@@ -801,24 +814,15 @@ def main() -> int:
         print(f"  remaining_parent_id={remaining_leg.parent_order_id}")
         print(f"  service_calls={service.evidence_calls}")
         print("  sqlite_read_only=True")
-        print(
-            "  persisted_legs="
-            f"{persisted_counts['ib_virtual_position_legs']}"
-        )
+        print("  persisted_legs=" f"{persisted_counts['ib_virtual_position_legs']}")
         print(
             "  persisted_order_history="
             f"{persisted_counts['ib_virtual_position_leg_orders']}"
         )
         print(f"  active_order_mappings={active_order_count}")
-        print(
-            "  repeat_sync_legs="
-            f"{repeat_result['persistence']['legs_written']}"
-        )
+        print("  repeat_sync_legs=" f"{repeat_result['persistence']['legs_written']}")
         print("  blocked_sync_rejected=True")
-        print(
-            "  orphan_status="
-            f"{orphan_snapshot.group_statuses[eurusd_id]}"
-        )
+        print("  orphan_status=" f"{orphan_snapshot.group_statuses[eurusd_id]}")
         print(
             "  foreign_client_status="
             f"{foreign_client_snapshot.group_statuses[gbpusd_id]}"

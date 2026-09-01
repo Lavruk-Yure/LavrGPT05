@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
-"""Детермінований Alligator-фільтр для Replay WSP.
+"""workspace_alligator.py — детермінований Alligator-фільтр WSP.
 
 Alligator використовує точний ``resolved_profile_snapshot``
 із прив'язки WSP. Редагування профілю не змінює
-збережений Replay. Контракт реалізує ``SAME_TIMEFRAME``,
+збережений Replay. Canonical completed bars із ``REPLAY`` і ``BROKER``
+проходять однакову математику індикатора; BROKER-path лишається read-only і
+не виконує broker requests або execution. Контракт реалізує ``SAME_TIMEFRAME``,
 ``HIGHER_1`` та експериментальний ``HIGHER_2`` без look-ahead bias.
 RoadMap101 додає causal FLAT/TREND_UP/TREND_DOWN diagnostics і фазу
 STARTING/ACTIVE/ENDING. Legacy snapshot використовує 3-bar confirmation.
@@ -24,7 +25,10 @@ from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from core.algorithm_workspace import WORKSPACE_DATA_MODE_REPLAY
+from core.algorithm_workspace import (
+    WORKSPACE_DATA_MODE_BROKER,
+    WORKSPACE_DATA_MODE_REPLAY,
+)
 from core.timeframes import resolve_alligator_confirmation_timeframe
 from core.workspace_algorithm import (
     WorkspaceAlgorithm,
@@ -359,7 +363,7 @@ class WorkspaceAlligatorRuntimeProfile:
 
 @dataclass(frozen=True, slots=True)
 class WorkspaceAlligatorObservation:
-    """Один стан Alligator після завершеного Replay-бару."""
+    """Один стан Alligator після завершеного canonical market bar."""
 
     timestamp: datetime
     median_price: float
@@ -901,7 +905,7 @@ class WorkspaceAlligatorFilter:
         *,
         available_at: datetime | None = None,
     ) -> WorkspaceAlligatorObservation:
-        """Оновити Alligator завершеним causal Replay-bar."""
+        """Оновити Alligator завершеним causal REPLAY або BROKER bar."""
         effective_available_at = available_at or event.timestamp
         if effective_available_at < event.timestamp:
             raise WorkspaceAlgorithmError(
@@ -947,14 +951,17 @@ class WorkspaceAlligatorFilter:
             return observation
 
         self.validate_runtime_mode()
-        if event.source_mode != WORKSPACE_DATA_MODE_REPLAY:
+        if event.source_mode not in {
+            WORKSPACE_DATA_MODE_REPLAY,
+            WORKSPACE_DATA_MODE_BROKER,
+        }:
             raise WorkspaceAlgorithmError(
-                "Alligator runtime currently supports Replay only"
+                "Alligator runtime supports completed Replay or broker bars only"
             )
         if self._last_timestamp is not None:
             if event.timestamp <= self._last_timestamp:
                 raise WorkspaceAlgorithmError(
-                    "Alligator Replay bars must be strictly ordered and unique"
+                    "Alligator bars must be strictly ordered and unique"
                 )
         self._last_timestamp = event.timestamp
 

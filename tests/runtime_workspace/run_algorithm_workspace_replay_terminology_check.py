@@ -42,8 +42,7 @@ def main() -> None:
 
     assert '"AlgorithmWorkspaceWindow.lblReplayEquity": "Replay equity:"' in area_source
     assert (
-        '"AlgorithmWorkspaceWindow.lblReplayBalance": "Replay balance:"'
-        in area_source
+        '"AlgorithmWorkspaceWindow.lblReplayBalance": "Replay balance:"' in area_source
     )
     assert (
         '"AlgorithmWorkspaceWindow.lblReplaySummaryEquity": "Replay equity:"'

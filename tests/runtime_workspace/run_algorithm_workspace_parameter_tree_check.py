@@ -120,9 +120,7 @@ def main() -> None:
 
     signal_group = stopped_tree.group(WORKSPACE_PARAMETER_GROUP_SIGNALS)
     filter_group = stopped_tree.group(WORKSPACE_PARAMETER_GROUP_FILTERS)
-    risk_group = stopped_tree.group(
-        WORKSPACE_PARAMETER_GROUP_RISK_MANAGEMENT
-    )
+    risk_group = stopped_tree.group(WORKSPACE_PARAMETER_GROUP_RISK_MANAGEMENT)
     assert len(signal_group.parameters) == 7
     assert len(filter_group.parameters) == 2
     assert len(risk_group.parameters) == 6
@@ -134,13 +132,10 @@ def main() -> None:
     macd_mode = stopped_tree.parameter("signals.macd_signal_mode")
     assert macd_mode.value == "EXTENDED"
     assert (
-        stopped_tree.parameter("signals.macd_extremum_min_prominence").value
-        == 0.00001
+        stopped_tree.parameter("signals.macd_extremum_min_prominence").value == 0.00001
     )
     assert (
-        stopped_tree.parameter(
-            "signals.macd_extremum_to_cross_min_distance"
-        ).value
+        stopped_tree.parameter("signals.macd_extremum_to_cross_min_distance").value
         == 0.00005
     )
     macd_angle_model = stopped_tree.parameter("signals.macd_cross_angle_model")
@@ -154,9 +149,7 @@ def main() -> None:
     assert macd_angle.minimum == 0.0
     assert macd_angle.maximum == 180.0
     assert macd_angle.step == 1.0
-    macd_abc_angle = stopped_tree.parameter(
-        "signals.macd_cross_min_abc_angle"
-    )
+    macd_abc_angle = stopped_tree.parameter("signals.macd_cross_min_abc_angle")
     assert macd_abc_angle.value == 2.0
     assert macd_abc_angle.minimum == 0.0
     assert macd_abc_angle.maximum == 180.0
@@ -165,9 +158,7 @@ def main() -> None:
         ("LINEAR", "uk:Linear"),
         ("EXTENDED", "uk:Extended"),
     )
-    alligator_mode = stopped_tree.parameter(
-        "filters.alligator_confirmation"
-    )
+    alligator_mode = stopped_tree.parameter("filters.alligator_confirmation")
     assert alligator_mode.value == "HIGHER_1"
     assert alligator_mode.allowed_value_labels[1] == (
         "HIGHER_1",
@@ -221,9 +212,7 @@ def main() -> None:
     assert locked_risk.editable_by_runtime
     assert not locked_risk.editable
     assert locked_risk.status == "uk:Locked by license"
-    assert WORKSPACE_PARAMETER_FEATURE_RISK_MANAGEMENT in str(
-        locked_risk.reason
-    )
+    assert WORKSPACE_PARAMETER_FEATURE_RISK_MANAGEMENT in str(locked_risk.reason)
 
     storage_after = (
         dict(workspace.parameters),
@@ -246,9 +235,7 @@ def main() -> None:
     assert "AlgorithmWorkspaceParametersDialog.macdLinear" in translation_keys
     assert "AlgorithmWorkspaceParametersDialog.macdAngleAbc" in translation_keys
     assert "WorkspaceParameter.riskPercent.description" in translation_keys
-    assert (
-        "WorkspaceParameterAvailability.runtimeLocked" in translation_keys
-    )
+    assert "WorkspaceParameterAvailability.runtimeLocked" in translation_keys
     assert "WorkspaceParameterAvailability.stopRequired" in translation_keys
 
     print("Algorithm Workspace Parameter Tree result")

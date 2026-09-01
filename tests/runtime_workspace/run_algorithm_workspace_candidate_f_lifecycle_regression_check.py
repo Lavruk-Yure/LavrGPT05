@@ -247,9 +247,7 @@ def _alligator_observation(
 def _armable_proposal(index: int, *, direction: str = "BUY") -> WorkspaceSignalProposal:
     timestamp = BASE_TIME + timedelta(minutes=15 * index)
     regime = (
-        ALLIGATOR_REGIME_TREND_UP
-        if direction == "BUY"
-        else ALLIGATOR_REGIME_TREND_DOWN
+        ALLIGATOR_REGIME_TREND_UP if direction == "BUY" else ALLIGATOR_REGIME_TREND_DOWN
     )
     return WorkspaceSignalProposal(
         signal_type="MACD_CROSS",
@@ -364,10 +362,7 @@ def _opposite_macd_cancel_scenario() -> bool:
     lifecycle_events = algorithm.drain_candidate_f_lifecycle_events()
     assert len(lifecycle_events) == 1
     assert lifecycle_events[0].action == CANDIDATE_F_LIFECYCLE_CANCEL
-    assert (
-        lifecycle_events[0].reason_code
-        == CANDIDATE_F_LIFECYCLE_REASON_OPPOSITE_MACD
-    )
+    assert lifecycle_events[0].reason_code == CANDIDATE_F_LIFECYCLE_REASON_OPPOSITE_MACD
     assert not algorithm.has_armed_candidate()
     assert not algorithm.deferred_releases
     return True
@@ -392,10 +387,7 @@ def _macd_invalid_cancel_scenario() -> bool:
     lifecycle_events = algorithm.drain_candidate_f_lifecycle_events()
     assert len(lifecycle_events) == 1
     assert lifecycle_events[0].action == CANDIDATE_F_LIFECYCLE_CANCEL
-    assert (
-        lifecycle_events[0].reason_code
-        == CANDIDATE_F_LIFECYCLE_REASON_MACD_INVALID
-    )
+    assert lifecycle_events[0].reason_code == CANDIDATE_F_LIFECYCLE_REASON_MACD_INVALID
     assert not algorithm.has_armed_candidate()
     return True
 
@@ -454,10 +446,7 @@ def _ttl_expiry_scenario() -> bool:
     lifecycle_events = algorithm.drain_candidate_f_lifecycle_events()
     assert len(lifecycle_events) == 1
     assert lifecycle_events[0].action == CANDIDATE_F_LIFECYCLE_EXPIRE
-    assert (
-        lifecycle_events[0].reason_code
-        == CANDIDATE_F_LIFECYCLE_REASON_TTL_EXPIRED
-    )
+    assert lifecycle_events[0].reason_code == CANDIDATE_F_LIFECYCLE_REASON_TTL_EXPIRED
     assert lifecycle_events[0].delay_bars == expiry
     assert not algorithm.has_armed_candidate()
     return True

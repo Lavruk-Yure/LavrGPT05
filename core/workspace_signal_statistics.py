@@ -191,8 +191,7 @@ def build_workspace_signal_variant_statistics(
                 )
             assert context.observation_timestamp is not None
             delays.append(
-                (context.available_at - context.observation_timestamp)
-                .total_seconds()
+                (context.available_at - context.observation_timestamp).total_seconds()
             )
         outcomes[record.signal_uid] = _directional_outcome(
             record,

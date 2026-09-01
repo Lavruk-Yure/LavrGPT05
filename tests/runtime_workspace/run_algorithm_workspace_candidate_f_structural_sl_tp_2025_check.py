@@ -77,9 +77,7 @@ STRUCTURE_TOUCH_TOLERANCE_PIPS = 1.0
 SL_FLOOR_VARIANTS_PIPS = (12.0, 24.0)
 
 OUTPUT_DIR = (
-    Path(tempfile.gettempdir())
-    / "LavrGPT05"
-    / "RM103_7M_Structural_SL_TP_2025"
+    Path(tempfile.gettempdir()) / "LavrGPT05" / "RM103_7M_Structural_SL_TP_2025"
 )
 OUTPUT_CSV = OUTPUT_DIR / "candidate_f_structural_sl_tp_2025.csv"
 
@@ -351,9 +349,7 @@ def _build_plan(
         take_distance=take_distance,
         stop_source=stop_source,
         take_source=take_source,
-        fallback_used=(
-            stop_source != "STRUCTURE" or take_source != "STRUCTURE"
-        ),
+        fallback_used=(stop_source != "STRUCTURE" or take_source != "STRUCTURE"),
     )
 
 
@@ -735,10 +731,7 @@ def main() -> None:
     print("  pivot_confirmation=2_left_2_right_completed_M15_bars")
     print(f"  pivot_lookback_bars={PIVOT_LOOKBACK_BARS}")
     print(f"  structure_buffer_pips={STRUCTURE_BUFFER_PIPS:.1f}")
-    print(
-        "  touch_count_tolerance_pips="
-        f"{STRUCTURE_TOUCH_TOLERANCE_PIPS:.1f}"
-    )
+    print("  touch_count_tolerance_pips=" f"{STRUCTURE_TOUCH_TOLERANCE_PIPS:.1f}")
     print("  sl_variants_pips=12.0|24.0")
     print("  sl_rule=STRUCTURE_PLUS_BUFFER_WITH_MINIMUM_DISTANCE_ELSE_PRODUCTION")
     print("  tp_rule=STRUCTURE_INSIDE_LEVEL_ELSE_2X_ACTUAL_SL")

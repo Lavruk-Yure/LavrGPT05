@@ -103,9 +103,7 @@ def _workspace(start_utc: str, end_utc: str) -> AlgorithmWorkspace:
             "macd_signal_enabled": True,
             "macd_signal_mode": "EXTENDED",
             "alligator_filter_enabled": True,
-            "alligator_confirmation": (
-                WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME
-            ),
+            "alligator_confirmation": (WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME),
             "spread_limit": 0.00020,
             "warmup_bars": 3,
             "macd_extremum_min_prominence": 0.000015,
@@ -255,14 +253,12 @@ def main() -> None:
         assert summary.blocked_good_macd >= summary.armed_candidates
         assert summary.potential_deferred_entries <= summary.armed_candidates
         assert all(
-            outcome.release_after_bars is None
-            or outcome.release_after_bars > 0
+            outcome.release_after_bars is None or outcome.release_after_bars > 0
             for outcome in summary.outcomes
         )
 
     assert (
-        workspace_alligator.ALLIGATOR_REGIME_TREND_START_CONFIRMATION_BARS
-        == original
+        workspace_alligator.ALLIGATOR_REGIME_TREND_START_CONFIRMATION_BARS == original
     )
 
     print("Algorithm Workspace deferred MACD / Alligator candidate diagnostic result")

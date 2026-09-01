@@ -157,7 +157,7 @@ def _canonical_stochastic(
     """Обчислити causal canonical %K(14,1) та %D SMA(3)."""
     percent_k: list[float | None] = [None] * len(events)
     for index in range(K_LENGTH - 1, len(events)):
-        window = events[index - K_LENGTH + 1:index + 1]
+        window = events[index - K_LENGTH + 1 : index + 1]
         highest = max(float(event.high) for event in window)
         lowest = min(float(event.low) for event in window)
         width = highest - lowest
@@ -170,7 +170,7 @@ def _canonical_stochastic(
     percent_d: list[float | None] = [None] * len(events)
     first_d_index = K_LENGTH + D_LENGTH - 2
     for index in range(first_d_index, len(events)):
-        window = percent_k[index - D_LENGTH + 1:index + 1]
+        window = percent_k[index - D_LENGTH + 1 : index + 1]
         if all(value is not None for value in window):
             percent_d[index] = statistics.fmean(float(value) for value in window)
     return tuple(percent_k), tuple(percent_d)
@@ -308,14 +308,12 @@ def _build_rows(
         d = float(current_d)
         slope_k = k - float(previous_k)
         slope_d = d - float(previous_d)
-        cross_direction, bars_since_cross = _last_cross(
-            index, percent_k, percent_d
-        )
+        cross_direction, bars_since_cross = _last_cross(index, percent_k, percent_d)
         reference_start = events[index - K_LENGTH + 1].timestamp
         assert reference_start <= signal_event.timestamp
         assert all(
             event.timestamp <= signal_event.timestamp
-            for event in events[index - K_LENGTH + 1:index + 1]
+            for event in events[index - K_LENGTH + 1 : index + 1]
         )
 
         rows.append(
@@ -333,13 +331,9 @@ def _build_rows(
                 distance_to_50=abs(k - MIDLINE),
                 signed_k_minus_50=k - MIDLINE,
                 kd_state=_kd_state(k, d),
-                cross_alignment=_cross_alignment(
-                    str(trade.direction), cross_direction
-                ),
+                cross_alignment=_cross_alignment(str(trade.direction), cross_direction),
                 cross_freshness=_cross_freshness(bars_since_cross),
-                slope_state=_slope_state(
-                    str(trade.direction), slope_k, slope_d
-                ),
+                slope_state=_slope_state(str(trade.direction), slope_k, slope_d),
                 reference_start=reference_start,
             )
         )
@@ -390,14 +384,10 @@ def _group_line(name: str, rows: tuple[StochasticEntryRow, ...]) -> str:
     if not rows:
         return f"    {name}=n:0,pnl:+0.00"
     cross_ages = [
-        row.bars_since_cross
-        for row in rows
-        if row.bars_since_cross is not None
+        row.bars_since_cross for row in rows if row.bars_since_cross is not None
     ]
     cross_age_median = (
-        "NONE"
-        if not cross_ages
-        else f"{statistics.median(cross_ages):.1f}"
+        "NONE" if not cross_ages else f"{statistics.median(cross_ages):.1f}"
     )
     return (
         f"    {name}=n:{len(rows)},"
@@ -417,9 +407,7 @@ def _group_line(name: str, rows: tuple[StochasticEntryRow, ...]) -> str:
 
 def _print_entry(index: int, row: StochasticEntryRow) -> None:
     trade = row.trade
-    cross_age = (
-        "NONE" if row.bars_since_cross is None else str(row.bars_since_cross)
-    )
+    cross_age = "NONE" if row.bars_since_cross is None else str(row.bars_since_cross)
     print(
         f"    entry={index:02d},signal:{trade.signal_timestamp.isoformat()},"
         f"direction:{trade.direction},outcome:{row.outcome},"

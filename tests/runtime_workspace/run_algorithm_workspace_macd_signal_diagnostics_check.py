@@ -55,11 +55,7 @@ def _report():
 
 
 def _signal_at(report, timestamp: datetime):
-    return next(
-        item
-        for item in report.signals
-        if item.timestamp == timestamp
-    )
+    return next(item for item in report.signals if item.timestamp == timestamp)
 
 
 def main() -> None:
@@ -134,10 +130,7 @@ def main() -> None:
         f"(BUY_below={report.buy_below_zero}, "
         f"SELL_above={report.sell_above_zero})"
     )
-    print(
-        "  directional_zero_side="
-        f"{report.directional_zero_side_signals}"
-    )
+    print("  directional_zero_side=" f"{report.directional_zero_side_signals}")
     print(f"  strength_lt_1e-6={report.strength_lt_1e6}")
     print(f"  strength_lt_5e-6={report.strength_lt_5e6}")
     print(f"  strength_lt_1e-5={report.strength_lt_1e5}")

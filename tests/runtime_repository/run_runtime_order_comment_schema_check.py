@@ -32,9 +32,7 @@ from engine.runtime_repository import RuntimeRepository  # noqa: E402
 def _column_names(connection: sqlite3.Connection, table_name: str) -> set[str]:
     return {
         str(row[1])
-        for row in connection.execute(
-            f"PRAGMA table_info({table_name});"
-        ).fetchall()
+        for row in connection.execute(f"PRAGMA table_info({table_name});").fetchall()
     }
 
 
@@ -71,9 +69,7 @@ def _create_legacy_row(db_path: Path) -> None:
     legacy.execute("PRAGMA foreign_keys=OFF")
     legacy.execute("ALTER TABLE trades DROP COLUMN comment")
     legacy.execute("ALTER TABLE broker_orders DROP COLUMN broker_comment")
-    legacy.execute(
-        "ALTER TABLE ib_virtual_position_leg_orders DROP COLUMN order_ref"
-    )
+    legacy.execute("ALTER TABLE ib_virtual_position_leg_orders DROP COLUMN order_ref")
     legacy.execute("PRAGMA user_version=6")
     legacy.commit()
     legacy.close()

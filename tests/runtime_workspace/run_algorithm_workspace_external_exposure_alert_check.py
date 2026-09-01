@@ -71,9 +71,7 @@ def _set_hold(runtime: WorkspaceRuntime, *, active: bool, revision: int) -> None
     context.safety_hold_active = active
     context.safety_hold_revision = revision
     context.safety_hold_message = (
-        "External IB FX exposure blocks exact account and symbol"
-        if active
-        else None
+        "External IB FX exposure blocks exact account and symbol" if active else None
     )
     context.safety_hold_signed_volume = 1000.0 if active else 0.0
     context.safety_hold_evidence_status = "CONFIRMED" if active else None

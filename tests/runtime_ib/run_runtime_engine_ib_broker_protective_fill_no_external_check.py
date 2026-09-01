@@ -298,10 +298,13 @@ def _assert_no_external(snapshot) -> None:
     ):
         raise AssertionError("Broker TP close did not remain RECONCILED")
 
-    if snapshot.group_broker_residual_signed_volumes.get(
-        BROKER_POSITION_ID,
-        0.0,
-    ) != 0.0:
+    if (
+        snapshot.group_broker_residual_signed_volumes.get(
+            BROKER_POSITION_ID,
+            0.0,
+        )
+        != 0.0
+    ):
         raise AssertionError("LGE TP close became broker residual exposure")
 
     exposure = snapshot.group_external_exposures.get(BROKER_POSITION_ID)

@@ -306,25 +306,13 @@ def _assert_incomplete_higher_bucket_breaks_sync(
     assert observation is not None
     assert algorithm.higher_timeframe_synchronized
 
-    assert (
-        _feed_public_algorithm_path(algorithm, _event(94, 1.2000))
-        is not None
-    )
-    assert (
-        _feed_public_algorithm_path(algorithm, _event(95, 1.2000))
-        is not None
-    )
-    assert (
-        _feed_public_algorithm_path(algorithm, _event(96, 1.2000))
-        is None
-    )
+    assert _feed_public_algorithm_path(algorithm, _event(94, 1.2000)) is not None
+    assert _feed_public_algorithm_path(algorithm, _event(95, 1.2000)) is not None
+    assert _feed_public_algorithm_path(algorithm, _event(96, 1.2000)) is None
     assert not algorithm.higher_timeframe_synchronized
 
     for index in range(97, 100):
-        assert (
-            _feed_public_algorithm_path(algorithm, _event(index, 1.2000))
-            is None
-        )
+        assert _feed_public_algorithm_path(algorithm, _event(index, 1.2000)) is None
         assert not algorithm.higher_timeframe_synchronized
 
     recovered = _feed_public_algorithm_path(
@@ -345,9 +333,7 @@ def _assert_disabled_filter_ignores_stale_mode(
         timeframe="D1",
         parameters=parameters,
     )
-    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(
-        disabled_workspace.algorithm
-    )
+    algorithm = WorkspaceMacdAlligatorReplayAlgorithm(disabled_workspace.algorithm)
     context = WorkspaceRuntimeContext.from_workspace(disabled_workspace)
     algorithm.configure(context, disabled_workspace.parameters)
     assert algorithm.signal_filter is not None
@@ -433,10 +419,13 @@ def main() -> None:
         ALLIGATOR_CONFIRMATION_HIGHER_1_BULLISH,
         ALLIGATOR_CONFIRMATION_HIGHER_1_BEARISH,
     ]
-    assert sum(
-        record.alligator_confirmation == ALLIGATOR_CONFIRMATION_HIGHER_1_WARMUP
-        for record in rejected
-    ) == 2
+    assert (
+        sum(
+            record.alligator_confirmation == ALLIGATOR_CONFIRMATION_HIGHER_1_WARMUP
+            for record in rejected
+        )
+        == 2
+    )
     assert all(
         record.filter_decision
         in {WORKSPACE_SIGNAL_FILTER_ALLOW, WORKSPACE_SIGNAL_FILTER_REJECT}

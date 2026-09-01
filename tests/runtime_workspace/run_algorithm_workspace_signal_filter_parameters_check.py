@@ -99,17 +99,9 @@ def main() -> None:
     assert invalid_choice_blocked
 
     signal_definition = catalog.definition("signals.macd_signal_mode")
-    filter_definition = catalog.definition(
-        "filters.alligator_confirmation"
-    )
-    assert (
-        signal_definition.feature_code
-        == WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES
-    )
-    assert (
-        filter_definition.feature_code
-        == WORKSPACE_PARAMETER_FEATURE_SIGNAL_FILTERS
-    )
+    filter_definition = catalog.definition("filters.alligator_confirmation")
+    assert signal_definition.feature_code == WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES
+    assert filter_definition.feature_code == WORKSPACE_PARAMETER_FEATURE_SIGNAL_FILTERS
     assert signal_definition.allowed_values == ("LINEAR", "EXTENDED")
     assert filter_definition.allowed_values == (
         "SAME_TIMEFRAME",
@@ -124,24 +116,20 @@ def main() -> None:
             WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES,
         ),
     )
-    assert WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES in (
-        profile.granted_feature_codes
-    )
-    assert WORKSPACE_PARAMETER_FEATURE_SIGNAL_FILTERS in (
-        profile.granted_feature_codes
-    )
+    assert WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES in (profile.granted_feature_codes)
+    assert WORKSPACE_PARAMETER_FEATURE_SIGNAL_FILTERS in (profile.granted_feature_codes)
 
     translator = FakeLangManager()
     localized = catalog.register_translations(translator)
-    assert localized[
-        "AlgorithmWorkspaceParametersDialog.macdExtended"
-    ] == "uk:Extended"
-    assert localized[
-        "AlgorithmWorkspaceParametersDialog.alligatorHigher1"
-    ] == "uk:One timeframe higher"
-    assert localized[
-        "AlgorithmWorkspaceParametersDialog.macdAngleAbc"
-    ] == "uk:ABC, real time"
+    assert localized["AlgorithmWorkspaceParametersDialog.macdExtended"] == "uk:Extended"
+    assert (
+        localized["AlgorithmWorkspaceParametersDialog.alligatorHigher1"]
+        == "uk:One timeframe higher"
+    )
+    assert (
+        localized["AlgorithmWorkspaceParametersDialog.macdAngleAbc"]
+        == "uk:ABC, real time"
+    )
 
     print("Algorithm Workspace Signal Filter Parameters result")
     print("  macd_independent_signal_source=True")

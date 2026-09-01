@@ -173,10 +173,7 @@ def _closes() -> tuple[float, ...]:
 
 
 def _events() -> tuple[WorkspaceMarketEvent, ...]:
-    return tuple(
-        _event(index, close)
-        for index, close in enumerate(_closes())
-    )
+    return tuple(_event(index, close) for index, close in enumerate(_closes()))
 
 
 def _revised_user_profile(
@@ -184,9 +181,7 @@ def _revised_user_profile(
     name: str,
     parameters: dict[str, object],
 ) -> WorkspaceIndicatorProfile:
-    built_in = built_in_workspace_indicator_profile(
-        ALLIGATOR_PROFILE_UID_LGE_CLASSIC
-    )
+    built_in = built_in_workspace_indicator_profile(ALLIGATOR_PROFILE_UID_LGE_CLASSIC)
     duplicate = built_in.duplicate_as_user(name)
     return duplicate.revised(name=name, parameters=parameters)
 
@@ -359,9 +354,7 @@ def main() -> None:
     assert fast_filter.runtime_profile.source == WORKSPACE_INDICATOR_SOURCE_CLOSE
     assert fast_filter.runtime_profile.ma_type == WORKSPACE_INDICATOR_MA_EXPONENTIAL
     assert fast_requests == 0
-    assert fast_bindings["FUTURE_INDICATOR"] == {
-        "future_key": "preserved"
-    }
+    assert fast_bindings["FUTURE_INDICATOR"] == {"future_key": "preserved"}
     assert fast_workspace.parameters["warmup_bars"] == 2
     assert fast_workspace.parameters["spread_limit"] == 0.00020
     assert fast_workspace.parameters["future_parameter"] == "preserved"
@@ -379,9 +372,7 @@ def main() -> None:
             "ma_type": WORKSPACE_INDICATOR_MA_EXPONENTIAL,
         },
     )
-    tws_binding = WorkspaceIndicatorProfileBinding.from_profile(
-        tws_completed_profile
-    )
+    tws_binding = WorkspaceIndicatorProfileBinding.from_profile(tws_completed_profile)
     tws_run = _run(_workspace(tws_binding, macd_enabled=False))
     assert tws_run[1] == 29
     assert tws_run[2].required_bars == 29
@@ -390,9 +381,7 @@ def main() -> None:
     ctrader_profile = built_in_workspace_indicator_profile(
         ALLIGATOR_PROFILE_UID_CTRADER_DEFAULT
     )
-    ctrader_binding = WorkspaceIndicatorProfileBinding.from_profile(
-        ctrader_profile
-    )
+    ctrader_binding = WorkspaceIndicatorProfileBinding.from_profile(ctrader_profile)
     combined_workspace = _workspace(ctrader_binding, macd_enabled=True)
     combined_1x = _run(combined_workspace, speed=1)
     combined_10x = _run(combined_workspace, speed=10)
@@ -401,20 +390,15 @@ def main() -> None:
     assert combined_10x[0] == combined_records
     assert combined_step[0] == combined_records
     assert combined_1x[2].profile_uid == ctrader_profile.profile_uid
-    assert combined_1x[2].runtime_profile.source == (
-        WORKSPACE_INDICATOR_SOURCE_CLOSE
-    )
-    assert combined_1x[2].runtime_profile.ma_type == (
-        WORKSPACE_INDICATOR_MA_SIMPLE
-    )
+    assert combined_1x[2].runtime_profile.source == (WORKSPACE_INDICATOR_SOURCE_CLOSE)
+    assert combined_1x[2].runtime_profile.ma_type == (WORKSPACE_INDICATOR_MA_SIMPLE)
     assert combined_records
     assert all(
         f"alligator_profile_uid={ctrader_profile.profile_uid}" in record.reason
         for record in combined_records
     )
     assert all(
-        "alligator_profile_revision=1" in record.reason
-        for record in combined_records
+        "alligator_profile_revision=1" in record.reason for record in combined_records
     )
     assert combined_1x[3] == 0
     assert combined_10x[3] == 0
@@ -496,9 +480,10 @@ def main() -> None:
     assert simple_lines != smoothed_lines
     assert ema_lines != smoothed_lines
     assert simple_observations[0].source_value == _events()[0].close
-    assert median_observations[0].source_value == (
-        _events()[0].high + _events()[0].low
-    ) / 2.0
+    assert (
+        median_observations[0].source_value
+        == (_events()[0].high + _events()[0].low) / 2.0
+    )
 
     _assert_profile_shift_is_causal(fast_profile)
 

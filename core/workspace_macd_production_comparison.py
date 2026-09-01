@@ -113,8 +113,7 @@ class WorkspaceMacdComparisonProfile:
             uid = str(
                 uuid5(
                     NAMESPACE_URL,
-                    "lge:rm101:macd:"
-                    f"{name}:{fast}:{slow}:{signal}:r{revision}",
+                    "lge:rm101:macd:" f"{name}:{fast}:{slow}:{signal}:r{revision}",
                 )
             )
         object.__setattr__(self, "name", name)
@@ -455,9 +454,7 @@ def _build_workspace(
         profit_protection={
             "enabled": True,
             "activation_mode": "AFTER_SPREAD",
-            "max_profit_drawdown_percent": (
-                MACD_COMPARISON_PROFIT_DRAWDOWN_PERCENT
-            ),
+            "max_profit_drawdown_percent": (MACD_COMPARISON_PROFIT_DRAWDOWN_PERCENT),
             "minimum_profit": 0.0,
         },
         indicator_profile_bindings=bindings,
@@ -587,9 +584,7 @@ def _build_report(
         quality_accepted=accepted,
         quality_rejected=rejected,
         reject_reasons=reasons,
-        classic_density_per_100_bars=(
-            len(diagnostics) / completed_m15_bars * 100.0
-        ),
+        classic_density_per_100_bars=(len(diagnostics) / completed_m15_bars * 100.0),
         candidate_density_per_100_bars=(accepted / completed_m15_bars * 100.0),
         price_turn_latency=latency,
         orders_created=orders_created,
@@ -711,9 +706,7 @@ def _deterministic_signature(
 
 def _utc_datetime(value: datetime, field_name: str) -> datetime:
     if not isinstance(value, datetime):
-        raise WorkspaceMacdProductionComparisonError(
-            f"{field_name} must be datetime"
-        )
+        raise WorkspaceMacdProductionComparisonError(f"{field_name} must be datetime")
     if value.tzinfo is None:
         raise WorkspaceMacdProductionComparisonError(
             f"{field_name} must be timezone-aware"
@@ -732,9 +725,7 @@ def _positive_int(value: object, field_name: str) -> int:
 def _positive_float(value: object, field_name: str) -> float:
     number = _bounded_float(value, field_name, minimum=0.0, maximum=math.inf)
     if number <= 0.0:
-        raise WorkspaceMacdProductionComparisonError(
-            f"{field_name} must be positive"
-        )
+        raise WorkspaceMacdProductionComparisonError(f"{field_name} must be positive")
     return number
 
 
@@ -746,14 +737,10 @@ def _bounded_float(
     maximum: float,
 ) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise WorkspaceMacdProductionComparisonError(
-            f"{field_name} must be numeric"
-        )
+        raise WorkspaceMacdProductionComparisonError(f"{field_name} must be numeric")
     number = float(value)
     if not math.isfinite(number):
-        raise WorkspaceMacdProductionComparisonError(
-            f"{field_name} must be finite"
-        )
+        raise WorkspaceMacdProductionComparisonError(f"{field_name} must be finite")
     if number < minimum or number > maximum:
         raise WorkspaceMacdProductionComparisonError(
             f"{field_name} is outside supported range"

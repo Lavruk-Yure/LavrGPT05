@@ -174,9 +174,7 @@ class WorkspaceIndicatorProfilesDialog(QDialog):
 
     def indicator_profile_bindings(self) -> dict[str, dict[str, object]]:
         """Повернути bindings, які слід зберегти разом із параметрами WSP."""
-        return normalize_workspace_indicator_profile_bindings(
-            self._pending_bindings
-        )
+        return normalize_workspace_indicator_profile_bindings(self._pending_bindings)
 
     def apply_translation(self) -> None:
         """Перекласти статичні тексти та combo labels без зміни data."""
@@ -397,9 +395,7 @@ class WorkspaceIndicatorProfilesDialog(QDialog):
         self._profile_items.clear()
         groups = {
             WORKSPACE_INDICATOR_MACD: QTreeWidgetItem(["MACD", "", ""]),
-            WORKSPACE_INDICATOR_ALLIGATOR: QTreeWidgetItem(
-                ["Alligator", "", ""]
-            ),
+            WORKSPACE_INDICATOR_ALLIGATOR: QTreeWidgetItem(["Alligator", "", ""]),
         }
         for code, item in groups.items():
             item.setData(0, Qt.ItemDataRole.UserRole, code)
@@ -505,9 +501,7 @@ class WorkspaceIndicatorProfilesDialog(QDialog):
                 self.ui.cmbMacdSignalMa,
                 parameters.get("signal_ma_type", WORKSPACE_INDICATOR_MA_EXPONENTIAL),
             )
-            self.ui.spnMacdShift.setValue(
-                self._profile_integer(parameters, "shift", 0)
-            )
+            self.ui.spnMacdShift.setValue(self._profile_integer(parameters, "shift", 0))
         else:
             self.stack_indicator.setCurrentWidget(self.ui.pageAlligator)
             self._set_combo_data(
@@ -829,9 +823,7 @@ class WorkspaceIndicatorProfilesDialog(QDialog):
                 "WorkspaceIndicatorProfilesDialog.deleteBuiltInMessage",
                 "Built-in templates cannot be deleted.",
             )
-        names = ", ".join(
-            sorted({usage.workspace_name for usage in lifecycle.usages})
-        )
+        names = ", ".join(sorted({usage.workspace_name for usage in lifecycle.usages}))
         return self._tr(
             "WorkspaceIndicatorProfilesDialog.deleteInUseMessage",
             "Profile is used by {count} WSP binding(s): {names}. "

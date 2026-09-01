@@ -774,14 +774,11 @@ class RuntimeEngine:
             elif (
                 group.group_mode == IB_POSITION_GROUP_MODE_NET_ONLY
                 and group.broker_position_present
-                and group.display_volume
-                > IB_POSITION_QUANTITY_ABS_TOLERANCE
+                and group.display_volume > IB_POSITION_QUANTITY_ABS_TOLERANCE
             ):
                 external_signed_volume = group.display_signed_volume
 
-            if abs(external_signed_volume) <= (
-                IB_POSITION_QUANTITY_ABS_TOLERANCE
-            ):
+            if abs(external_signed_volume) <= (IB_POSITION_QUANTITY_ABS_TOLERANCE):
                 continue
 
             current_exposure = IBFxExternalExposure(
@@ -1198,9 +1195,7 @@ class RuntimeEngine:
                 account_ids.append(account_id)
 
         evidence_order_ids = self._ib_evidence_order_ids(evidence_snapshot)
-        evidence_order_perm_ids = self._ib_evidence_order_perm_ids(
-            evidence_snapshot
-        )
+        evidence_order_perm_ids = self._ib_evidence_order_perm_ids(evidence_snapshot)
         seeds: list[dict[str, Any]] = []
 
         if account_ids:
@@ -1236,9 +1231,7 @@ class RuntimeEngine:
         legs = build_ib_virtual_position_legs_from_repository_seeds(seeds)
         persisted_external_exposures = {
             exposure.broker_position_id: exposure
-            for exposure in (
-                self.repository.get_active_ib_fx_external_exposures()
-            )
+            for exposure in (self.repository.get_active_ib_fx_external_exposures())
         }
 
         return reconcile_ib_virtual_position_legs(
@@ -2943,9 +2936,7 @@ class RuntimeEngine:
 
         normalized_mode = str(account_mode).strip().upper()
         if normalized_mode not in {"DEMO", "LIVE"}:
-            raise ValueError(
-                f"Unsupported cTrader account_mode: {account_mode}"
-            )
+            raise ValueError(f"Unsupported cTrader account_mode: {account_mode}")
 
         self.set_broker("CTRADER")
         self.context.account_mode = normalized_mode
@@ -3366,9 +3357,7 @@ class RuntimeEngine:
         reconnect_task = RuntimeReconnectTask(
             runtime_service=service,
             reconnect_cooldown_seconds=CTRADER_RECONNECT_COOLDOWN_SECONDS,
-            failure_backoff_seconds=(
-                CTRADER_RECONNECT_FAILURE_BACKOFF_SECONDS
-            ),
+            failure_backoff_seconds=(CTRADER_RECONNECT_FAILURE_BACKOFF_SECONDS),
         )
 
         self._ctrader_reconnect_task = reconnect_task

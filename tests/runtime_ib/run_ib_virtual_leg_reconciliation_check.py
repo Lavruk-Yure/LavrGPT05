@@ -225,14 +225,10 @@ def main() -> int:
 
     for leg in snapshot.legs:
         if leg.reconciliation_status != IB_RECONCILIATION_STATUS_RECONCILED:
-            raise AssertionError(
-                f"Leg was not reconciled: {leg.position_uid}"
-            )
+            raise AssertionError(f"Leg was not reconciled: {leg.position_uid}")
 
         if leg.protection_status != IB_PROTECTION_STATUS_COMPLETE:
-            raise AssertionError(
-                f"Leg protection is incomplete: {leg.position_uid}"
-            )
+            raise AssertionError(f"Leg protection is incomplete: {leg.position_uid}")
 
     eur_1k = snapshot.legs[0]
     eur_2k = snapshot.legs[1]
@@ -265,10 +261,7 @@ def main() -> int:
     print(f"  eurusd_status={snapshot.group_statuses[eur_position_id]}")
     print(f"  gbpusd_status={snapshot.group_statuses[gbp_position_id]}")
     print(f"  unmapped_orders={snapshot.unmapped_protective_order_ids}")
-    print(
-        "  mismatch_status="
-        f"{mismatch_snapshot.group_statuses[eur_position_id]}"
-    )
+    print("  mismatch_status=" f"{mismatch_snapshot.group_statuses[eur_position_id]}")
     print("IB_VIRTUAL_LEG_RECONCILIATION_CHECK=OK")
     return 0
 

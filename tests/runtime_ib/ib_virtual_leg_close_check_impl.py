@@ -224,12 +224,8 @@ class DummyIBRuntimeService(IBRuntimeServiceProtocol):
                     self.close_calls > 0
                     and self.evidence_calls > self.close_evidence_after_call
                 ),
-                pre_virtual_fx_quantity=(
-                    self.pre_virtual_fx_quantity
-                ),
-                post_virtual_fx_quantity=(
-                    self.post_virtual_fx_quantity
-                ),
+                pre_virtual_fx_quantity=(self.pre_virtual_fx_quantity),
+                post_virtual_fx_quantity=(self.post_virtual_fx_quantity),
             )
         )
 
@@ -325,18 +321,18 @@ def _build_evidence(
     pre_virtual_fx_quantity: float = 0.0,
     post_virtual_fx_quantity: float = VOLUME,
 ) -> dict[str, Any]:
-    open_orders = [] if closed else [
-        _order(SL_ID, "STP", STOP_LOSS),
-        _order(TP_ID, "LMT", TAKE_PROFIT),
-    ]
-    executions = [
-        _execution(PARENT_ID, "SLD", 1.1426, "20260717 13:07:10 UTC")
-    ]
+    open_orders = (
+        []
+        if closed
+        else [
+            _order(SL_ID, "STP", STOP_LOSS),
+            _order(TP_ID, "LMT", TAKE_PROFIT),
+        ]
+    )
+    executions = [_execution(PARENT_ID, "SLD", 1.1426, "20260717 13:07:10 UTC")]
 
     if closed:
-        executions.append(
-            _execution(CLOSE_ID, "BOT", 1.1440, "20260717 15:50:00 UTC")
-        )
+        executions.append(_execution(CLOSE_ID, "BOT", 1.1440, "20260717 15:50:00 UTC"))
 
     return {
         "broker": "IB",
@@ -357,39 +353,31 @@ def _build_evidence(
                 "currency": "USD",
                 "sec_type": "CASH",
                 "signed_quantity": (
-                    post_virtual_fx_quantity
-                    if closed
-                    else pre_virtual_fx_quantity
+                    post_virtual_fx_quantity if closed else pre_virtual_fx_quantity
                 ),
                 "side": (
                     "BUY"
-                    if (
-                        post_virtual_fx_quantity
-                        if closed
-                        else pre_virtual_fx_quantity
-                    ) > 0.0
+                    if (post_virtual_fx_quantity if closed else pre_virtual_fx_quantity)
+                    > 0.0
                     else (
                         "SELL"
                         if (
                             post_virtual_fx_quantity
                             if closed
                             else pre_virtual_fx_quantity
-                        ) < 0.0
+                        )
+                        < 0.0
                         else "UNKNOWN"
                     )
                 ),
                 "volume": abs(
-                    post_virtual_fx_quantity
-                    if closed
-                    else pre_virtual_fx_quantity
+                    post_virtual_fx_quantity if closed else pre_virtual_fx_quantity
                 ),
                 "average_cost": 0.0,
             }
         ],
         "open_orders": open_orders,
-        "completed_orders": (
-            [_completed_close_order()] if closed else []
-        ),
+        "completed_orders": ([_completed_close_order()] if closed else []),
         "executions": executions,
     }
 
@@ -467,13 +455,9 @@ def _create_leg(engine: RuntimeEngine) -> str:
             order_role=role,
             broker_order_id=order_id,
             execution_status=(
-                "FILLED"
-                if role == IB_LEG_ORDER_ROLE_PARENT
-                else "SUBMITTED"
+                "FILLED" if role == IB_LEG_ORDER_ROLE_PARENT else "SUBMITTED"
             ),
-            parent_order_id=(
-                None if role == IB_LEG_ORDER_ROLE_PARENT else PARENT_ID
-            ),
+            parent_order_id=(None if role == IB_LEG_ORDER_ROLE_PARENT else PARENT_ID),
             client_id=CURRENT_CLIENT_ID,
             action=POSITION_SIDE if role == IB_LEG_ORDER_ROLE_PARENT else "BUY",
             order_type=order_type,
@@ -559,23 +543,15 @@ def _create_missing_close_sibling(engine: RuntimeEngine) -> str:
             order_role=role,
             broker_order_id=order_id,
             execution_status=(
-                "FILLED"
-                if role == IB_LEG_ORDER_ROLE_PARENT
-                else "SUBMITTED"
+                "FILLED" if role == IB_LEG_ORDER_ROLE_PARENT else "SUBMITTED"
             ),
-            parent_order_id=(
-                None if role == IB_LEG_ORDER_ROLE_PARENT else 511
-            ),
+            parent_order_id=(None if role == IB_LEG_ORDER_ROLE_PARENT else 511),
             client_id=CURRENT_CLIENT_ID,
             action=POSITION_SIDE if role == IB_LEG_ORDER_ROLE_PARENT else "BUY",
             order_type=order_type,
             quantity=VOLUME,
             price=price,
-            oca_group=(
-                ""
-                if role == IB_LEG_ORDER_ROLE_PARENT
-                else "OCA_512_513"
-            ),
+            oca_group=("" if role == IB_LEG_ORDER_ROLE_PARENT else "OCA_512_513"),
             oca_type=None if role == IB_LEG_ORDER_ROLE_PARENT else 1,
         )
 
@@ -713,18 +689,12 @@ def main() -> int:
             result = engine.close_runtime_position_leg(position_uid)
 
             if result["leg_status"] != IB_LEG_STATUS_CLOSED:
-                raise AssertionError(
-                    "Nonzero-offset Close did not close the leg"
-                )
+                raise AssertionError("Nonzero-offset Close did not close the leg")
 
             if result["cash_fx_virtual_observation_offset"] != 2000.0:
-                raise AssertionError(
-                    "Nonzero pre-Close CASH FX offset differs"
-                )
+                raise AssertionError("Nonzero pre-Close CASH FX offset differs")
 
-            print(
-                "  cash_fx_nonzero_offset_close_reconciled=True"
-            )
+            print("  cash_fx_nonzero_offset_close_reconciled=True")
         finally:
             engine.connection.close()
 
@@ -753,14 +723,10 @@ def main() -> int:
                     "Unexpected CASH FX observation offset was not blocked"
                 )
 
-            row = engine.repository.get_ib_virtual_position_leg(
-                position_uid
-            )
+            row = engine.repository.get_ib_virtual_position_leg(position_uid)
 
             if row is None or row["leg_status"] != IB_LEG_STATUS_OPEN:
-                raise AssertionError(
-                    "Blocked Close changed virtual-leg persistence"
-                )
+                raise AssertionError("Blocked Close changed virtual-leg persistence")
 
             print("  unexpected_cash_fx_offset_blocked=True")
         finally:
@@ -782,9 +748,7 @@ def main() -> int:
                 position_uid=position_uid,
                 close_order_id=CLOSE_ID,
             )
-            row = engine.repository.get_ib_virtual_position_leg(
-                position_uid
-            )
+            row = engine.repository.get_ib_virtual_position_leg(position_uid)
 
             if row is None or row["leg_status"] != IB_LEG_STATUS_CLOSED:
                 raise AssertionError("Recovered virtual leg is not CLOSED")
@@ -795,10 +759,7 @@ def main() -> int:
             if service.close_calls != 1:
                 raise AssertionError("Recovery sent another broker Close")
 
-            print(
-                "  recovered_close_order_id="
-                f"{result['close_order_id']}"
-            )
+            print("  recovered_close_order_id=" f"{result['close_order_id']}")
             print(
                 "  recovery_cash_fx_offset="
                 f"{result['cash_fx_virtual_observation_offset']}"
@@ -837,8 +798,7 @@ def main() -> int:
 
             print("  timeout_close_auto_recovered=True")
             print(
-                "  timeout_recovery_attempts="
-                f"{result['timeout_recovery_attempts']}"
+                "  timeout_recovery_attempts=" f"{result['timeout_recovery_attempts']}"
             )
         finally:
             engine.connection.close()
@@ -868,8 +828,7 @@ def main() -> int:
                 raise AssertionError("Delayed Close did not enter pending state")
 
             pending_rows = (
-                first_engine.repository
-                .get_pending_ib_virtual_position_leg_close_orders()
+                first_engine.repository.get_pending_ib_virtual_position_leg_close_orders()
             )
 
             if len(pending_rows) != 1:
@@ -915,12 +874,9 @@ def main() -> int:
                 restarted_engine.recover_pending_runtime_position_leg_closes()
             )
             snapshot = restarted_engine.get_active_broker_position_groups()
-            row = restarted_engine.repository.get_ib_virtual_position_leg(
-                position_uid
-            )
+            row = restarted_engine.repository.get_ib_virtual_position_leg(position_uid)
             pending_rows = (
-                restarted_engine.repository
-                .get_pending_ib_virtual_position_leg_close_orders()
+                restarted_engine.repository.get_pending_ib_virtual_position_leg_close_orders()
             )
 
             if row is None or row["leg_status"] != IB_LEG_STATUS_CLOSED:
@@ -932,9 +888,7 @@ def main() -> int:
             if refresh_recovery.get("recovered") != [CLOSE_ID]:
                 raise AssertionError("Restart recovery result differs")
 
-            open_leg_count = sum(
-                len(group.open_legs) for group in snapshot.groups
-            )
+            open_leg_count = sum(len(group.open_legs) for group in snapshot.groups)
 
             if open_leg_count != 0:
                 raise AssertionError("Recovered Close remained visible as OPEN")
@@ -945,19 +899,14 @@ def main() -> int:
             print("  timeout_close_pending_saved=True")
             print("  timeout_close_blocked_without_evidence=True")
             print("  timeout_close_restart_recovered=True")
-            print(
-                "  pending_close_order_id="
-                f"{pending_error.close_order_id}"
-            )
+            print("  pending_close_order_id=" f"{pending_error.close_order_id}")
         finally:
             restarted_engine.connection.close()
 
     with tempfile.TemporaryDirectory(
         prefix="lge_ib_virtual_leg_close_mixed_group_",
     ) as temporary_directory:
-        _run_mixed_group_close_case(
-            Path(temporary_directory) / "runtime.db"
-        )
+        _run_mixed_group_close_case(Path(temporary_directory) / "runtime.db")
         print("  mixed_group_exact_leg_close=True")
 
     print("RUNTIME_ENGINE_IB_VIRTUAL_LEG_CLOSE_CHECK=OK")

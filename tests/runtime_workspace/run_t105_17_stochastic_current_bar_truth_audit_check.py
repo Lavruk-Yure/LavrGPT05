@@ -107,9 +107,7 @@ class ChronologyEvidence:
     future_bars_used: bool
 
 
-class StochasticCurrentBarTruthAuditAlgorithm(
-    WorkspaceMacdAlligatorReplayAlgorithm
-):
+class StochasticCurrentBarTruthAuditAlgorithm(WorkspaceMacdAlligatorReplayAlgorithm):
     """Production Candidate F із коротким TEST_ONLY causal audit gate."""
 
     def __init__(self, algorithm_id: str, *, gate_enabled: bool) -> None:
@@ -364,7 +362,7 @@ def _assert_runtime_truth(
         event.timestamp for event in session.events
     ]
     assert len(runtime.warmup_events) == runtime.context.warmup_bars_required
-    assert tuple(runtime.warmup_events) == session.events[:len(runtime.warmup_events)]
+    assert tuple(runtime.warmup_events) == session.events[: len(runtime.warmup_events)]
     assert all(
         left.timestamp < right.timestamp
         for left, right in zip(session.events, session.events[1:])
@@ -458,8 +456,7 @@ def main() -> None:
         assert control_algorithm.allows == spec.trades
         assert control_algorithm.rejects == 0
         assert (
-            control_algorithm.current_bar_candidates
-            == REFERENCE_REJECTIONS[spec.code]
+            control_algorithm.current_bar_candidates == REFERENCE_REJECTIONS[spec.code]
         )
 
         gated = _run(spec, gate_enabled=True)

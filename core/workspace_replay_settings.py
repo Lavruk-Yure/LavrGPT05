@@ -122,9 +122,7 @@ class WorkspaceReplaySettings:
         source_name = str(self.source_name or "").strip()
         object.__setattr__(self, "source_name", source_name)
 
-        source_timeframe = (
-            str(self.source_timeframe or "").strip().upper() or None
-        )
+        source_timeframe = str(self.source_timeframe or "").strip().upper() or None
         if source_timeframe is not None:
             try:
                 source_timeframe = get_timeframe(source_timeframe).name
@@ -136,13 +134,9 @@ class WorkspaceReplaySettings:
 
         initial_balance = float(self.initial_balance)
         if not math.isfinite(initial_balance):
-            raise WorkspaceReplaySettingsError(
-                "Replay initial balance must be finite"
-            )
+            raise WorkspaceReplaySettingsError("Replay initial balance must be finite")
         if not (
-            MINIMUM_REPLAY_RISK_EQUITY
-            <= initial_balance
-            <= MAXIMUM_REPLAY_RISK_EQUITY
+            MINIMUM_REPLAY_RISK_EQUITY <= initial_balance <= MAXIMUM_REPLAY_RISK_EQUITY
         ):
             raise WorkspaceReplaySettingsError(
                 "Replay initial balance must be between "
@@ -153,9 +147,7 @@ class WorkspaceReplaySettings:
 
         speed = int(self.speed)
         if speed not in REPLAY_SPEEDS:
-            raise WorkspaceReplaySettingsError(
-                f"Unsupported Replay speed: {speed}"
-            )
+            raise WorkspaceReplaySettingsError(f"Unsupported Replay speed: {speed}")
         object.__setattr__(self, "speed", speed)
 
     @classmethod
@@ -228,9 +220,7 @@ class WorkspaceReplaySettings:
     def require_existing_csv(self) -> Path:
         """Return the selected CSV path or raise before saving/running."""
         if self.source_type != WORKSPACE_REPLAY_SOURCE_CSV:
-            raise WorkspaceReplaySettingsError(
-                "Current Replay source is not CSV"
-            )
+            raise WorkspaceReplaySettingsError("Current Replay source is not CSV")
         path = Path(self.file_path or "").expanduser()
         if not path.is_file():
             raise WorkspaceReplaySettingsError(
@@ -261,7 +251,5 @@ class WorkspaceReplaySettings:
         try:
             normalized = normalize_market_timestamp(value)
         except ValueError as exc:
-            raise WorkspaceReplaySettingsError(
-                f"Invalid {field_name}"
-            ) from exc
+            raise WorkspaceReplaySettingsError(f"Invalid {field_name}") from exc
         return normalized.astimezone(UTC)

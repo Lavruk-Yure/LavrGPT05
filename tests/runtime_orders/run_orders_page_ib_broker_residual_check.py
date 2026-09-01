@@ -52,12 +52,8 @@ def main() -> int:
     group.bid_price = 1.1385
     group.ask_price = 1.1386
     group.current_price = 1.13855
-    group.reconciliation_status = (
-        IB_RECONCILIATION_STATUS_CLOSE_EVIDENCE_MISSING
-    )
-    group.reconciliation_messages = (
-        "Synthetic sibling close evidence is missing",
-    )
+    group.reconciliation_status = IB_RECONCILIATION_STATUS_CLOSE_EVIDENCE_MISSING
+    group.reconciliation_messages = ("Synthetic sibling close evidence is missing",)
     runtime = TrackingGroupRuntimeEngine(snapshot)
     page = OrdersPage(DummyLangManager())
     page.set_runtime_engine(runtime)

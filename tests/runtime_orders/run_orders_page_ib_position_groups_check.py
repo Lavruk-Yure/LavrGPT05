@@ -52,9 +52,7 @@ def main() -> int:
         assert runtime.group_calls == 1
         assert runtime.pending_open_recovery_calls == 1
         activation_refresh_calls = runtime.group_calls
-        activation_open_recovery_calls = (
-            runtime.pending_open_recovery_calls
-        )
+        activation_open_recovery_calls = runtime.pending_open_recovery_calls
 
         tree = page.ui.tblOpenPositions
         assert tree.topLevelItemCount() == 1
@@ -167,10 +165,7 @@ def main() -> int:
         print("  closed_virtual_fx_with_broker_position_visible=True")
         print("  visible_groups_status=1")
         print("  activation_refresh_calls=" f"{activation_refresh_calls}")
-        print(
-            "  activation_open_recovery_calls="
-            f"{activation_open_recovery_calls}"
-        )
+        print("  activation_open_recovery_calls=" f"{activation_open_recovery_calls}")
         print("ORDERS_PAGE_IB_POSITION_GROUPS_CHECK=OK")
         return 0
     finally:

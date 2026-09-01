@@ -204,9 +204,7 @@ def _workspace(window: ReplayWindow) -> AlgorithmWorkspace:
             "macd_signal_enabled": True,
             "macd_signal_mode": "EXTENDED",
             "alligator_filter_enabled": True,
-            "alligator_confirmation": (
-                WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME
-            ),
+            "alligator_confirmation": (WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME),
             "spread_limit": SPREAD_LIMIT_PIPS * PIP_SIZE,
             "warmup_bars": 3,
             "macd_extremum_min_prominence": (
@@ -674,7 +672,8 @@ def main() -> None:
             for plan in final.plans.values()
         )
         assert all(
-            TP_MINIMUM_PIPS <= plan.take_distance_pips
+            TP_MINIMUM_PIPS
+            <= plan.take_distance_pips
             <= TP_FALLBACK_R * plan.stop_distance_pips + EPSILON
             for plan in final.plans.values()
         )

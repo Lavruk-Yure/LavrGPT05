@@ -83,9 +83,7 @@ def _database_digest(db_path: Path) -> tuple[str, dict[str, int]]:
         for (table_name,) in table_rows:
             table_name_text = str(table_name)
             quoted_name = table_name_text.replace('"', '""')
-            cursor = connection.execute(
-                f'SELECT * FROM "{quoted_name}" ORDER BY rowid'
-            )
+            cursor = connection.execute(f'SELECT * FROM "{quoted_name}" ORDER BY rowid')
             rows = cursor.fetchall()
             table_counts[table_name_text] = len(rows)
             digest.update(table_name_text.encode("utf-8"))
@@ -110,8 +108,7 @@ def _create_backup() -> Path:
     BACKUP_DIRECTORY.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     backup_path = (
-        BACKUP_DIRECTORY
-        / f"demo_before_ib_virtual_leg_live_sync_{timestamp}.db"
+        BACKUP_DIRECTORY / f"demo_before_ib_virtual_leg_live_sync_{timestamp}.db"
     )
     _copy_database_snapshot(DB_PATH, backup_path)
     return backup_path
@@ -174,28 +171,22 @@ def _read_persisted_state(db_path: Path) -> PersistedState:
     }
     stop_row = rows_by_order_id.get(TARGET_STOP_LOSS_ORDER_ID)
     take_profit_row = rows_by_order_id.get(TARGET_TAKE_PROFIT_ORDER_ID)
-    active_protective_count = sum(
-        1 for row in order_rows if bool(row["is_active"])
-    )
+    active_protective_count = sum(1 for row in order_rows if bool(row["is_active"]))
 
     return {
         "leg_status": str(leg_row["leg_status"] or "").strip().upper(),
         "remaining_volume": float(leg_row["remaining_volume"] or 0.0),
         "closed_utc": str(leg_row["closed_utc"] or "").strip() or None,
-        "reconciliation_status": str(
-            leg_row["reconciliation_status"] or ""
-        ).strip().upper(),
+        "reconciliation_status": str(leg_row["reconciliation_status"] or "")
+        .strip()
+        .upper(),
         "active_protective_count": active_protective_count,
         "stop_loss_active": bool(stop_row["is_active"]) if stop_row else False,
         "take_profit_active": (
-            bool(take_profit_row["is_active"])
-            if take_profit_row
-            else False
+            bool(take_profit_row["is_active"]) if take_profit_row else False
         ),
         "stop_loss_status": (
-            str(stop_row["execution_status"] or "").strip().upper()
-            if stop_row
-            else ""
+            str(stop_row["execution_status"] or "").strip().upper() if stop_row else ""
         ),
         "take_profit_status": (
             str(take_profit_row["execution_status"] or "").strip().upper()
@@ -213,16 +204,13 @@ def _validate_pre_sync_state(state: PersistedState) -> bool:
 
     if state["leg_status"] != IB_LEG_STATUS_OPEN:
         raise RuntimeError(
-            "Unexpected persisted parent 114 leg status: "
-            f"{state['leg_status']}"
+            "Unexpected persisted parent 114 leg status: " f"{state['leg_status']}"
         )
 
     if abs(state["remaining_volume"] - TARGET_VOLUME) > 1e-9:
         raise RuntimeError("Persisted parent 114 remaining volume differs")
 
-    if state["reconciliation_status"] != (
-        IB_RECONCILIATION_STATUS_RECONCILED
-    ):
+    if state["reconciliation_status"] != (IB_RECONCILIATION_STATUS_RECONCILED):
         raise RuntimeError("Persisted parent 114 leg is not reconciled")
 
     if not state["stop_loss_active"]:
@@ -241,9 +229,7 @@ def _validate_closed_state(state: PersistedState) -> None:
     if abs(state["remaining_volume"]) > 1e-9:
         raise RuntimeError("Closed parent 114 leg retained remaining volume")
 
-    if state["reconciliation_status"] != (
-        IB_RECONCILIATION_STATUS_RECONCILED
-    ):
+    if state["reconciliation_status"] != (IB_RECONCILIATION_STATUS_RECONCILED):
         raise RuntimeError("Closed parent 114 leg is not reconciled")
 
     if state["active_protective_count"] != 0:
@@ -334,12 +320,8 @@ def _run_live_sync(db_path: Path) -> LiveSyncResult:
     return {
         "already_applied": False,
         "snapshot_legs": len(snapshot.legs),
-        "persistence_legs_written": int(
-            persistence["legs_written"]
-        ),
-        "persistence_orders_written": int(
-            persistence["orders_written"]
-        ),
+        "persistence_legs_written": int(persistence["legs_written"]),
+        "persistence_orders_written": int(persistence["orders_written"]),
         "transition_order_id": transition_order_id,
         "persisted_state": persisted_state,
     }
@@ -359,9 +341,9 @@ def _read_mode_from_console() -> SyncMode:
             continue
 
         if choice in {"2", "APPLY"}:
-            confirmation = input(
-                "Для підтвердження запису введіть APPLY: "
-            ).strip().upper()
+            confirmation = (
+                input("Для підтвердження запису введіть APPLY: ").strip().upper()
+            )
 
             if confirmation == "APPLY":
                 selected_mode = "APPLY"
@@ -394,9 +376,7 @@ def _run_selected_mode(
         result = _run_live_sync(target_path)
 
     after_digest, after_counts = _database_digest(DB_PATH)
-    sqlite_read_only = (
-        before_digest == after_digest and before_counts == after_counts
-    )
+    sqlite_read_only = before_digest == after_digest and before_counts == after_counts
     return None, result, sqlite_read_only
 
 
@@ -410,22 +390,13 @@ def main() -> int:
     print(f"  mode={mode}")
     print(f"  already_applied={result['already_applied']}")
     print(f"  snapshot_legs={result['snapshot_legs']}")
-    print(
-        "  persistence_legs_written="
-        f"{result['persistence_legs_written']}"
-    )
-    print(
-        "  persistence_orders_written="
-        f"{result['persistence_orders_written']}"
-    )
+    print("  persistence_legs_written=" f"{result['persistence_legs_written']}")
+    print("  persistence_orders_written=" f"{result['persistence_orders_written']}")
     print(f"  transition_order_id={result['transition_order_id']}")
     print(f"  leg_status={state['leg_status']}")
     print(f"  remaining_volume={state['remaining_volume']}")
     print(f"  closed_utc={state['closed_utc']}")
-    print(
-        "  active_protective_mappings="
-        f"{state['active_protective_count']}"
-    )
+    print("  active_protective_mappings=" f"{state['active_protective_count']}")
     print(f"  stop_loss_status={state['stop_loss_status']}")
     print(f"  take_profit_status={state['take_profit_status']}")
     print(f"  open_seed_count={state['open_seed_count']}")

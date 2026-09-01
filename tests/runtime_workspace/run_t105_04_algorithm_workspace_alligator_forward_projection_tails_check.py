@@ -22,7 +22,10 @@ from core.algorithm_workspace import (  # noqa: E402
 from core.workspace_alligator import WorkspaceMacdAlligatorReplayAlgorithm  # noqa: E402
 from core.workspace_chart import WorkspaceChartSeries  # noqa: E402
 from core.workspace_market_event import WorkspaceMarketEvent  # noqa: E402
-from core.workspace_replay import WorkspaceReplayService, WorkspaceReplaySession  # noqa: E402
+from core.workspace_replay import (
+    WorkspaceReplayService,
+    WorkspaceReplaySession,
+)  # noqa: E402
 from core.workspace_runtime import WorkspaceRuntime  # noqa: E402
 
 EVENT_COUNT = 180
@@ -130,8 +133,7 @@ def main() -> None:
         "ALLIGATOR_LIPS": profile.lips_shift,
     }
     actual_lengths = {
-        code: len(series_map[code].projection_points)
-        for code in expected_lengths
+        code: len(series_map[code].projection_points) for code in expected_lengths
     }
     profile_shifts_respected = actual_lengths == expected_lengths
     assert profile_shifts_respected

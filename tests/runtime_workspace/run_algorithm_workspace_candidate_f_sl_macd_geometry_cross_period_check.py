@@ -341,8 +341,7 @@ def _run(
     for record in signal_history:
         records_by_timestamp.setdefault(record.timestamp, []).append(record)
     immutable_by_timestamp = {
-        timestamp: tuple(items)
-        for timestamp, items in records_by_timestamp.items()
+        timestamp: tuple(items) for timestamp, items in records_by_timestamp.items()
     }
 
     evidence: list[MacdGeometryEvidence] = []

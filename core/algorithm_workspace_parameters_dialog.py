@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """algorithm_workspace_parameters_dialog.py — параметри WSP.
 
 Schema-редактор і контроль профільних bindings індикаторів одного workspace.
@@ -444,6 +443,13 @@ class AlgorithmWorkspaceParametersDialog(QDialog):
             return
         self._pending_indicator_profile_bindings = dialog.indicator_profile_bindings()
         self._refresh_context_label()
+        current = self.tree_parameters.currentItem()
+        if (
+            current is not None
+            and current.data(0, Qt.ItemDataRole.UserRole)
+            == WORKSPACE_PARAMETER_GROUP_ALGORITHM
+        ):
+            self._show_algorithm_snapshot()
 
     def _request_replay_settings(self) -> None:
         """Передати area запит на штатний редактор Replay для цього WSP."""

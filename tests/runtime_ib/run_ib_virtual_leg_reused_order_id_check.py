@@ -153,20 +153,16 @@ def main() -> int:
 
     old_closed_stays_reconciled = (
         old_after.leg_status == IB_LEG_STATUS_CLOSED
-        and old_after.reconciliation_status
-        == IB_RECONCILIATION_STATUS_RECONCILED
+        and old_after.reconciliation_status == IB_RECONCILIATION_STATUS_RECONCILED
         and old_after.protection_status == IB_PROTECTION_STATUS_NONE
     )
     current_open_owns_protection = (
         current_after.leg_status == IB_LEG_STATUS_OPEN
-        and current_after.reconciliation_status
-        == IB_RECONCILIATION_STATUS_RECONCILED
-        and current_after.protection_status
-        == IB_PROTECTION_STATUS_COMPLETE
+        and current_after.reconciliation_status == IB_RECONCILIATION_STATUS_RECONCILED
+        and current_after.protection_status == IB_PROTECTION_STATUS_COMPLETE
     )
     group_reconciled = (
-        snapshot.group_statuses[POSITION_ID]
-        == IB_RECONCILIATION_STATUS_RECONCILED
+        snapshot.group_statuses[POSITION_ID] == IB_RECONCILIATION_STATUS_RECONCILED
     )
     no_unmapped_protection = not snapshot.unmapped_protective_order_ids
 

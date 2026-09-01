@@ -210,9 +210,7 @@ def main() -> int:
         engine = RuntimeEngine(db_path=str(db_path))
         engine.set_active_broker("IB", require_connected=False)
         seed_runtime_rows(engine)
-        service = EvidenceOnlyIBService(
-            build_evidence(broker_position_present=True)
-        )
+        service = EvidenceOnlyIBService(build_evidence(broker_position_present=True))
         service_for_test: Any = service
         engine.ib_runtime_service = service_for_test
 
@@ -233,9 +231,7 @@ def main() -> int:
                     "Manual recovery was allowed while broker exposure existed"
                 )
 
-            service.evidence = build_evidence(
-                broker_position_present=False
-            )
+            service.evidence = build_evidence(broker_position_present=False)
             result = engine.resolve_ib_close_evidence_missing(POSITION_UID)
 
             if not result.get("closed"):
@@ -279,9 +275,7 @@ def main() -> int:
             ):
                 raise AssertionError("Manual reconciliation status was lost")
 
-            messages = json.loads(
-                str(leg_row["reconciliation_messages_json"])
-            )
+            messages = json.loads(str(leg_row["reconciliation_messages_json"]))
 
             if not any("RECONCILED_MANUAL" in value for value in messages):
                 raise AssertionError("Manual recovery audit message is absent")
@@ -320,10 +314,7 @@ def main() -> int:
 
             after_snapshot = engine.get_active_broker_position_groups()
 
-            if any(
-                group.symbol_name == "EURUSD"
-                for group in after_snapshot.groups
-            ):
+            if any(group.symbol_name == "EURUSD" for group in after_snapshot.groups):
                 raise AssertionError("Resolved EURUSD remained active")
 
             synced_snapshot = engine.sync_active_broker_position_groups()
@@ -344,9 +335,7 @@ def main() -> int:
                 FROM runtime_events
                 WHERE event_type = ?
                 """,
-                (
-                    RuntimeEventType.IB_MANUAL_RECONCILIATION_RESOLVED.value,
-                ),
+                (RuntimeEventType.IB_MANUAL_RECONCILIATION_RESOLVED.value,),
             ).fetchone()[0]
 
             if int(audit_count) != 1:

@@ -141,9 +141,7 @@ class SettingsCenter(QDialog):
             stack,
             self._lang_mgr,
             on_license_changed=self._on_license_changed,
-            on_license_restart_requested=(
-                self._on_license_restart_requested
-            ),
+            on_license_restart_requested=(self._on_license_restart_requested),
         )
         stack.addWidget(self._page_license)  # index = 3
 

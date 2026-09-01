@@ -96,8 +96,7 @@ class WorkspaceChartModel:
         normalized_max = int(max_events)
         if normalized_max < MIN_WORKSPACE_CHART_VISIBLE_EVENTS:
             raise WorkspaceChartError(
-                "max_events must be at least "
-                f"{MIN_WORKSPACE_CHART_VISIBLE_EVENTS}"
+                "max_events must be at least " f"{MIN_WORKSPACE_CHART_VISIBLE_EVENTS}"
             )
         self.max_events = normalized_max
         self._events: list[WorkspaceMarketEvent] = []
@@ -159,9 +158,7 @@ class WorkspaceChartModel:
         if self._events:
             last_event = self._events[-1]
             if event.timestamp < last_event.timestamp:
-                raise WorkspaceChartError(
-                    "Chart market events must be chronological"
-                )
+                raise WorkspaceChartError("Chart market events must be chronological")
             if event.timestamp == last_event.timestamp:
                 self._validate_full_history_replacement(event)
                 self._events[-1] = event
@@ -194,9 +191,7 @@ class WorkspaceChartModel:
         if self._follow_latest:
             self._visible_start = self._latest_start()
             return
-        self._visible_start = self._clamp_start(
-            previous_end - self._visible_count
-        )
+        self._visible_start = self._clamp_start(previous_end - self._visible_count)
         self._follow_latest = self._visible_start == self._latest_start()
 
     def zoom_in(self) -> None:
@@ -279,14 +274,10 @@ class WorkspaceChartModel:
             cursor_timestamp=(
                 cursor_event.timestamp if cursor_event is not None else None
             ),
-            current_close=(
-                cursor_event.close if cursor_event is not None else None
-            ),
+            current_close=(cursor_event.close if cursor_event is not None else None),
             current_bid=cursor_event.bid if cursor_event is not None else None,
             current_ask=cursor_event.ask if cursor_event is not None else None,
-            current_spread=(
-                cursor_event.spread if cursor_event is not None else None
-            ),
+            current_spread=(cursor_event.spread if cursor_event is not None else None),
             at_latest=self._follow_latest,
         )
 

@@ -200,9 +200,7 @@ def main() -> None:
         )
 
         basis = (
-            "SIGNAL_RANGE"
-            if signal_range + EPSILON >= spread_floor
-            else "SPREAD_FLOOR"
+            "SIGNAL_RANGE" if signal_range + EPSILON >= spread_floor else "SPREAD_FLOOR"
         )
         basis_counts[basis] += 1
         risk_usd = _risk_usd(trade.stop_loss_distance, trade.volume)
@@ -298,10 +296,7 @@ def main() -> None:
         f"dd:{summary.maximum_drawdown:.2f}"
     )
     print(f"  stop_loss_trades={len(sl_trades)}")
-    print(
-        "  stop_distance_formula="
-        "max(SIGNAL_M15_HIGH_LOW,SPREAD_X10)*1.0"
-    )
+    print("  stop_distance_formula=" "max(SIGNAL_M15_HIGH_LOW,SPREAD_X10)*1.0")
     print(
         "  stop_basis="
         f"signal_range:{basis_counts['SIGNAL_RANGE']},"

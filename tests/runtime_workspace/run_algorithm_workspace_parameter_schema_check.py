@@ -79,12 +79,8 @@ def main() -> None:
         60,
     ]
 
-    signal_parameters = catalog.parameters_for_group(
-        WORKSPACE_PARAMETER_GROUP_SIGNALS
-    )
-    filter_parameters = catalog.parameters_for_group(
-        WORKSPACE_PARAMETER_GROUP_FILTERS
-    )
+    signal_parameters = catalog.parameters_for_group(WORKSPACE_PARAMETER_GROUP_SIGNALS)
+    filter_parameters = catalog.parameters_for_group(WORKSPACE_PARAMETER_GROUP_FILTERS)
     assert len(signal_parameters) == 7
     assert len(filter_parameters) == 2
     assert all(
@@ -123,9 +119,7 @@ def main() -> None:
     assert values["signals.macd_cross_min_abc_angle"] == 2.0
     assert values["filters.alligator_enabled"] is True
     assert values["filters.alligator_confirmation"] == "HIGHER_1"
-    alligator_definition = catalog.definition(
-        "filters.alligator_confirmation"
-    )
+    alligator_definition = catalog.definition("filters.alligator_confirmation")
     assert alligator_definition.allowed_values == (
         "SAME_TIMEFRAME",
         "HIGHER_1",

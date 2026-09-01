@@ -310,10 +310,7 @@ def main() -> None:
     assert_frozen_oos_snapshot()
     result = _run_variant()
 
-    print(
-        "Algorithm Workspace Candidate F "
-        "Negative PD Recovery Pending 2025 result"
-    )
+    print("Algorithm Workspace Candidate F " "Negative PD Recovery Pending 2025 result")
     print("  mode=TEST_ONLY_FIXED_3_M1_NEGATIVE_PD_RECOVERY_PENDING")
     print(
         "  baseline="
@@ -390,8 +387,7 @@ def main() -> None:
     print("  broker_execution_attempted=False")
     print("  performance_threshold_assertions=False")
     print(
-        "ALGORITHM_WORKSPACE_CANDIDATE_F_NEGATIVE_PD_RECOVERY_"
-        "PENDING_2025_CHECK=OK"
+        "ALGORITHM_WORKSPACE_CANDIDATE_F_NEGATIVE_PD_RECOVERY_" "PENDING_2025_CHECK=OK"
     )
 
 

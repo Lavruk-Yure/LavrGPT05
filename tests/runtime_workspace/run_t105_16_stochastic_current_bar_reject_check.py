@@ -121,15 +121,9 @@ class StochasticCurrentBarGateAlgorithm(WorkspaceMacdAlligatorReplayAlgorithm):
         previous_k = self._previous_k
         previous_d = self._previous_d
         if previous_k is not None and previous_d is not None:
-            if (
-                previous_k <= previous_d + EPSILON
-                and percent_k > percent_d + EPSILON
-            ):
+            if previous_k <= previous_d + EPSILON and percent_k > percent_d + EPSILON:
                 self.current_cross = CROSS_UP
-            elif (
-                previous_k >= previous_d - EPSILON
-                and percent_k < percent_d - EPSILON
-            ):
+            elif previous_k >= previous_d - EPSILON and percent_k < percent_d - EPSILON:
                 self.current_cross = CROSS_DOWN
         self._previous_k = percent_k
         self._previous_d = percent_d
@@ -151,9 +145,7 @@ class StochasticCurrentBarGateAlgorithm(WorkspaceMacdAlligatorReplayAlgorithm):
             return proposal
 
         self.rejects += 1
-        reason = (
-            f"{proposal.reason}; " if proposal.reason else ""
-        ) + (
+        reason = (f"{proposal.reason}; " if proposal.reason else "") + (
             f"{FILTER_REASON}: stochastic K/D cross={self.current_cross},"
             "bars_since_cross=0"
         )
@@ -322,18 +314,12 @@ def main() -> None:
     print("  percent_k_d_threshold_used=False")
     print("  distance_50_threshold_used=False")
 
-    results = {
-        spec.code: _run_period(spec)
-        for spec in PERIODS
-    }
+    results = {spec.code: _run_period(spec) for spec in PERIODS}
     assert _production_hashes() == production_before
 
     print(
         "  current_bar_reject_count_check="
-        + ",".join(
-            f"{spec.code}:{results[spec.code][1]}"
-            for spec in PERIODS
-        )
+        + ",".join(f"{spec.code}:{results[spec.code][1]}" for spec in PERIODS)
     )
     print("  production_hashes_unchanged=True")
     print("  production_files_changed=False")

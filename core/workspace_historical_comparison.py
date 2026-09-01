@@ -102,9 +102,7 @@ def build_workspace_historical_mode_comparison(
 
     if tuple(run_by_mode) != HISTORICAL_COMPARISON_MODES:
         missing = tuple(
-            mode
-            for mode in HISTORICAL_COMPARISON_MODES
-            if mode not in run_by_mode
+            mode for mode in HISTORICAL_COMPARISON_MODES if mode not in run_by_mode
         )
         if missing:
             raise WorkspaceHistoricalComparisonError(

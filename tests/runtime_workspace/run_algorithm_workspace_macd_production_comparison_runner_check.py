@@ -89,9 +89,12 @@ def main() -> None:
     assert first.historical_m1_rows > 0
     assert first.completed_m15_bars > 0
     assert first.classic_crosses == first.buy_crosses + first.sell_crosses
-    assert first.extremum_windows.window_3 + first.extremum_windows.window_5 + (
-        first.extremum_windows.window_7 + first.extremum_windows.none
-    ) == first.classic_crosses
+    assert (
+        first.extremum_windows.window_3
+        + first.extremum_windows.window_5
+        + (first.extremum_windows.window_7 + first.extremum_windows.none)
+        == first.classic_crosses
+    )
     assert first.prominence_criterion.passed + first.prominence_criterion.rejected == (
         first.classic_crosses
     )
@@ -133,10 +136,7 @@ def main() -> None:
     print(f"  profile_uid={first.profile_uid}")
     print(f"  historical_m1_rows={first.historical_m1_rows}")
     print(f"  completed_m15_bars={first.completed_m15_bars}")
-    print(
-        "  dropped_incomplete_m15_buckets="
-        f"{first.dropped_incomplete_m15_buckets}"
-    )
+    print("  dropped_incomplete_m15_buckets=" f"{first.dropped_incomplete_m15_buckets}")
     print(
         "  classic_crosses="
         f"{first.classic_crosses} BUY/SELL="
@@ -161,8 +161,7 @@ def main() -> None:
         f"{first.abc_angle_criterion.passed}/{first.abc_angle_criterion.rejected}"
     )
     print(
-        "  quality_accept/reject="
-        f"{first.quality_accepted}/{first.quality_rejected}"
+        "  quality_accept/reject=" f"{first.quality_accepted}/{first.quality_rejected}"
     )
     reasons = first.reject_reasons
     print(
@@ -205,14 +204,8 @@ def main() -> None:
     )
     print(f"  NEXT_BAR_GAP={first.next_bar_gap_orders}")
     excursions = first.excursions
-    print(
-        "  MFE_avg/max="
-        f"{excursions.average_mfe:.4f}/{excursions.maximum_mfe:.4f}"
-    )
-    print(
-        "  MAE_avg/min="
-        f"{excursions.average_mae:.4f}/{excursions.minimum_mae:.4f}"
-    )
+    print("  MFE_avg/max=" f"{excursions.average_mfe:.4f}/{excursions.maximum_mfe:.4f}")
+    print("  MAE_avg/min=" f"{excursions.average_mae:.4f}/{excursions.minimum_mae:.4f}")
     print(f"  signal_timestamp_before_entry={first.signal_timestamp_before_entry}")
     print(f"  completed_m15_only={first.completed_m15_only}")
     print(f"  broker_requests={first.broker_requests}")

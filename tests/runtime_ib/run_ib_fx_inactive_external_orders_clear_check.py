@@ -65,9 +65,7 @@ def _protective_order(
 
 
 def _evidence(open_orders: list[dict], captured_utc: str) -> dict:
-    snapshot = support.build_live_like_evidence(
-        include_external_execution=False
-    )
+    snapshot = support.build_live_like_evidence(include_external_execution=False)
     snapshot["captured_utc"] = captured_utc
     snapshot["positions"] = []
     snapshot["open_orders"] = [

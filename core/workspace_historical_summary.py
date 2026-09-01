@@ -121,8 +121,7 @@ def build_workspace_historical_signal_metrics(
             sell += 1
 
         alligator_active = (
-            record.alligator_confirmation
-            != WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED
+            record.alligator_confirmation != WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED
         )
         if alligator_active:
             if record.filter_decision == WORKSPACE_SIGNAL_FILTER_ALLOW:

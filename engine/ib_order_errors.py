@@ -32,9 +32,7 @@ class IBMarketOrderTimeoutError(RuntimeError):
         self.filled = float(filled or 0.0)
         self.remaining = float(remaining or 0.0)
         self.child_order_ids = tuple(
-            int(value)
-            for value in (child_order_ids or ())
-            if int(value) > 0
+            int(value) for value in (child_order_ids or ()) if int(value) > 0
         )
         self.stop_loss_order_id = (
             None if stop_loss_order_id is None else int(stop_loss_order_id)

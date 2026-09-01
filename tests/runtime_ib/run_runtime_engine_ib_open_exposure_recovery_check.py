@@ -291,9 +291,7 @@ def _create_runtime_leg(
 
 def _evidence() -> dict:
     return fixture.build_snapshot(
-        positions=[
-            fixture.build_position(USDZAR_ID, "USD", "ZAR", 1000.0)
-        ],
+        positions=[fixture.build_position(USDZAR_ID, "USD", "ZAR", 1000.0)],
         open_orders=[],
         executions=[fixture.build_usdzar_sell_leg_close_execution()],
     )
@@ -313,16 +311,12 @@ def main() -> int:
             engine.set_broker("IB")
             snapshot = engine.sync_active_broker_position_groups()
             group = snapshot.groups[0]
-            open_leg = next(
-                leg for leg in group.legs if leg.position_uid == open_uid
-            )
+            open_leg = next(leg for leg in group.legs if leg.position_uid == open_uid)
 
             if group.reconciliation_status != IB_RECONCILIATION_STATUS_RECONCILED:
                 raise AssertionError("Recovered broker group is not RECONCILED")
 
-            if open_leg.reconciliation_status != (
-                IB_RECONCILIATION_STATUS_RECONCILED
-            ):
+            if open_leg.reconciliation_status != (IB_RECONCILIATION_STATUS_RECONCILED):
                 raise AssertionError("Recovered OPEN leg is not RECONCILED")
 
             if open_leg.protection_status != IB_PROTECTION_STATUS_NONE:
@@ -350,8 +344,7 @@ def main() -> int:
                 active_only=True,
             )
             active_roles = {
-                str(row["order_role"] or "").strip().upper()
-                for row in active_orders
+                str(row["order_role"] or "").strip().upper() for row in active_orders
             }
 
             if active_roles != {IB_LEG_ORDER_ROLE_PARENT}:
@@ -367,9 +360,7 @@ def main() -> int:
             restart_snapshot = restart_engine.sync_active_broker_position_groups()
             restart_group = restart_snapshot.groups[0]
             restart_open_leg = next(
-                leg
-                for leg in restart_group.legs
-                if leg.position_uid == open_uid
+                leg for leg in restart_group.legs if leg.position_uid == open_uid
             )
 
             if restart_group.reconciliation_status != (

@@ -72,11 +72,7 @@ def _mark_profit(
     """Відтворити production executable mark-to-close PnL на M1 event."""
     close_price = event.bid if trade.direction == "BUY" else event.ask
     direction = 1.0 if trade.direction == "BUY" else -1.0
-    return (
-        (close_price - trade.entry_price)
-        * trade.volume
-        * direction
-    )
+    return (close_price - trade.entry_price) * trade.volume * direction
 
 
 def _trade_events(
@@ -138,17 +134,15 @@ def _observed_arming_case(
     post_arm_marks = mark_profits[arm_index:]
     arm_event = events[arm_index]
     arm_delay_m15 = (
-        (arm_event.timestamp - trade.entry_timestamp).total_seconds()
-        / M15_SECONDS
-    )
+        arm_event.timestamp - trade.entry_timestamp
+    ).total_seconds() / M15_SECONDS
     trigger_delay_m15: float | None = None
     trigger_profit_r: float | None = None
     if trigger_index is not None:
         trigger_event = events[trigger_index]
         trigger_delay_m15 = (
-            (trigger_event.timestamp - arm_event.timestamp).total_seconds()
-            / M15_SECONDS
-        )
+            trigger_event.timestamp - arm_event.timestamp
+        ).total_seconds() / M15_SECONDS
         trigger_profit_r = mark_profits[trigger_index] / risk_usd
 
     return ObservedArmingCase(
@@ -218,9 +212,7 @@ def main() -> None:
     assert len(trades) == 59
 
     source_events = tuple(
-        event
-        for window in session.execution_windows
-        for event in window
+        event for window in session.execution_windows for event in window
     )
     assert source_events
     assert all(
@@ -238,8 +230,7 @@ def main() -> None:
     assert (len(pd_positive), len(pd_negative), len(pd_zero)) == (29, 18, 1)
 
     paths = {
-        trade.position_id: _trade_events(trade, source_events)
-        for trade in pd_trades
+        trade.position_id: _trade_events(trade, source_events) for trade in pd_trades
     }
     assert all(
         _baseline_drawdown_close_matches(trade, paths[trade.position_id])
@@ -302,9 +293,7 @@ def main() -> None:
             trade for trade in pd_zero if cases[trade.position_id].reached
         )
         drawdown_triggered = tuple(
-            trade
-            for trade in reached
-            if cases[trade.position_id].drawdown_triggered
+            trade for trade in reached if cases[trade.position_id].drawdown_triggered
         )
 
         arm_delays = tuple(

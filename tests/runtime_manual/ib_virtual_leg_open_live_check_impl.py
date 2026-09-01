@@ -92,10 +92,7 @@ def _copy_database_snapshot(source_path: Path, target_path: Path) -> None:
 def _create_backup() -> Path:
     BACKUP_DIRECTORY.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-    backup_path = (
-        BACKUP_DIRECTORY
-        / f"demo_before_ib_virtual_leg_open_{timestamp}.db"
-    )
+    backup_path = BACKUP_DIRECTORY / f"demo_before_ib_virtual_leg_open_{timestamp}.db"
     _copy_database_snapshot(DB_PATH, backup_path)
     return backup_path
 
@@ -158,9 +155,9 @@ def main() -> int:
             comment="RoadMap90 live virtual-leg Open persistence check",
         )
         position_uid = str(result.get("position_uid") or "").strip()
-        persistence_status = str(
-            result.get("virtual_leg_persistence_status") or ""
-        ).strip().upper()
+        persistence_status = (
+            str(result.get("virtual_leg_persistence_status") or "").strip().upper()
+        )
         persistence_error = str(
             result.get("virtual_leg_persistence_error") or ""
         ).strip()
@@ -169,14 +166,8 @@ def main() -> int:
         print("IB virtual-leg live Open result")
         print(f"  position_uid={position_uid or '-'}")
         print(f"  parent_order_id={broker_result.get('parent_order_id')}")
-        print(
-            "  stop_loss_order_id="
-            f"{broker_result.get('stop_loss_order_id')}"
-        )
-        print(
-            "  take_profit_order_id="
-            f"{broker_result.get('take_profit_order_id')}"
-        )
+        print("  stop_loss_order_id=" f"{broker_result.get('stop_loss_order_id')}")
+        print("  take_profit_order_id=" f"{broker_result.get('take_profit_order_id')}")
         print(f"  persistence_status={persistence_status}")
         print(f"  persistence_error={persistence_error or '-'}")
         print(f"  backup={backup_path}")
@@ -210,9 +201,7 @@ def main() -> int:
             position_uid=position_uid,
             active_only=True,
         )
-        open_seeds = (
-            engine.repository.get_open_ib_virtual_position_leg_seeds()
-        )
+        open_seeds = engine.repository.get_open_ib_virtual_position_leg_seeds()
 
         print(f"  leg_side={leg.get('side')}")
         print(f"  initial_volume={leg.get('initial_volume')}")

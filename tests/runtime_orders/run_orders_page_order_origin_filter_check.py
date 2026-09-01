@@ -144,8 +144,7 @@ def _assert_ib_filters(app: QApplication) -> None:
             "AUTO",
         ]
         assert [
-            lge_group.child(index).data(COL_ID, ROLE_ORDER_ORIGIN)
-            for index in range(3)
+            lge_group.child(index).data(COL_ID, ROLE_ORDER_ORIGIN) for index in range(3)
         ] == ["MANUAL", "SEMI", "AUTO"]
         assert broker_group.text(COL_SOURCE) == "BROKER"
         assert page.ui.lblPnlSummary.text() == "Σ PnL: 3.00 JPY; ≈ 11.00 USD"

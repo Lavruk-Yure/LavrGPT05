@@ -166,12 +166,8 @@ def main() -> None:
     assert replay_speed_label(REPLAY_SPEED_MAX_FAST) == "MAX FAST"
     assert replay_speed_label(1000) == "1000x"
 
-    ui_100x_batches = _ui_cycle_batch_sizes(
-        service, speed=100, event_count=2058
-    )
-    ui_1000x_batches = _ui_cycle_batch_sizes(
-        service, speed=1000, event_count=2058
-    )
+    ui_100x_batches = _ui_cycle_batch_sizes(service, speed=100, event_count=2058)
+    ui_1000x_batches = _ui_cycle_batch_sizes(service, speed=1000, event_count=2058)
     ui_max_batches = _ui_cycle_batch_sizes(
         service, speed=REPLAY_SPEED_MAX, event_count=2058
     )
@@ -214,9 +210,7 @@ def main() -> None:
     assert "REPLAY_MAX_FAST_TIME_BUDGET_SECONDS" in area_source
     assert "_replay_fast_ui_last_sync" in area_source
     sync_call = "self._sync_workspace_runtime(workspace_uid)"
-    post_sync_stamp = (
-        "self._replay_fast_ui_last_sync[workspace_uid] = monotonic()"
-    )
+    post_sync_stamp = "self._replay_fast_ui_last_sync[workspace_uid] = monotonic()"
     burst_index = area_source.index("def _advance_replay_burst")
     sync_index = area_source.index(sync_call, burst_index)
     stamp_index = area_source.index(post_sync_stamp, sync_index)
@@ -267,8 +261,7 @@ def main() -> None:
     assert max_fast_settings.speed == REPLAY_SPEED_MAX_FAST
     assert max_fast_settings.merge_settings({"future_key": "keep"})["speed"] == -1
     assert (
-        max_fast_settings.merge_settings({"future_key": "keep"})["future_key"]
-        == "keep"
+        max_fast_settings.merge_settings({"future_key": "keep"})["future_key"] == "keep"
     )
 
     invalid_session_speed_blocked = False

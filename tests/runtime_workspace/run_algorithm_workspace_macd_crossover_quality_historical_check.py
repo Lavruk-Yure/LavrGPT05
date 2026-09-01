@@ -126,14 +126,10 @@ def main() -> None:
     assert proposals == report.total_crosses
     assert report.buy_crosses + report.sell_crosses == report.total_crosses
     assert (
-        report.final_quality_pass + report.final_quality_reject
-        == report.total_crosses
+        report.final_quality_pass + report.final_quality_reject == report.total_crosses
     )
     assert (
-        report.window_3
-        + report.window_5
-        + report.window_7
-        + report.extremum_not_found
+        report.window_3 + report.window_5 + report.window_7 + report.extremum_not_found
         == report.total_crosses
     )
     assert data_set.report.accepted_rows == 58320
@@ -169,9 +165,7 @@ def main() -> None:
     assert not ordinary_sell.criterion_angle_pass
     assert 40.0 < ordinary_sell.effective_angle_degrees < 41.0
 
-    visual_45_reference = by_timestamp[
-        datetime(2026, 1, 9, 14, 15, tzinfo=UTC)
-    ]
+    visual_45_reference = by_timestamp[datetime(2026, 1, 9, 14, 15, tzinfo=UTC)]
     assert visual_45_reference.direction == "SELL"
     assert visual_45_reference.final_quality_pass
     assert 45.0 <= visual_45_reference.effective_angle_degrees < 45.1
@@ -186,28 +180,22 @@ def main() -> None:
     angle_bands = {
         "lt_10": sum(item.effective_angle_degrees < 10.0 for item in report.signals),
         "10_20": sum(
-            10.0 <= item.effective_angle_degrees < 20.0
-            for item in report.signals
+            10.0 <= item.effective_angle_degrees < 20.0 for item in report.signals
         ),
         "20_30": sum(
-            20.0 <= item.effective_angle_degrees < 30.0
-            for item in report.signals
+            20.0 <= item.effective_angle_degrees < 30.0 for item in report.signals
         ),
         "30_40": sum(
-            30.0 <= item.effective_angle_degrees < 40.0
-            for item in report.signals
+            30.0 <= item.effective_angle_degrees < 40.0 for item in report.signals
         ),
         "40_45": sum(
-            40.0 <= item.effective_angle_degrees < 45.0
-            for item in report.signals
+            40.0 <= item.effective_angle_degrees < 45.0 for item in report.signals
         ),
         "45_50": sum(
-            45.0 <= item.effective_angle_degrees < 50.0
-            for item in report.signals
+            45.0 <= item.effective_angle_degrees < 50.0 for item in report.signals
         ),
         "50_60": sum(
-            50.0 <= item.effective_angle_degrees < 60.0
-            for item in report.signals
+            50.0 <= item.effective_angle_degrees < 60.0 for item in report.signals
         ),
         "ge_60": sum(item.effective_angle_degrees >= 60.0 for item in report.signals),
     }
@@ -231,19 +219,14 @@ def main() -> None:
     assert len(structurally_qualified) == 64
     assert sum(item.criterion_angle_pass for item in structurally_qualified) == 23
 
-    accepted = tuple(
-        item for item in report.signals if item.final_quality_pass
-    )
-    rejected = tuple(
-        item for item in report.signals if not item.final_quality_pass
-    )
+    accepted = tuple(item for item in report.signals if item.final_quality_pass)
+    rejected = tuple(item for item in report.signals if not item.final_quality_pass)
 
     print("Algorithm Workspace MACD Crossover Quality Historical result")
     print(f"  source_rows={data_set.report.accepted_rows}")
     print(f"  completed_m15_bars={aggregator.completed_bars}")
     print(
-        "  dropped_incomplete_m15_buckets="
-        f"{aggregator.dropped_incomplete_buckets}"
+        "  dropped_incomplete_m15_buckets=" f"{aggregator.dropped_incomplete_buckets}"
     )
     print(f"  classic_crosses={report.total_crosses}")
     print(f"  BUY/SELL={report.buy_crosses}/{report.sell_crosses}")

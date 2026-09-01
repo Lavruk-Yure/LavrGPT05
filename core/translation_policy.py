@@ -333,24 +333,14 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     "AlgorithmWorkspaceSignalTooltip.macdQualityResult": {
         "uk": "Результат MACD Quality"
     },
-    "AlgorithmWorkspaceSignalTooltip.alligatorReason": {
-        "uk": "Причина Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.alligatorState": {
-        "uk": "Стан Alligator"
-    },
+    "AlgorithmWorkspaceSignalTooltip.alligatorReason": {"uk": "Причина Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.alligatorState": {"uk": "Стан Alligator"},
     "AlgorithmWorkspaceSignalTooltip.alligatorObservationState": {
         "uk": "Стан observation Alligator"
     },
-    "AlgorithmWorkspaceSignalTooltip.alligatorRegime": {
-        "uk": "Режим Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.alligatorPhase": {
-        "uk": "Фаза Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.alligatorActiveAge": {
-        "uk": "Вік ACTIVE, барів"
-    },
+    "AlgorithmWorkspaceSignalTooltip.alligatorRegime": {"uk": "Режим Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.alligatorPhase": {"uk": "Фаза Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.alligatorActiveAge": {"uk": "Вік ACTIVE, барів"},
     "AlgorithmWorkspaceSignalTooltip.alligatorNormalizedSlope": {
         "uk": "Нормалізований нахил Alligator"
     },
@@ -360,9 +350,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     "AlgorithmWorkspaceAlligatorRegime.flat": {"uk": "Флет"},
     "AlgorithmWorkspaceAlligatorRegime.trendUp": {"uk": "Тренд вгору"},
     "AlgorithmWorkspaceAlligatorRegime.trendDown": {"uk": "Тренд вниз"},
-    "AlgorithmWorkspaceAlligatorRegime.trendUpStarting": {
-        "uk": "Початок тренду вгору"
-    },
+    "AlgorithmWorkspaceAlligatorRegime.trendUpStarting": {"uk": "Початок тренду вгору"},
     "AlgorithmWorkspaceAlligatorRegime.trendUpEnding": {
         "uk": "Завершення тренду вгору"
     },
@@ -377,51 +365,29 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     "AlgorithmWorkspaceAlligatorPhase.starting": {"uk": "STARTING"},
     "AlgorithmWorkspaceAlligatorPhase.active": {"uk": "ACTIVE"},
     "AlgorithmWorkspaceAlligatorPhase.ending": {"uk": "ENDING"},
-    "AlgorithmWorkspaceSignalTooltip.alligatorMode": {
-        "uk": "Режим Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.alligatorTimeframe": {
-        "uk": "Таймфрейм Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.alligatorProfile": {
-        "uk": "Профіль Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.observationTime": {
-        "uk": "Час спостереження"
-    },
-    "AlgorithmWorkspaceSignalTooltip.availableAt": {
-        "uk": "Доступно з"
-    },
+    "AlgorithmWorkspaceSignalTooltip.alligatorMode": {"uk": "Режим Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.alligatorTimeframe": {"uk": "Таймфрейм Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.alligatorProfile": {"uk": "Профіль Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.observationTime": {"uk": "Час спостереження"},
+    "AlgorithmWorkspaceSignalTooltip.availableAt": {"uk": "Доступно з"},
     "AlgorithmWorkspaceSignalTooltip.alligatorT2": {"uk": "Alligator t-2"},
     "AlgorithmWorkspaceSignalTooltip.alligatorT1": {"uk": "Alligator t-1"},
     "AlgorithmWorkspaceSignalTooltip.alligatorT": {"uk": "Alligator t"},
-    "AlgorithmWorkspaceSignalTooltip.alligatorDecision": {
-        "uk": "Рішення Alligator"
-    },
-    "AlgorithmWorkspaceSignalTooltip.finalDecision": {
-        "uk": "Підсумкове рішення"
-    },
+    "AlgorithmWorkspaceSignalTooltip.alligatorDecision": {"uk": "Рішення Alligator"},
+    "AlgorithmWorkspaceSignalTooltip.finalDecision": {"uk": "Підсумкове рішення"},
     "AlgorithmWorkspaceSignalTooltip.candidateFLifecycle": {
         "uk": "Життєвий цикл Candidate F"
     },
     "AlgorithmWorkspaceSignalTooltip.lifecycleReason": {
         "uk": "Причина завершення lifecycle"
     },
-    "AlgorithmWorkspaceSignalTooltip.lifecycleTime": {
-        "uk": "Час завершення lifecycle"
-    },
-    "AlgorithmWorkspaceSignalTooltip.lifecycleDelayBars": {
-        "uk": "Очікування, барів"
-    },
+    "AlgorithmWorkspaceSignalTooltip.lifecycleTime": {"uk": "Час завершення lifecycle"},
+    "AlgorithmWorkspaceSignalTooltip.lifecycleDelayBars": {"uk": "Очікування, барів"},
     "AlgorithmWorkspaceSignalTooltip.lifecycleSnapshot": {
         "uk": "Стан при завершенні lifecycle"
     },
-    "AlgorithmWorkspaceSignalTooltip.technicalCodes": {
-        "uk": "Технічні коди причини"
-    },
-    "AlgorithmWorkspaceSignalTooltip.diagnosticReason": {
-        "uk": "Діагностична причина"
-    },
+    "AlgorithmWorkspaceSignalTooltip.technicalCodes": {"uk": "Технічні коди причини"},
+    "AlgorithmWorkspaceSignalTooltip.diagnosticReason": {"uk": "Діагностична причина"},
     "AlgorithmWorkspaceSignalTooltip.profileRevision": {"uk": "ревізія"},
     "AlgorithmWorkspaceSignalSummary.header": {
         "uk": (
@@ -438,29 +404,19 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     "AlgorithmWorkspaceSignalSummary.signal": {"uk": "Сигнал"},
     "AlgorithmWorkspaceSignalSummary.macdQuality": {"uk": "MACD Quality"},
     "AlgorithmWorkspaceSignalSummary.alligator": {"uk": "Alligator"},
-    "AlgorithmWorkspaceSignalSummary.alligatorStrength": {
-        "uk": "Сила Alligator"
-    },
+    "AlgorithmWorkspaceSignalSummary.alligatorStrength": {"uk": "Сила Alligator"},
     "AlgorithmWorkspaceSignalSummary.lifecycle": {"uk": "Candidate F"},
-    "AlgorithmWorkspaceSignalSummary.lifecycleSnapshot": {
-        "uk": "Стан lifecycle"
-    },
-    "AlgorithmWorkspaceSignalSummary.lifecycleReason": {
-        "uk": "Причина lifecycle"
-    },
+    "AlgorithmWorkspaceSignalSummary.lifecycleSnapshot": {"uk": "Стан lifecycle"},
+    "AlgorithmWorkspaceSignalSummary.lifecycleReason": {"uk": "Причина lifecycle"},
     "AlgorithmWorkspaceSignalSummary.alligatorConfirmation": {
         "uk": "Підтвердження Alligator"
     },
     "AlgorithmWorkspaceSignalSummary.confirmationPassedRelease": {
         "uk": "ПРОЙДЕНО → RELEASE"
     },
-    "AlgorithmWorkspaceSignalSummary.structuralGuard": {
-        "uk": "Structural guard"
-    },
+    "AlgorithmWorkspaceSignalSummary.structuralGuard": {"uk": "Structural guard"},
     "AlgorithmWorkspaceSignalSummary.filter": {"uk": "Фільтр / guard"},
-    "AlgorithmWorkspaceSignalSummary.finalDecision": {
-        "uk": "Фінальне рішення"
-    },
+    "AlgorithmWorkspaceSignalSummary.finalDecision": {"uk": "Фінальне рішення"},
     "AlgorithmWorkspaceSignalSummary.decision": {"uk": "Рішення"},
     "AlgorithmWorkspaceSignalSummary.technicalHeader": {
         "uk": "*** ТЕХНІЧНА ДІАГНОСТИКА ***"
@@ -470,16 +426,10 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     "AlgorithmWorkspaceCandidateFLifecycle.cancel": {"uk": "CANCEL"},
     "AlgorithmWorkspaceCandidateFLifecycle.expire": {"uk": "EXPIRE"},
     "AlgorithmWorkspaceCandidateFLifecycle.oppositeMacd": {
-        "uk": (
-            "З’явився протилежний сигнал MACD; "
-            "ARMED скасовано."
-        )
+        "uk": ("З’явився протилежний сигнал MACD; " "ARMED скасовано.")
     },
     "AlgorithmWorkspaceCandidateFLifecycle.macdInvalid": {
-        "uk": (
-            "Співвідношення MACD стало невалідним "
-            "до підтвердження."
-        )
+        "uk": ("Співвідношення MACD стало невалідним " "до підтвердження.")
     },
     "AlgorithmWorkspaceCandidateFLifecycle.oppositeActiveAlligator": {
         "uk": "Протилежний ACTIVE Alligator скасував ARMED."
@@ -488,10 +438,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "uk": "TTL ARMED завершився без підтвердження."
     },
     "AlgorithmWorkspaceCandidateFLifecycle.releasedByAlligator": {
-        "uk": (
-            "Підтвердження Alligator дозволило "
-            "відкладений сигнал."
-        )
+        "uk": ("Підтвердження Alligator дозволило " "відкладений сигнал.")
     },
     "AlgorithmWorkspaceSignalReason.macdClassicCross": {
         "uk": "Класичний перетин MACD."
@@ -612,21 +559,15 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     },
     "AlgorithmWorkspaceSignalReason.externalExposureSafetyHold": {
         "uk": (
-            "Сигнали призупинено через захисну паузу зовнішньої "
-            "IB FX-експозиції."
+            "Сигнали призупинено через захисну паузу зовнішньої " "IB FX-експозиції."
         )
     },
-    "AlgorithmWorkspaceSignalReason.spreadTooWide": {
-        "uk": "Спред завеликий."
-    },
+    "AlgorithmWorkspaceSignalReason.spreadTooWide": {"uk": "Спред завеликий."},
     "AlgorithmWorkspaceSignalReason.manualDisplayOnly": {
         "uk": "Сигнал прийнято лише для відображення в режимі MANUAL."
     },
     "AlgorithmWorkspaceSignalReason.semiConfirmationRequired": {
-        "uk": (
-            "Сигнал прийнято; у режимі SEMI потрібне підтвердження "
-            "користувача."
-        )
+        "uk": ("Сигнал прийнято; у режимі SEMI потрібне підтвердження " "користувача.")
     },
     "AlgorithmWorkspaceSignalReason.autoAccepted": {
         "uk": "Сигнал прийнято в режимі AUTO."
@@ -638,33 +579,15 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "uk": "Сигнал відхилено обмеженнями ризику."
     },
     "AlgorithmWorkspaceWindow.colAlligatorRegime": {"uk": "Режим"},
-    "AlgorithmWorkspaceWindow.colSignalTimeframeMode": {
-        "uk": "ТФ / режим"
-    },
-    "AlgorithmWorkspaceWindow.colSignalProfileRevision": {
-        "uk": "Ревізія профілю"
-    },
-    "AlgorithmWorkspaceWindow.colFilterResult": {
-        "uk": "Фільтр / результат"
-    },
-    "AlgorithmWorkspaceWindow.colSpreadStatus": {
-        "uk": "Спред"
-    },
-    "AlgorithmWorkspaceWindow.colCloseReason": {
-        "uk": "Причина закриття"
-    },
-    "AlgorithmWorkspaceWindow.colPositionSignalTime": {
-        "uk": "Сигнал"
-    },
-    "AlgorithmWorkspaceWindow.colClosedAt": {
-        "uk": "Закрито"
-    },
-    "AlgorithmWorkspaceWindow.lblPositionDateJump": {
-        "uk": "Перейти до дати"
-    },
-    "AlgorithmWorkspaceWindow.btnPositionDateJump": {
-        "uk": "Перейти на вказану дату"
-    },
+    "AlgorithmWorkspaceWindow.colSignalTimeframeMode": {"uk": "ТФ / режим"},
+    "AlgorithmWorkspaceWindow.colSignalProfileRevision": {"uk": "Ревізія профілю"},
+    "AlgorithmWorkspaceWindow.colFilterResult": {"uk": "Фільтр / результат"},
+    "AlgorithmWorkspaceWindow.colSpreadStatus": {"uk": "Спред"},
+    "AlgorithmWorkspaceWindow.colCloseReason": {"uk": "Причина закриття"},
+    "AlgorithmWorkspaceWindow.colPositionSignalTime": {"uk": "Сигнал"},
+    "AlgorithmWorkspaceWindow.colClosedAt": {"uk": "Закрито"},
+    "AlgorithmWorkspaceWindow.lblPositionDateJump": {"uk": "Перейти до дати"},
+    "AlgorithmWorkspaceWindow.btnPositionDateJump": {"uk": "Перейти на вказану дату"},
     "AlgorithmWorkspaceWindow.positionDateJumpHint": {
         "uk": (
             "Вибрати календарну дату відкриття й перейти до першої "
@@ -672,18 +595,10 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "доступної дати."
         )
     },
-    "AlgorithmWorkspaceWindow.btnPositionGoSignal": {
-        "uk": "До сигналу"
-    },
-    "AlgorithmWorkspaceWindow.btnPositionGoEntry": {
-        "uk": "На діаграму"
-    },
-    "AlgorithmWorkspaceWindow.lblSignalDateJump": {
-        "uk": "Перейти до дати"
-    },
-    "AlgorithmWorkspaceWindow.btnSignalDateJump": {
-        "uk": "Перейти на вказану дату"
-    },
+    "AlgorithmWorkspaceWindow.btnPositionGoSignal": {"uk": "До сигналу"},
+    "AlgorithmWorkspaceWindow.btnPositionGoEntry": {"uk": "На діаграму"},
+    "AlgorithmWorkspaceWindow.lblSignalDateJump": {"uk": "Перейти до дати"},
+    "AlgorithmWorkspaceWindow.btnSignalDateJump": {"uk": "Перейти на вказану дату"},
     "AlgorithmWorkspaceWindow.signalDateJumpHint": {
         "uk": (
             "Вибрати календарну дату сигналу й перейти до першого "
@@ -691,15 +606,9 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "доступної дати."
         )
     },
-    "AlgorithmWorkspaceWindow.btnSignalGoPosition": {
-        "uk": "До позиції"
-    },
-    "AlgorithmWorkspaceWindow.btnSignalGoChart": {
-        "uk": "До діаграми"
-    },
-    "AlgorithmWorkspaceWindow.btnSignalGoJournal": {
-        "uk": "До журналу"
-    },
+    "AlgorithmWorkspaceWindow.btnSignalGoPosition": {"uk": "До позиції"},
+    "AlgorithmWorkspaceWindow.btnSignalGoChart": {"uk": "До діаграми"},
+    "AlgorithmWorkspaceWindow.btnSignalGoJournal": {"uk": "До журналу"},
     "AlgorithmWorkspaceWindow.signalGoPositionHint": {
         "uk": "Відкрити позицію, створену з вибраного прийнятого сигналу."
     },
@@ -718,33 +627,15 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "за політикою NEXT_BAR_OPEN."
         )
     },
-    "AlgorithmWorkspacePositionStatus.open": {
-        "uk": "Відкрита"
-    },
-    "AlgorithmWorkspacePositionStatus.closed": {
-        "uk": "Закрита"
-    },
-    "AlgorithmWorkspacePositionCloseReason.stopLoss": {
-        "uk": "Stop Loss"
-    },
-    "AlgorithmWorkspacePositionCloseReason.takeProfit": {
-        "uk": "Take Profit"
-    },
-    "AlgorithmWorkspacePositionCloseReason.profitDrawdown": {
-        "uk": "Відкат прибутку"
-    },
-    "AlgorithmWorkspacePositionCloseReason.sessionEnd": {
-        "uk": "Кінець Replay"
-    },
-    "AlgorithmWorkspacePositionTooltip.status": {
-        "uk": "Стан"
-    },
-    "AlgorithmWorkspacePositionTooltip.closeReason": {
-        "uk": "Причина закриття"
-    },
-    "AlgorithmWorkspacePositionTooltip.technicalStatus": {
-        "uk": "Технічний статус"
-    },
+    "AlgorithmWorkspacePositionStatus.open": {"uk": "Відкрита"},
+    "AlgorithmWorkspacePositionStatus.closed": {"uk": "Закрита"},
+    "AlgorithmWorkspacePositionCloseReason.stopLoss": {"uk": "Stop Loss"},
+    "AlgorithmWorkspacePositionCloseReason.takeProfit": {"uk": "Take Profit"},
+    "AlgorithmWorkspacePositionCloseReason.profitDrawdown": {"uk": "Відкат прибутку"},
+    "AlgorithmWorkspacePositionCloseReason.sessionEnd": {"uk": "Кінець Replay"},
+    "AlgorithmWorkspacePositionTooltip.status": {"uk": "Стан"},
+    "AlgorithmWorkspacePositionTooltip.closeReason": {"uk": "Причина закриття"},
+    "AlgorithmWorkspacePositionTooltip.technicalStatus": {"uk": "Технічний статус"},
     "AlgorithmWorkspacePositionTooltip.technicalReason": {
         "uk": "Технічний код причини"
     },
@@ -1375,23 +1266,15 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
     },
     "AlgorithmWorkspaceWindow.chartZoomOutHint": {
         "uk": (
-            "Горизонтальний масштаб: зменшити. Клавіша: -. "
-            "Миша: коліщатко вниз."
+            "Горизонтальний масштаб: зменшити. Клавіша: -. " "Миша: коліщатко вниз."
         ),
-        "pl": (
-            "Skala pozioma: pomniejsz. Klawisz: -. "
-            "Mysz: kółko w dół."
-        ),
+        "pl": ("Skala pozioma: pomniejsz. Klawisz: -. " "Mysz: kółko w dół."),
     },
     "AlgorithmWorkspaceWindow.chartZoomInHint": {
         "uk": (
-            "Горизонтальний масштаб: збільшити. Клавіша: +. "
-            "Миша: коліщатко вгору."
+            "Горизонтальний масштаб: збільшити. Клавіша: +. " "Миша: коліщатко вгору."
         ),
-        "pl": (
-            "Skala pozioma: powiększ. Klawisz: +. "
-            "Mysz: kółko w górę."
-        ),
+        "pl": ("Skala pozioma: powiększ. Klawisz: +. " "Mysz: kółko w górę."),
     },
     "AlgorithmWorkspaceWindow.chartVerticalZoomOutHint": {
         "uk": (
@@ -1399,8 +1282,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "Миша: Ctrl+коліщатко вниз."
         ),
         "pl": (
-            "Skala pionowa: pomniejsz. Klawisze: Ctrl+-. "
-            "Mysz: Ctrl+kółko w dół."
+            "Skala pionowa: pomniejsz. Klawisze: Ctrl+-. " "Mysz: Ctrl+kółko w dół."
         ),
     },
     "AlgorithmWorkspaceWindow.chartVerticalZoomInHint": {
@@ -1409,8 +1291,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "Миша: Ctrl+коліщатко вгору."
         ),
         "pl": (
-            "Skala pionowa: powiększ. Klawisze: Ctrl++. "
-            "Mysz: Ctrl+kółko w górę."
+            "Skala pionowa: powiększ. Klawisze: Ctrl++. " "Mysz: Ctrl+kółko w górę."
         ),
     },
     "AlgorithmWorkspaceWindow.chartVerticalPanHint": {
@@ -1447,8 +1328,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "Replay має бути на паузі."
         ),
         "pl": (
-            "Przeciągnij pionowo, aby zmienić Stop Loss. "
-            "Replay musi być wstrzymany."
+            "Przeciągnij pionowo, aby zmienić Stop Loss. " "Replay musi być wstrzymany."
         ),
     },
     "AlgorithmWorkspaceWindow.chartTakeProfitDragHint": {
@@ -2001,8 +1881,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "pl": "Minimalne |H[extremum]| przed przecięciem MACD i Signal.",
         "de": "Minimales |H[extremum]| vor der Kreuzung von MACD und Signal.",
         "fr": (
-            "Valeur minimale de |H[extremum]| avant le croisement "
-            "de MACD et Signal."
+            "Valeur minimale de |H[extremum]| avant le croisement " "de MACD et Signal."
         ),
     },
     "WorkspaceParameter.macdCrossMinAngle.title": {
@@ -2012,22 +1891,12 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "fr": "MACD : angle min. de croisement, °",
     },
     "WorkspaceParameter.macdCrossMinAngle.description": {
-        "uk": (
-            "Мінімальний калібрований кут між MACD і Signal "
-            "у режимі EXTENDED."
-        ),
-        "pl": (
-            "Minimalny skalibrowany kąt między MACD i Signal "
-            "w trybie EXTENDED."
-        ),
+        "uk": ("Мінімальний калібрований кут між MACD і Signal " "у режимі EXTENDED."),
+        "pl": ("Minimalny skalibrowany kąt między MACD i Signal " "w trybie EXTENDED."),
         "de": (
-            "Kalibrierter Mindestwinkel zwischen MACD und Signal "
-            "im EXTENDED-Modus."
+            "Kalibrierter Mindestwinkel zwischen MACD und Signal " "im EXTENDED-Modus."
         ),
-        "fr": (
-            "Angle calibré minimal entre MACD et Signal "
-            "en mode EXTENDED."
-        ),
+        "fr": ("Angle calibré minimal entre MACD et Signal " "en mode EXTENDED."),
     },
     "WorkspaceParameter.alligatorEnabled.title": {
         "uk": "Увімкнути фільтр Alligator",
@@ -2248,13 +2117,9 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "pl": "Wykryto automatycznie ze znaczników czasu CSV: {timeframe}",
     },
     "AlgorithmWorkspaceReplayDialog.sourceTimeframeManualFallback": {
-        "uk": (
-            "Таймфрейм CSV не вдалося визначити надійно. "
-            "Виберіть його вручну."
-        ),
+        "uk": ("Таймфрейм CSV не вдалося визначити надійно. " "Виберіть його вручну."),
         "pl": (
-            "Nie udało się wiarygodnie wykryć interwału CSV. "
-            "Wybierz go ręcznie."
+            "Nie udało się wiarygodnie wykryć interwału CSV. " "Wybierz go ręcznie."
         ),
     },
     "AlgorithmWorkspaceReplayDialog.lblDelimiter": {
@@ -2381,10 +2246,7 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
         "pl": "Tabulator",
     },
     "AlgorithmWorkspaceWindow.historyQuality": {
-        "uk": (
-            "пропущено {filtered} • розривів {gaps} • "
-            "котирувань {quotes}"
-        ),
+        "uk": ("пропущено {filtered} • розривів {gaps} • " "котирувань {quotes}"),
     },
     "AlgorithmWorkspaceParametersDialog.btnIndicatorProfiles": {
         "uk": "Профілі індикаторів…",

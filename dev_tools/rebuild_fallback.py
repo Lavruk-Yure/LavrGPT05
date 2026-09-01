@@ -371,8 +371,7 @@ def main() -> None:
 
     central_updates = apply_central_translation_overrides(fallback)
     print(
-        "[2/6] Централізовані translation overrides "
-        f"(оновлень: {central_updates})"
+        "[2/6] Централізовані translation overrides " f"(оновлень: {central_updates})"
     )
 
     # ------------------------------------------------------------------

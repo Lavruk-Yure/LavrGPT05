@@ -226,9 +226,7 @@ def main() -> None:
             order_rows=order_rows,
             position_rows=position_rows,
         )
-        assert [order.order_id for order in other_owned.orders] == [
-            "OTHER-WSP-ORDER"
-        ]
+        assert [order.order_id for order in other_owned.orders] == ["OTHER-WSP-ORDER"]
         assert [position.position_id for position in other_owned.positions] == [
             "OTHER-WSP-POSITION"
         ]

@@ -1,5 +1,11 @@
-# -*- coding: utf-8 -*-
-"""Runtime check for WSP broker request and subscription accounting."""
+"""run_workspace_broker_request_accounting_check.py — broker accounting.
+
+Regression перевіряє WSP subscription/reference counters, quote та historical
+request accounting, reconnect retries і звільнення subscriptions на локальному
+fake RuntimeEngine. Quote snapshots залишаються в одному відкритому bucket,
+тому provider не повертає їх як completed algorithm events. Мережа та broker
+execution не використовуються; Replay і торгову математику тест не змінює.
+"""
 
 from __future__ import annotations
 
@@ -170,6 +176,7 @@ def _start(
 
 
 def main() -> None:
+    """Перевірити counters без dispatch незавершених quote buckets."""
     engine = FakeRuntimeEngine()
     provider = RuntimeEngineWorkspaceMarketProvider(engine)
 
@@ -185,8 +192,8 @@ def main() -> None:
     assert initial.history_downloads == 2
     assert initial.history_broker_requests == 6
 
-    assert provider.poll_workspace("WSP-A") is not None
-    assert provider.poll_workspace("WSP-B") is not None
+    assert provider.poll_workspace("WSP-A") is None
+    assert provider.poll_workspace("WSP-B") is None
     after_poll = provider.request_accounting_snapshot()
     assert after_poll.quote_snapshot_requests == 2
     assert engine.quote_calls == [
@@ -196,7 +203,7 @@ def main() -> None:
 
     provider.suspend_workspace("WSP-A")
     assert provider.resume_workspace("WSP-A") == ()
-    assert provider.poll_workspace("WSP-A") is not None
+    assert provider.poll_workspace("WSP-A") is None
     after_retry = provider.request_accounting_snapshot()
     assert after_retry.retry_requests == 1
     assert after_retry.quote_snapshot_requests == 3

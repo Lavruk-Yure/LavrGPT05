@@ -592,9 +592,7 @@ class _IBWrapper(EWrapper):
                 },
             )
             row[tick_field] = price_value
-            row["timestamp"] = (
-                datetime.now(UTC).replace(microsecond=0).isoformat()
-            )
+            row["timestamp"] = datetime.now(UTC).replace(microsecond=0).isoformat()
             row["delayed"] = int(tick_type) in {66, 67, 68, 75}
             row["error_code"] = None
             row["error_message"] = ""
@@ -715,8 +713,7 @@ class _IBWrapper(EWrapper):
             if req_id_int == self.historical_data_req_id:
                 if error_code not in {2104, 2106, 2158}:
                     self.historical_data_error = (
-                        f"IB historical data error {error_code}: "
-                        f"{error_string}"
+                        f"IB historical data error {error_code}: " f"{error_string}"
                     )
                     self.historical_data_event.set()
 
@@ -1314,9 +1311,9 @@ class IBAdapter(BrokerInterface):
             "AvailableFunds",
             "MaintMarginReq",
         ):
-            currency = str(
-                (values.get(tag) or {}).get("currency") or ""
-            ).strip().upper()
+            currency = (
+                str((values.get(tag) or {}).get("currency") or "").strip().upper()
+            )
 
             if currency and currency != "BASE":
                 return currency
@@ -3088,19 +3085,14 @@ class IBAdapter(BrokerInterface):
 
         quotes = self._wrapper.get_market_data_snapshot(symbols)
         complete = all(
-            self._quote_has_bid_and_ask(quotes.get(symbol) or {})
-            for symbol in symbols
+            self._quote_has_bid_and_ask(quotes.get(symbol) or {}) for symbol in symbols
         )
 
         return {
-            "captured_utc": (
-                datetime.now(UTC).replace(microsecond=0).isoformat()
-            ),
+            "captured_utc": (datetime.now(UTC).replace(microsecond=0).isoformat()),
             "complete": complete,
             "quotes": quotes,
-            "subscribed_symbols": sorted(
-                self._market_data_requests_by_symbol
-            ),
+            "subscribed_symbols": sorted(self._market_data_requests_by_symbol),
         }
 
     def get_historical_bars(
@@ -3134,16 +3126,12 @@ class IBAdapter(BrokerInterface):
         request_end = end
         request_count = 0
         consecutive_empty_requests = 0
-        empty_chunk_seconds = IB_HISTORY_EMPTY_CHUNK_SECONDS_BY_TIMEFRAME[
-            frame
-        ]
+        empty_chunk_seconds = IB_HISTORY_EMPTY_CHUNK_SECONDS_BY_TIMEFRAME[frame]
 
         with self._historical_data_lock:
             while request_end >= start:
                 if request_count >= IB_HISTORY_MAX_REQUESTS:
-                    raise RuntimeError(
-                        "IB historical request safety limit exceeded"
-                    )
+                    raise RuntimeError("IB historical request safety limit exceeded")
                 request_count += 1
                 try:
                     raw_bars = self._request_historical_chunk(
@@ -3168,9 +3156,7 @@ class IBAdapter(BrokerInterface):
                             "IB historical data remained empty for too many "
                             "consecutive chunks"
                         )
-                    next_end = request_end - timedelta(
-                        seconds=empty_chunk_seconds
-                    )
+                    next_end = request_end - timedelta(seconds=empty_chunk_seconds)
                     if next_end < start:
                         break
                     request_end = next_end
@@ -3201,15 +3187,11 @@ class IBAdapter(BrokerInterface):
                     break
                 next_end = earliest - timedelta(seconds=bar_seconds)
                 if next_end >= request_end:
-                    raise RuntimeError(
-                        "IB historical pagination did not move backward"
-                    )
+                    raise RuntimeError("IB historical pagination did not move backward")
                 request_end = next_end
                 time.sleep(IB_HISTORY_REQUEST_DELAY_SECONDS)
 
-        bars = tuple(
-            bars_by_timestamp[key] for key in sorted(bars_by_timestamp)
-        )
+        bars = tuple(bars_by_timestamp[key] for key in sorted(bars_by_timestamp))
         return IBHistoryDownloadResult(
             broker="IB",
             symbol=symbol,
@@ -5202,9 +5184,7 @@ class IBAdapter(BrokerInterface):
         for leg_key, staged_order in staged_orders.items():
             staged_order.orderId = create_order_ids[leg_key]
             staged_order.account = account_id_clean
-            staged_order.orderRef = (
-                str(order_ref or "").strip() or IB_SL_TP_ORDER_REF
-            )
+            staged_order.orderRef = str(order_ref or "").strip() or IB_SL_TP_ORDER_REF
             staged_order.ocaGroup = oca_group
             staged_order.ocaType = IB_SL_TP_OCA_TYPE_CANCEL_WITH_BLOCK
             staged_order.transmit = False
@@ -6497,9 +6477,7 @@ class IBAdapter(BrokerInterface):
                     candidate_order_id
                     for candidate in oca_group_rows
                     for candidate_order_id in [
-                        self._virtual_leg_guard_positive_int(
-                            candidate.get("order_id")
-                        )
+                        self._virtual_leg_guard_positive_int(candidate.get("order_id"))
                     ]
                     if candidate_order_id is not None
                 }

@@ -57,9 +57,7 @@ def main() -> None:
     assert len(alligator_profiles) == 4
 
     macd_lge = built_in_workspace_indicator_profile(MACD_PROFILE_UID_LGE_CLASSIC)
-    macd_default = built_in_workspace_indicator_profile(
-        MACD_PROFILE_UID_LGE_DEFAULT
-    )
+    macd_default = built_in_workspace_indicator_profile(MACD_PROFILE_UID_LGE_DEFAULT)
     macd_tws = built_in_workspace_indicator_profile(MACD_PROFILE_UID_TWS_DEFAULT)
     macd_ctrader = built_in_workspace_indicator_profile(
         MACD_PROFILE_UID_CTRADER_REFERENCE
@@ -138,10 +136,13 @@ def main() -> None:
             "future_key": "preserved",
         },
     )
-    assert workspace_indicator_profile_binding(
-        workspace,
-        WORKSPACE_INDICATOR_MACD,
-    ).profile_uid == MACD_PROFILE_UID_LGE_DEFAULT
+    assert (
+        workspace_indicator_profile_binding(
+            workspace,
+            WORKSPACE_INDICATOR_MACD,
+        ).profile_uid
+        == MACD_PROFILE_UID_LGE_DEFAULT
+    )
     workspace.set_indicator_profile_bindings(defaults)
     assert workspace.indicator_profile_bindings["FUTURE_INDICATOR"] == {
         "future_key": "preserved"
@@ -203,18 +204,24 @@ def main() -> None:
                 binding_v2,
             )
         )
-        assert workspace_indicator_profile_binding(
-            workspace,
-            WORKSPACE_INDICATOR_MACD,
-        ).profile_revision == 2
+        assert (
+            workspace_indicator_profile_binding(
+                workspace,
+                WORKSPACE_INDICATOR_MACD,
+            ).profile_revision
+            == 2
+        )
 
         archived = repository.archive_profile(user_profile.profile_uid)
         assert archived.archived
         assert archived.revision == 3
-        assert workspace_indicator_profile_binding(
-            workspace,
-            WORKSPACE_INDICATOR_MACD,
-        ).profile_revision == 2
+        assert (
+            workspace_indicator_profile_binding(
+                workspace,
+                WORKSPACE_INDICATOR_MACD,
+            ).profile_revision
+            == 2
+        )
 
         built_in_edit_blocked = False
         try:
@@ -231,10 +238,13 @@ def main() -> None:
     assert storage["schema_version"] == 5
     assert "indicator_profile_bindings" in storage
     restored = AlgorithmWorkspace.from_storage_dict(storage)
-    assert workspace_indicator_profile_binding(
-        restored,
-        WORKSPACE_INDICATOR_MACD,
-    ).profile_revision == 2
+    assert (
+        workspace_indicator_profile_binding(
+            restored,
+            WORKSPACE_INDICATOR_MACD,
+        ).profile_revision
+        == 2
+    )
     assert restored.parameters["spread_limit"] == 0.00018
     assert restored.parameters["warmup_bars"] == 25
     assert restored.parameters["future_key"] == "preserved"
@@ -246,10 +256,13 @@ def main() -> None:
     legacy_payload["schema_version"] = 4
     legacy_payload.pop("indicator_profile_bindings")
     legacy_restored = AlgorithmWorkspace.from_storage_dict(legacy_payload)
-    assert workspace_indicator_profile_binding(
-        legacy_restored,
-        WORKSPACE_INDICATOR_MACD,
-    ).profile_uid == MACD_PROFILE_UID_LGE_CLASSIC
+    assert (
+        workspace_indicator_profile_binding(
+            legacy_restored,
+            WORKSPACE_INDICATOR_MACD,
+        ).profile_uid
+        == MACD_PROFILE_UID_LGE_CLASSIC
+    )
 
     print("Workspace Indicator Profile Model result")
     print("  built_in_profiles=8")

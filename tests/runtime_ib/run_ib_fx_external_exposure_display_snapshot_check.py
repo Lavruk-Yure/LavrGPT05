@@ -206,9 +206,7 @@ def main() -> int:
     if cleared_snapshot.groups:
         raise AssertionError("Protective-only stale row survived cancellation")
 
-    cleared_exposure = cleared_reconciliation.group_external_exposures.get(
-        POSITION_ID
-    )
+    cleared_exposure = cleared_reconciliation.group_external_exposures.get(POSITION_ID)
 
     if cleared_exposure is None:
         raise AssertionError("Protective-only clear marker is missing")

@@ -16,11 +16,7 @@ class WorkspaceBrokerSubscriptionKey:
     def __post_init__(self) -> None:
         broker = str(self.broker or "").strip().upper()
         symbol = (
-            str(self.symbol or "")
-            .strip()
-            .upper()
-            .replace("/", "")
-            .replace(".", "")
+            str(self.symbol or "").strip().upper().replace("/", "").replace(".", "")
         )
         if broker not in {"CTRADER", "IB"}:
             raise ValueError("Unsupported workspace subscription broker")
@@ -55,9 +51,7 @@ class WorkspaceBrokerAccountingSnapshot:
     failed_requests: int
     active_subscriptions: int
     active_references: int
-    references_by_subscription: tuple[
-        tuple[WorkspaceBrokerSubscriptionKey, int], ...
-    ]
+    references_by_subscription: tuple[tuple[WorkspaceBrokerSubscriptionKey, int], ...]
 
 
 class WorkspaceBrokerRequestAccounting:
@@ -164,10 +158,7 @@ class WorkspaceBrokerRequestAccounting:
         """Return deterministic immutable accounting state."""
         references = tuple(
             sorted(
-                (
-                    (key, len(owners))
-                    for key, owners in self._owners_by_key.items()
-                ),
+                ((key, len(owners)) for key, owners in self._owners_by_key.items()),
                 key=lambda row: (
                     row[0].broker,
                     row[0].symbol,

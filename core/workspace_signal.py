@@ -148,9 +148,7 @@ class WorkspaceSignalFilterContext:
                 "observation_timestamp and available_at must be set together"
             )
         if observation_timestamp is not None and available_at is not None:
-            observation_timestamp = normalize_market_timestamp(
-                observation_timestamp
-            )
+            observation_timestamp = normalize_market_timestamp(observation_timestamp)
             available_at = normalize_market_timestamp(available_at)
             if available_at < observation_timestamp:
                 raise ValueError(
@@ -175,9 +173,7 @@ class WorkspaceSignalFilterContext:
             isinstance(item, WorkspaceSignalFilterObservation)
             for item in diagnostic_observations
         ):
-            raise ValueError(
-                "diagnostic_observations must contain filter observations"
-            )
+            raise ValueError("diagnostic_observations must contain filter observations")
         object.__setattr__(self, "mode", mode)
         object.__setattr__(self, "timeframe", timeframe)
         object.__setattr__(self, "profile_uid", profile_uid)
@@ -248,12 +244,8 @@ class WorkspaceSignalProposal:
             ),
         )
         object.__setattr__(self, "reason", str(self.reason or "").strip())
-        source_reason_code = (
-            str(self.source_reason_code or "").strip().upper() or None
-        )
-        source_profile_uid = (
-            str(self.source_profile_uid or "").strip() or None
-        )
+        source_reason_code = str(self.source_reason_code or "").strip().upper() or None
+        source_profile_uid = str(self.source_profile_uid or "").strip() or None
         source_profile_revision = self.source_profile_revision
         if source_profile_revision is not None:
             try:
@@ -263,13 +255,9 @@ class WorkspaceSignalProposal:
                     "source_profile_revision must be a positive integer"
                 ) from exc
             if source_profile_revision <= 0:
-                raise ValueError(
-                    "source_profile_revision must be a positive integer"
-                )
+                raise ValueError("source_profile_revision must be a positive integer")
         if (source_profile_uid is None) != (source_profile_revision is None):
-            raise ValueError(
-                "source profile uid and revision must be set together"
-            )
+            raise ValueError("source profile uid and revision must be set together")
         object.__setattr__(self, "source_reason_code", source_reason_code)
         object.__setattr__(self, "source_profile_uid", source_profile_uid)
         object.__setattr__(
@@ -283,16 +271,12 @@ class WorkspaceSignalProposal:
         )
         if filter_decision not in WORKSPACE_SIGNAL_FILTER_DECISIONS:
             raise ValueError("Invalid filter_decision")
-        filter_reason_code = (
-            str(self.filter_reason_code or "").strip().upper() or None
-        )
+        filter_reason_code = str(self.filter_reason_code or "").strip().upper() or None
         if (
             filter_decision == WORKSPACE_SIGNAL_FILTER_REJECT
             and filter_reason_code is None
         ):
-            raise ValueError(
-                "filter_reason_code is required for rejected proposals"
-            )
+            raise ValueError("filter_reason_code is required for rejected proposals")
         object.__setattr__(self, "filter_decision", filter_decision)
         object.__setattr__(
             self,
@@ -308,9 +292,7 @@ class WorkspaceSignalProposal:
             self.filter_context,
             WorkspaceSignalFilterContext,
         ):
-            raise ValueError(
-                "filter_context must be WorkspaceSignalFilterContext"
-            )
+            raise ValueError("filter_context must be WorkspaceSignalFilterContext")
 
 
 @dataclass(frozen=True, slots=True)
@@ -410,12 +392,8 @@ class WorkspaceSignalRecord:
             "reason",
             str(self.reason or "").strip() or "—",
         )
-        source_reason_code = (
-            str(self.source_reason_code or "").strip().upper() or None
-        )
-        source_profile_uid = (
-            str(self.source_profile_uid or "").strip() or None
-        )
+        source_reason_code = str(self.source_reason_code or "").strip().upper() or None
+        source_profile_uid = str(self.source_profile_uid or "").strip() or None
         source_profile_revision = self.source_profile_revision
         if source_profile_revision is not None:
             try:
@@ -425,13 +403,9 @@ class WorkspaceSignalRecord:
                     "source_profile_revision must be a positive integer"
                 ) from exc
             if source_profile_revision <= 0:
-                raise ValueError(
-                    "source_profile_revision must be a positive integer"
-                )
+                raise ValueError("source_profile_revision must be a positive integer")
         if (source_profile_uid is None) != (source_profile_revision is None):
-            raise ValueError(
-                "source profile uid and revision must be set together"
-            )
+            raise ValueError("source profile uid and revision must be set together")
         object.__setattr__(self, "source_reason_code", source_reason_code)
         object.__setattr__(self, "source_profile_uid", source_profile_uid)
         object.__setattr__(
@@ -440,9 +414,7 @@ class WorkspaceSignalRecord:
             source_profile_revision,
         )
         risk_decision = str(self.risk_decision or "").strip().upper() or None
-        risk_reason_code = (
-            str(self.risk_reason_code or "").strip().upper() or None
-        )
+        risk_reason_code = str(self.risk_reason_code or "").strip().upper() or None
         requested_volume = _optional_positive_float(
             self.requested_volume,
             "requested_volume",
@@ -457,21 +429,15 @@ class WorkspaceSignalRecord:
         )
         if filter_decision not in WORKSPACE_SIGNAL_FILTER_DECISIONS:
             raise ValueError("Invalid filter_decision")
-        filter_reason_code = (
-            str(self.filter_reason_code or "").strip().upper() or None
-        )
+        filter_reason_code = str(self.filter_reason_code or "").strip().upper() or None
         if (
             filter_decision == WORKSPACE_SIGNAL_FILTER_REJECT
             and filter_reason_code is None
         ):
-            raise ValueError(
-                "filter_reason_code is required for rejected records"
-            )
+            raise ValueError("filter_reason_code is required for rejected records")
         risk_execution_attempted = bool(self.risk_execution_attempted)
         if risk_execution_attempted:
-            raise ValueError(
-                "Signal risk evaluation cannot attempt broker execution"
-            )
+            raise ValueError("Signal risk evaluation cannot attempt broker execution")
         object.__setattr__(self, "risk_decision", risk_decision)
         object.__setattr__(self, "risk_reason_code", risk_reason_code)
         object.__setattr__(self, "requested_volume", requested_volume)
@@ -491,9 +457,7 @@ class WorkspaceSignalRecord:
             self.filter_context,
             WorkspaceSignalFilterContext,
         ):
-            raise ValueError(
-                "filter_context must be WorkspaceSignalFilterContext"
-            )
+            raise ValueError("filter_context must be WorkspaceSignalFilterContext")
         lifecycle_action = (
             str(self.candidate_f_lifecycle_action or "").strip().upper() or None
         )
@@ -575,9 +539,7 @@ def _non_negative_float(value: object, field_name: str) -> float:
     try:
         number = float(value_text)
     except ValueError as exc:
-        raise ValueError(
-            f"{field_name} must be a non-negative finite number"
-        ) from exc
+        raise ValueError(f"{field_name} must be a non-negative finite number") from exc
     if not math.isfinite(number) or number < 0.0:
         raise ValueError(f"{field_name} must be a non-negative finite number")
     return number
@@ -610,9 +572,7 @@ def _optional_non_negative_integer(
     try:
         numeric_value = float(value_text)
     except ValueError as exc:
-        raise ValueError(
-            f"{field_name} must be a non-negative integer"
-        ) from exc
+        raise ValueError(f"{field_name} must be a non-negative integer") from exc
     if (
         not math.isfinite(numeric_value)
         or numeric_value < 0.0

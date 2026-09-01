@@ -425,7 +425,7 @@ class LangManager:
             return text
 
         try:
-            
+
             from core import session_state
             from core.ai_translator import AITranslator
 

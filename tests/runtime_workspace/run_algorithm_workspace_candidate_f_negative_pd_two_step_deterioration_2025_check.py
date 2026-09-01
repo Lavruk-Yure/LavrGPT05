@@ -76,11 +76,7 @@ def _risk_usd(pair: PairedRecoveryCase) -> float:
 def _two_step_case(pair: PairedRecoveryCase) -> TwoStepCase | None:
     if pair.step_1_r > NUMERIC_EPSILON:
         return None
-    cohort = (
-        COHORT_M2_REBOUND
-        if pair.step_2_r > NUMERIC_EPSILON
-        else COHORT_TWO_STEP
-    )
+    cohort = COHORT_M2_REBOUND if pair.step_2_r > NUMERIC_EPSILON else COHORT_TWO_STEP
     risk_usd = _risk_usd(pair)
     m2_abort_r = pair.mark_2_r
     m2_abort_usd = m2_abort_r * risk_usd
@@ -195,43 +191,27 @@ def main() -> None:
     summary = runtime.historical_summary
     assert summary is not None
     pairs = build_paired_recovery_cases(runtime)
-    cases = tuple(
-        case
-        for pair in pairs
-        if (case := _two_step_case(pair)) is not None
-    )
+    cases = tuple(case for pair in pairs if (case := _two_step_case(pair)) is not None)
     two_step = tuple(case for case in cases if case.cohort == COHORT_TWO_STEP)
-    rebound = tuple(
-        case for case in cases if case.cohort == COHORT_M2_REBOUND
-    )
+    rebound = tuple(case for case in cases if case.cohort == COHORT_M2_REBOUND)
 
     six_f_delta = sum(pair.delta_usd for pair in pairs)
     six_f_net = summary.net_profit + six_f_delta
-    two_step_abort_delta_vs_6f = sum(
-        case.abort_delta_vs_6f_usd for case in two_step
-    )
+    two_step_abort_delta_vs_6f = sum(case.abort_delta_vs_6f_usd for case in two_step)
     hybrid_net = six_f_net + two_step_abort_delta_vs_6f
     hybrid_delta_vs_baseline = hybrid_net - summary.net_profit
 
     sacrificed_recovery = sum(
         case.pair.outcome == OUTCOME_RECOVERY for case in two_step
     )
-    shortened_timeout = sum(
-        case.pair.outcome == OUTCOME_TIMEOUT for case in two_step
-    )
-    rebound_recovery = sum(
-        case.pair.outcome == OUTCOME_RECOVERY for case in rebound
-    )
-    rebound_timeout = sum(
-        case.pair.outcome == OUTCOME_TIMEOUT for case in rebound
-    )
+    shortened_timeout = sum(case.pair.outcome == OUTCOME_TIMEOUT for case in two_step)
+    rebound_recovery = sum(case.pair.outcome == OUTCOME_RECOVERY for case in rebound)
+    rebound_timeout = sum(case.pair.outcome == OUTCOME_TIMEOUT for case in rebound)
     m2_to_m3_improved = sum(
-        case.pair.mark_3_r > case.pair.mark_2_r + NUMERIC_EPSILON
-        for case in two_step
+        case.pair.mark_3_r > case.pair.mark_2_r + NUMERIC_EPSILON for case in two_step
     )
     m2_to_m3_worsened = sum(
-        case.pair.mark_3_r < case.pair.mark_2_r - NUMERIC_EPSILON
-        for case in two_step
+        case.pair.mark_3_r < case.pair.mark_2_r - NUMERIC_EPSILON for case in two_step
     )
     m2_to_m3_flat = len(two_step) - m2_to_m3_improved - m2_to_m3_worsened
 
@@ -265,10 +245,7 @@ def main() -> None:
     )
     print("  source_negative_pd_pairs=18")
     print("  source_m1_nonpositive_pairs=10")
-    print(
-        "  fixed_candidate="
-        "M1_STEP_NONPOSITIVE_AND_M2_STEP_NONPOSITIVE"
-    )
+    print("  fixed_candidate=" "M1_STEP_NONPOSITIVE_AND_M2_STEP_NONPOSITIVE")
     print("  candidate_action=paired_M2_early_abort_diagnostic_only")
     print("  control=M1_STEP_NONPOSITIVE_AND_M2_STEP_POSITIVE")
     _cohort_summary("two_step_deterioration", two_step)

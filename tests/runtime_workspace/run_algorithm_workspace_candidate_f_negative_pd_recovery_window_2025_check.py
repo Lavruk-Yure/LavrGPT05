@@ -296,9 +296,7 @@ def main() -> None:
     summaries = tuple(
         WindowSummary(
             window_m1=window_m1,
-            cases=tuple(
-                _window_case(fate, source_events, window_m1) for fate in fates
-            ),
+            cases=tuple(_window_case(fate, source_events, window_m1) for fate in fates),
         )
         for window_m1 in GRACE_WINDOWS_M1
     )
@@ -339,8 +337,7 @@ def main() -> None:
 
     print("  chronological_window_outcomes:")
     by_trade = tuple(
-        tuple(item.cases[index] for item in summaries)
-        for index in range(len(fates))
+        tuple(item.cases[index] for item in summaries) for index in range(len(fates))
     )
     for index, windows in enumerate(by_trade, start=1):
         print(_case_line(index, windows))

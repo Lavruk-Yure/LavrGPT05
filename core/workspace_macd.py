@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-"""Детерміноване MACD-джерело сигналів для Replay WSP.
+"""workspace_macd.py — детерміноване MACD-джерело сигналів WSP.
 
 MACD використовує точний ``resolved_profile_snapshot`` із прив'язки WSP.
-Редагування профілю в каталозі не змінює вже збережений Replay. Перший
-сигнальний контракт навмисно обмежений перетином лінії MACD і сигнальної
-лінії. ``EXTENDED`` додає quality pipeline; RoadMap99_04K підтримує явний
-legacy/ABC вибір моделі кута без прихованої міграції persisted WSP.
+Редагування профілю в каталозі не змінює вже збережений runtime snapshot.
+Однакова MACD-математика приймає strictly ordered immutable completed bars із
+Replay та read-only BROKER delivery path. Перший сигнальний контракт навмисно
+обмежений перетином лінії MACD і сигнальної лінії; ``EXTENDED`` додає quality
+pipeline. Модуль не агрегує partial quotes і не виконує broker operations.
 """
 
 from __future__ import annotations
@@ -16,7 +16,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from core.algorithm_workspace import WORKSPACE_DATA_MODE_REPLAY
+from core.algorithm_workspace import (
+    WORKSPACE_DATA_MODE_BROKER,
+    WORKSPACE_DATA_MODE_REPLAY,
+)
+from core.timeframes import get_timeframe
 from core.workspace_algorithm import (
     WorkspaceAlgorithm,
     WorkspaceAlgorithmError,
@@ -24,11 +28,11 @@ from core.workspace_algorithm import (
 )
 from core.workspace_indicator_profile import (
     MACD_PROFILE_UID_LGE_CLASSIC,
-    WORKSPACE_INDICATOR_MACD,
     WORKSPACE_INDICATOR_MA_EXPONENTIAL,
     WORKSPACE_INDICATOR_MA_SIMPLE,
     WORKSPACE_INDICATOR_MA_SMOOTHED,
     WORKSPACE_INDICATOR_MA_TYPES,
+    WORKSPACE_INDICATOR_MACD,
     WORKSPACE_INDICATOR_SOURCE_CLOSE,
     WORKSPACE_INDICATOR_SOURCE_HIGH,
     WORKSPACE_INDICATOR_SOURCE_LOW,
@@ -41,7 +45,6 @@ from core.workspace_indicator_profile import (
     built_in_workspace_indicator_profile,
     workspace_indicator_profile_binding,
 )
-from core.timeframes import get_timeframe
 from core.workspace_macd_cross_angle_abc import (
     resolve_workspace_macd_cross_angle_value_scale,
 )
@@ -133,9 +136,7 @@ class WorkspaceMacdRuntimeProfile:
             "slow_period",
         )
         if slow_period <= fast_period:
-            raise WorkspaceAlgorithmError(
-                "MACD slow_period must exceed fast_period"
-            )
+            raise WorkspaceAlgorithmError("MACD slow_period must exceed fast_period")
         return cls(
             profile_uid=profile.profile_uid,
             profile_revision=profile.revision,
@@ -170,9 +171,7 @@ class WorkspaceMacdRuntimeProfile:
     @classmethod
     def lge_default(cls) -> WorkspaceMacdRuntimeProfile:
         """Повернути сумісний профіль для прямих legacy-конструкторів."""
-        profile = built_in_workspace_indicator_profile(
-            MACD_PROFILE_UID_LGE_CLASSIC
-        )
+        profile = built_in_workspace_indicator_profile(MACD_PROFILE_UID_LGE_CLASSIC)
         binding = WorkspaceIndicatorProfileBinding.from_profile(profile)
         return cls.from_binding(binding)
 
@@ -237,9 +236,7 @@ class _MovingAverageState:
                     return None
                 self._value = sum(self._samples) / self.period
                 return self._value
-            self._value = (
-                self._value * (self.period - 1) + number
-            ) / self.period
+            self._value = (self._value * (self.period - 1) + number) / self.period
             return self._value
 
         raise WorkspaceAlgorithmError(
@@ -328,9 +325,7 @@ class WorkspaceMacdSignalSource:
         self._previous_histogram: float | None = None
         self._last_timestamp: datetime | None = None
         self._observations: list[WorkspaceMacdObservation] = []
-        self._quality_diagnostics: list[
-            WorkspaceMacdCrossoverQualityDiagnostic
-        ] = []
+        self._quality_diagnostics: list[WorkspaceMacdCrossoverQualityDiagnostic] = []
 
     @classmethod
     def from_parameters(
@@ -390,9 +385,7 @@ class WorkspaceMacdSignalSource:
             str(angle_model or "").strip().upper()
             == WORKSPACE_MACD_CROSS_ANGLE_MODEL_ABC
         ):
-            abc_scale = resolve_workspace_macd_cross_angle_value_scale(
-                context.symbol
-            )
+            abc_scale = resolve_workspace_macd_cross_angle_value_scale(context.symbol)
         return cls(
             enabled=parameters.get(
                 WORKSPACE_MACD_SIGNAL_ENABLED_KEY,
@@ -462,15 +455,18 @@ class WorkspaceMacdSignalSource:
         self,
         event: WorkspaceMarketEvent,
     ) -> WorkspaceSignalProposal | None:
-        """Оновити MACD завершеним Replay-баром і, можливо, дати сигнал."""
+        """Оновити MACD завершеним Replay або BROKER bar і дати сигнал."""
         if not self.enabled:
             return None
-        if event.source_mode != WORKSPACE_DATA_MODE_REPLAY:
+        if event.source_mode not in {
+            WORKSPACE_DATA_MODE_REPLAY,
+            WORKSPACE_DATA_MODE_BROKER,
+        }:
             return None
         if self._last_timestamp is not None:
             if event.timestamp <= self._last_timestamp:
                 raise WorkspaceAlgorithmError(
-                    "MACD Replay bars must be strictly ordered and unique"
+                    "MACD bars must be strictly ordered and unique"
                 )
         self._last_timestamp = event.timestamp
 
@@ -505,8 +501,7 @@ class WorkspaceMacdSignalSource:
             macd_value, signal_value, histogram = effective
 
         warmed_up = bool(
-            self._bars_processed >= self.required_bars
-            and histogram is not None
+            self._bars_processed >= self.required_bars and histogram is not None
         )
         state = _macd_state(histogram, warmed_up=warmed_up)
 
@@ -561,9 +556,7 @@ class WorkspaceMacdSignalSource:
                 direction=direction,
                 strength=abs(histogram),
                 macd_state=state,
-                alligator_confirmation=(
-                    WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED
-                ),
+                alligator_confirmation=WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED,
                 reason=(
                     f"{reason_code}; mode={self.mode}; "
                     f"profile_uid={self.profile_uid}; "
@@ -586,9 +579,7 @@ class WorkspaceMacdSignalSource:
             direction=direction,
             strength=abs(histogram),
             macd_state=state,
-            alligator_confirmation=(
-                WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED
-            ),
+            alligator_confirmation=WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED,
             reason=self._quality_reason_text(diagnostic),
             source_reason_code=diagnostic.reason_code,
             source_profile_uid=self.profile_uid,
@@ -614,9 +605,7 @@ class WorkspaceMacdSignalSource:
             angle_reference_y_per_minute=legacy_reference,
             strategy_bar_minutes=get_timeframe(event.timeframe).minutes,
             extremum_min_prominence=self.extremum_min_prominence,
-            extremum_to_cross_min_distance=(
-                self.extremum_to_cross_min_distance
-            ),
+            extremum_to_cross_min_distance=self.extremum_to_cross_min_distance,
             cross_min_angle_degrees=min_angle,
             angle_model=self.angle_model,
             abc_indicator_value_scale=self.abc_indicator_value_scale,
@@ -846,9 +835,7 @@ def _positive_integer(value: object, field_name: str) -> int:
 
 def _non_negative_integer(value: object, field_name: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-        raise WorkspaceAlgorithmError(
-            f"{field_name} must be non-negative integer"
-        )
+        raise WorkspaceAlgorithmError(f"{field_name} must be non-negative integer")
     return value
 
 

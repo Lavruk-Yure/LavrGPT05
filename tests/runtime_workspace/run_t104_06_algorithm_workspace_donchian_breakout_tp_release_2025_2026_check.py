@@ -142,9 +142,7 @@ def _simulate_continuation(
             )
             if protection is not None:
                 close_index = index
-                close_price = (
-                    original_stop if protection == "STOP_LOSS" else take_price
-                )
+                close_price = original_stop if protection == "STOP_LOSS" else take_price
                 close_reason = protection
                 break
 
@@ -340,9 +338,7 @@ def _run_window(window: Any) -> dict[str, Any]:
         _simulate_trade(run, item, macd_exit_enabled=False) for item in candidates
     )
     variants = {
-        policy: tuple(
-            _simulate_continuation(run, item, policy) for item in candidates
-        )
+        policy: tuple(_simulate_continuation(run, item, policy) for item in candidates)
         for policy in POLICIES
     }
     return {
@@ -389,17 +385,11 @@ def main() -> int:
             f"invalidated:{data['invalidated']},timeout:{data['timed_out']},"
             f"aligned_at_start_not_used:{data['aligned_at_start']}"
         )
-        print(
-            f"  {window.label}/SLTP_BASELINE="
-            f"{_summary_text(_summary(baseline))}"
-        )
+        print(f"  {window.label}/SLTP_BASELINE=" f"{_summary_text(_summary(baseline))}")
         for policy in POLICIES:
             rows = data["variants"][policy]
             trades = tuple(item.trade for item in rows)
-            print(
-                f"  {window.label}/{policy}="
-                f"{_summary_text(_summary(trades))}"
-            )
+            print(f"  {window.label}/{policy}=" f"{_summary_text(_summary(trades))}")
             print(
                 f"  {window.label}/{policy}_PAIRED="
                 f"{_paired_text(_paired_diagnostics(baseline, rows))}"

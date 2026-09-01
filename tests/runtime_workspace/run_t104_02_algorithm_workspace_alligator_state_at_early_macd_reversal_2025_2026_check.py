@@ -150,9 +150,7 @@ def _snapshot(run: Any, direction: str, index: int) -> AlligatorEventSnapshot:
 
     return AlligatorEventSnapshot(
         normalized_opening=normalized_opening,
-        normalized_opening_delta=(
-            normalized_opening - previous_normalized_opening
-        ),
+        normalized_opening_delta=(normalized_opening - previous_normalized_opening),
         directional_normalized_center_slope=directional_center_slope,
         directional_normalized_center_slope_delta=(
             directional_center_slope - previous_directional_center_slope
@@ -160,9 +158,7 @@ def _snapshot(run: Any, direction: str, index: int) -> AlligatorEventSnapshot:
         directional_lips_jaw_gap=lips_jaw,
         directional_lips_teeth_gap=lips_teeth,
         directional_teeth_jaw_gap=teeth_jaw,
-        mouth_contracting=(
-            normalized_opening < previous_normalized_opening - EPSILON
-        ),
+        mouth_contracting=(normalized_opening < previous_normalized_opening - EPSILON),
         center_direction_broken=directional_center_slope <= EPSILON,
         lips_jaw_broken=lips_jaw <= EPSILON,
         full_order_holds=full_order_holds,
@@ -194,22 +190,16 @@ def _group_summary(rows: list[AlligatorEventSnapshot]) -> dict[str, Any]:
     return {
         "events": len(rows),
         "median_opening": _median([row.normalized_opening for row in rows]),
-        "median_opening_delta": _median(
-            [row.normalized_opening_delta for row in rows]
-        ),
+        "median_opening_delta": _median([row.normalized_opening_delta for row in rows]),
         "median_directional_slope": _median(
             [row.directional_normalized_center_slope for row in rows]
         ),
         "median_directional_slope_delta": _median(
             [row.directional_normalized_center_slope_delta for row in rows]
         ),
-        "median_lips_jaw": _median(
-            [row.directional_lips_jaw_gap for row in rows]
-        ),
+        "median_lips_jaw": _median([row.directional_lips_jaw_gap for row in rows]),
         "mouth_contracting": sum(row.mouth_contracting for row in rows),
-        "center_direction_broken": sum(
-            row.center_direction_broken for row in rows
-        ),
+        "center_direction_broken": sum(row.center_direction_broken for row in rows),
         "lips_jaw_broken": sum(row.lips_jaw_broken for row in rows),
         "full_order_holds": sum(row.full_order_holds for row in rows),
         "regime_aligned": sum(row.regime_aligned for row in rows),
@@ -336,14 +326,8 @@ def main() -> None:
             assert grouped["event_count"] == (
                 sl["events"] + tp["events"] + other["events"]
             )
-            print(
-                f"  {window.label}/{event_type}/BASELINE_SL="
-                f"{_group_text(sl)}"
-            )
-            print(
-                f"  {window.label}/{event_type}/BASELINE_TP="
-                f"{_group_text(tp)}"
-            )
+            print(f"  {window.label}/{event_type}/BASELINE_SL=" f"{_group_text(sl)}")
+            print(f"  {window.label}/{event_type}/BASELINE_TP=" f"{_group_text(tp)}")
             if other["events"]:
                 print(
                     f"  {window.label}/{event_type}/BASELINE_OTHER="

@@ -73,9 +73,7 @@ class AlgorithmWorkspaceController:
         self.repository = repository or SessionRepository()
         self._algorithm_factory = algorithm_factory
         self._runtime_engine: Any | None = None
-        self._broker_market_provider: (
-            RuntimeEngineWorkspaceMarketProvider | None
-        ) = None
+        self._broker_market_provider: RuntimeEngineWorkspaceMarketProvider | None = None
         self._runtimes: dict[str, WorkspaceRuntime] = {}
 
     def set_runtime_engine(self, runtime_engine: Any | None) -> None:
@@ -450,9 +448,7 @@ class AlgorithmWorkspaceController:
             profit_protection=storage.profit_protection,
         )
         if indicator_profile_bindings is not None:
-            workspace.set_indicator_profile_bindings(
-                dict(indicator_profile_bindings)
-            )
+            workspace.set_indicator_profile_bindings(dict(indicator_profile_bindings))
         self.repository.save_workspace(workspace)
         self.remove_workspace_runtime(workspace_uid)
         return workspace
@@ -476,9 +472,7 @@ class AlgorithmWorkspaceController:
         if values.source_type == WORKSPACE_REPLAY_SOURCE_CSV:
             resolved_path = values.require_existing_csv()
             values = replace(values, file_path=str(resolved_path))
-        workspace.set_replay_settings(
-            values.merge_settings(workspace.replay_settings)
-        )
+        workspace.set_replay_settings(values.merge_settings(workspace.replay_settings))
         self.repository.save_workspace(workspace)
         self.remove_workspace_runtime(workspace_uid)
         return workspace
@@ -673,9 +667,7 @@ class AlgorithmWorkspaceController:
         """Зберегти активний workspace у session.json."""
         manifest = self.repository.load_manifest()
         if workspace_uid is not None:
-            workspace_uid = self.repository.load_workspace(
-                workspace_uid
-            ).workspace_uid
+            workspace_uid = self.repository.load_workspace(workspace_uid).workspace_uid
         manifest["active_workspace_uid"] = workspace_uid
         self.repository.save_manifest(manifest)
 
@@ -692,9 +684,7 @@ class AlgorithmWorkspaceController:
     @staticmethod
     def _require_unlocked(manifest: dict[str, Any]) -> None:
         if bool(manifest.get("layout_locked", False)):
-            raise WorkspaceLayoutLockedError(
-                "Algorithm workspace layout is locked"
-            )
+            raise WorkspaceLayoutLockedError("Algorithm workspace layout is locked")
 
     @staticmethod
     def _make_unique_name(
@@ -705,9 +695,7 @@ class AlgorithmWorkspaceController:
         if not base_name:
             raise ValueError("display_name is required")
 
-        existing_names = {
-            workspace.display_name.casefold() for workspace in workspaces
-        }
+        existing_names = {workspace.display_name.casefold() for workspace in workspaces}
         if base_name.casefold() not in existing_names:
             return base_name
 

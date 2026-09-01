@@ -78,21 +78,14 @@ def main() -> int:
         area.shutdown_all_workspaces()
         app.processEvents()
 
-        first_stopped = (
-            first_runtime.context.runtime_state == WORKSPACE_STATE_STOPPED
-        )
-        second_stopped = (
-            second_runtime.context.runtime_state == WORKSPACE_STATE_STOPPED
-        )
+        first_stopped = first_runtime.context.runtime_state == WORKSPACE_STATE_STOPPED
+        second_stopped = second_runtime.context.runtime_state == WORKSPACE_STATE_STOPPED
         windows_closed = (
-            not first_subwindow.isVisible()
-            and not second_subwindow.isVisible()
+            not first_subwindow.isVisible() and not second_subwindow.isVisible()
         )
         shutdown_diagnostics = area.shutdown_diagnostics()
         timers_stopped = shutdown_diagnostics["timers_stopped"]
-        runtime_engine_detached = shutdown_diagnostics[
-            "runtime_engine_detached"
-        ]
+        runtime_engine_detached = shutdown_diagnostics["runtime_engine_detached"]
 
         print("Algorithm workspace controlled shutdown result")
         print(f"  workspaces=2")

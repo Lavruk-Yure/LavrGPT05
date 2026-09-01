@@ -188,25 +188,20 @@ def main() -> None:
     assert all(record.source_profile_revision == 1 for record in records)
     assert all(record.accepted for record in records)
     assert all(
-        record.alligator_confirmation
-        == WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED
+        record.alligator_confirmation == WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED
         for record in records
     )
     assert "WARMUP_REQUIREMENTS_APPLIED" in journal_events
     assert "WARMUP_COMPLETED" in journal_events
 
     disabled_workspace = _workspace(enabled=False, mode="LINEAR")
-    disabled_records, disabled_warmup, disabled_journal = _run(
-        disabled_workspace
-    )
+    disabled_records, disabled_warmup, disabled_journal = _run(disabled_workspace)
     assert disabled_records == ()
     assert disabled_warmup == 0
     assert "WARMUP_REQUIREMENTS_APPLIED" in disabled_journal
 
     extended_workspace = _workspace(enabled=True, mode="EXTENDED")
-    extended_records, extended_warmup, _extended_journal = _run(
-        extended_workspace
-    )
+    extended_records, extended_warmup, _extended_journal = _run(extended_workspace)
     assert len(extended_records) == 2
     assert extended_warmup == MACD_REQUIRED_BARS
     assert all(not record.accepted for record in extended_records)
@@ -215,8 +210,7 @@ def main() -> None:
         for record in extended_records
     )
     assert all(
-        "final_quality_pass=False" in record.reason
-        for record in extended_records
+        "final_quality_pass=False" in record.reason for record in extended_records
     )
 
     source = WorkspaceMacdSignalSource(enabled=True, mode="LINEAR")

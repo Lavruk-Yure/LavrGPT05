@@ -1,5 +1,12 @@
-# -*- coding: utf-8 -*-
-"""Broker-backed read-only market feed for one Algorithm Workspace."""
+"""workspace_broker_market.py — read-only BROKER market feed для WSP.
+
+Модуль перевіряє broker binding, завантажує завершені historical warm-up bars
+і перетворює мінливі bid/ask snapshots на canonical timeframe events. Поточний
+live bucket зберігається лише у volatile aggregator state; на rollover provider
+віддає попередній immutable completed bar рівно один раз. Quote/history request
+accounting та IB exposure safety лишаються broker-neutral, а execution requests
+цей pipeline не створює. Replay data path модуль навмисно не обробляє.
+"""
 
 from __future__ import annotations
 
@@ -110,7 +117,7 @@ class WorkspaceBrokerMarketProviderProtocol(ABC):
         self,
         workspace_uid: str,
     ) -> WorkspaceMarketEvent | None:
-        """Return one changed live event or None when no quote changed."""
+        """Return one completed live bar or None while its bucket is open."""
         ...
 
     @abstractmethod
@@ -181,24 +188,17 @@ class WorkspaceBrokerBinding:
 
 @dataclass(slots=True)
 class WorkspaceLiveBarAggregator:
-    """Aggregate changing bid/ask quotes into one canonical timeframe bar."""
+    """Aggregate quotes and release one immutable bar only after rollover."""
 
     binding: WorkspaceBrokerBinding
     _bucket_timestamp: datetime | None = None
+    _bid: float = 0.0
+    _ask: float = 0.0
     _open: float = 0.0
     _high: float = 0.0
     _low: float = 0.0
     _close: float = 0.0
     _volume: float = 0.0
-
-    def seed(self, event: WorkspaceMarketEvent) -> None:
-        """Seed the live bucket from the last historical warm-up event."""
-        self._bucket_timestamp = event.timestamp
-        self._open = event.open
-        self._high = event.high
-        self._low = event.low
-        self._close = event.close
-        self._volume = event.volume
 
     def update(
         self,
@@ -207,8 +207,8 @@ class WorkspaceLiveBarAggregator:
         bid: float,
         ask: float,
         volume: float = 0.0,
-    ) -> WorkspaceMarketEvent:
-        """Return the current bucket as one replaceable canonical event."""
+    ) -> WorkspaceMarketEvent | None:
+        """Update the open bucket and release the previous one on rollover."""
         quote_time = normalize_market_timestamp(timestamp)
         bid_value = float(bid)
         ask_value = float(ask)
@@ -220,27 +220,36 @@ class WorkspaceLiveBarAggregator:
 
         bucket = self._bucket_start(quote_time)
         midpoint = (bid_value + ask_value) / 2.0
-        if self._bucket_timestamp != bucket:
-            self._bucket_timestamp = bucket
-            self._open = midpoint
-            self._high = midpoint
-            self._low = midpoint
-            self._close = midpoint
-            self._volume = volume_value
-        else:
+        if self._bucket_timestamp is None:
+            self._start_bucket(
+                bucket=bucket,
+                bid=bid_value,
+                ask=ask_value,
+                midpoint=midpoint,
+                volume=volume_value,
+            )
+            return None
+        if bucket < self._bucket_timestamp:
+            raise WorkspaceBrokerMarketError(
+                "Live quote buckets must be ordered chronologically"
+            )
+        if bucket == self._bucket_timestamp:
+            self._bid = bid_value
+            self._ask = ask_value
             self._high = max(self._high, midpoint)
             self._low = min(self._low, midpoint)
             self._close = midpoint
             self._volume = max(self._volume, volume_value)
+            return None
 
-        return WorkspaceMarketEvent(
-            timestamp=bucket,
+        completed = WorkspaceMarketEvent(
+            timestamp=self._bucket_timestamp,
             broker=self.binding.broker,
             symbol=self.binding.symbol,
             timeframe=self.binding.timeframe,
-            bid=bid_value,
-            ask=ask_value,
-            spread=ask_value - bid_value,
+            bid=self._bid,
+            ask=self._ask,
+            spread=self._ask - self._bid,
             open=self._open,
             high=self._high,
             low=self._low,
@@ -248,6 +257,33 @@ class WorkspaceLiveBarAggregator:
             volume=self._volume,
             source_mode=WORKSPACE_DATA_MODE_BROKER,
         )
+        self._start_bucket(
+            bucket=bucket,
+            bid=bid_value,
+            ask=ask_value,
+            midpoint=midpoint,
+            volume=volume_value,
+        )
+        return completed
+
+    def _start_bucket(
+        self,
+        *,
+        bucket: datetime,
+        bid: float,
+        ask: float,
+        midpoint: float,
+        volume: float,
+    ) -> None:
+        """Initialize one open bucket without exposing it to the runtime."""
+        self._bucket_timestamp = bucket
+        self._bid = bid
+        self._ask = ask
+        self._open = midpoint
+        self._high = midpoint
+        self._low = midpoint
+        self._close = midpoint
+        self._volume = volume
 
     def _bucket_start(self, value: datetime) -> datetime:
         timeframe = get_timeframe(self.binding.timeframe)
@@ -437,8 +473,6 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
             warmup_bars=max(int(warmup_bars), 0),
             spread_limit=float(spread_limit),
         )
-        if events:
-            aggregator.seed(events[-1])
         self._warmup_loaded.add(binding.workspace_uid)
         return events
 
@@ -566,9 +600,6 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
             warmup_bars=warmup_bars,
             spread_limit=spread_limit,
         )
-        aggregator = self._aggregators.get(uid)
-        if events and aggregator is not None:
-            aggregator.seed(events[-1])
         self._warmup_loaded.add(uid)
         return events
 

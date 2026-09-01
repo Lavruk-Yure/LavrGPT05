@@ -102,13 +102,15 @@ def _signal(
         and risk_decision != RISK_DECISION_BLOCK,
         reason="summary fixture",
         risk_decision=risk_decision,
-        risk_reason_code="MAXIMUM_POSITION_VOLUME"
-        if risk_decision == RISK_DECISION_BLOCK
-        else None,
+        risk_reason_code=(
+            "MAXIMUM_POSITION_VOLUME" if risk_decision == RISK_DECISION_BLOCK else None
+        ),
         filter_decision=filter_decision,
-        filter_reason_code="ALLIGATOR_NOT_READY"
-        if filter_decision == WORKSPACE_SIGNAL_FILTER_REJECT
-        else None,
+        filter_reason_code=(
+            "ALLIGATOR_NOT_READY"
+            if filter_decision == WORKSPACE_SIGNAL_FILTER_REJECT
+            else None
+        ),
     )
 
 
@@ -148,19 +150,13 @@ def _check_runtime_summary() -> None:
     assert math.isclose(summary.spread, 0.00012)
     assert summary.opened_trades == 0
     assert summary.signals.total == 0
-    assert any(
-        entry.event == "HISTORICAL_SUMMARY_READY" for entry in runtime.journal
-    )
+    assert any(entry.event == "HISTORICAL_SUMMARY_READY" for entry in runtime.journal)
 
 
 def _check_designer_dialog_contract() -> None:
-    ui_path = (
-        PROJECT_ROOT / "ui" / "algorithm_workspace_historical_summary_dialog.ui"
-    )
+    ui_path = PROJECT_ROOT / "ui" / "algorithm_workspace_historical_summary_dialog.ui"
     generated_path = (
-        PROJECT_ROOT
-        / "ui"
-        / "ui_algorithm_workspace_historical_summary_dialog.py"
+        PROJECT_ROOT / "ui" / "ui_algorithm_workspace_historical_summary_dialog.py"
     )
     area_path = PROJECT_ROOT / "core" / "algorithm_workspace_area.py"
     dialog_path = (
@@ -179,10 +175,7 @@ def _check_designer_dialog_contract() -> None:
     assert "Ui_AlgorithmWorkspaceHistoricalSummaryDialog" in dialog_source
     assert "AlgorithmWorkspaceHistoricalSummaryDialog.stopLoss" in dialog_source
     assert "AlgorithmWorkspaceHistoricalSummaryDialog.takeProfit" in dialog_source
-    assert (
-        "AlgorithmWorkspaceHistoricalSummaryDialog.profitDrawdown"
-        in dialog_source
-    )
+    assert "AlgorithmWorkspaceHistoricalSummaryDialog.profitDrawdown" in dialog_source
     assert "AlgorithmWorkspaceHistoricalSummaryDialog.sessionEnd" in dialog_source
     translation_policy_source = (
         PROJECT_ROOT / "core" / "translation_policy.py"

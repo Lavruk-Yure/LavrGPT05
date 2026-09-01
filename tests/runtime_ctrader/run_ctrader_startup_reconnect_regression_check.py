@@ -126,22 +126,23 @@ from engine.services.ctrader_runtime_service import CTraderRuntimeService  # noq
 
 def _ib_startup_path_unchanged() -> bool:
     """Verify that the cTrader readiness work did not enter IB startup."""
-    source = (PROJECT_ROOT / "core" / "main_logic.py").read_text(
-        encoding="utf-8"
-    )
+    source = (PROJECT_ROOT / "core" / "main_logic.py").read_text(encoding="utf-8")
     ib_start = source.index("    def _startup_connect_ib(")
     ib_end = source.index(
         "    @staticmethod\n    def _startup_connect_ctrader(",
         ib_start,
     )
     ib_source = source[ib_start:ib_end]
-    return all(
-        token in ib_source
-        for token in (
-            "runtime_engine.connect_ib_demo()",
-            "runtime_engine.start_ib_reconnect_watch()",
+    return (
+        all(
+            token in ib_source
+            for token in (
+                "runtime_engine.connect_ib_demo()",
+                "runtime_engine.start_ib_reconnect_watch()",
+            )
         )
-    ) and "prepare_ctrader_startup_connection" not in ib_source
+        and "prepare_ctrader_startup_connection" not in ib_source
+    )
 
 
 def main() -> int:

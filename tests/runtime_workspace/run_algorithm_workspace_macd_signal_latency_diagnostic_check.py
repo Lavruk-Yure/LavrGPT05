@@ -125,8 +125,7 @@ def print_report(report: WorkspaceMacdSignalLatencyReport) -> None:
 
 def main() -> None:
     print(
-        "Algorithm Workspace MACD Signal Latency Diagnostic Check — "
-        "RoadMap99_04D",
+        "Algorithm Workspace MACD Signal Latency Diagnostic Check — " "RoadMap99_04D",
         flush=True,
     )
     print(
@@ -214,13 +213,9 @@ def main() -> None:
         datetime(2026, 1, 9, 14, 15, tzinfo=UTC),
     )
     assert jan_09.direction == "SELL"
-    assert jan_09.price_extremum_timestamp == datetime(
-        2026, 1, 9, 13, 30, tzinfo=UTC
-    )
+    assert jan_09.price_extremum_timestamp == datetime(2026, 1, 9, 13, 30, tzinfo=UTC)
     assert jan_09.price_to_signal_bars == 3
-    assert jan_09.expected_entry_timestamp == datetime(
-        2026, 1, 9, 14, 30, tzinfo=UTC
-    )
+    assert jan_09.expected_entry_timestamp == datetime(2026, 1, 9, 14, 30, tzinfo=UTC)
     assert jan_09.price_to_entry_bars == 4
 
     mar_23 = sample_by_timestamp(
@@ -228,13 +223,9 @@ def main() -> None:
         datetime(2026, 3, 23, 9, 15, tzinfo=UTC),
     )
     assert mar_23.direction == "SELL"
-    assert mar_23.price_extremum_timestamp == datetime(
-        2026, 3, 23, 8, 30, tzinfo=UTC
-    )
+    assert mar_23.price_extremum_timestamp == datetime(2026, 3, 23, 8, 30, tzinfo=UTC)
     assert mar_23.price_to_signal_bars == 3
-    assert mar_23.expected_entry_timestamp == datetime(
-        2026, 3, 23, 9, 30, tzinfo=UTC
-    )
+    assert mar_23.expected_entry_timestamp == datetime(2026, 3, 23, 9, 30, tzinfo=UTC)
     assert mar_23.price_to_entry_bars == 4
 
     print("Algorithm Workspace MACD Signal Latency Diagnostic result", flush=True)

@@ -34,6 +34,7 @@ from run_algorithm_workspace_candidate_f_frozen_oos_2025_check import (  # noqa:
     assert_frozen_oos_snapshot,
     frozen_oos_workspace,
 )
+
 _structural = importlib.import_module(
     "run_algorithm_workspace_candidate_f_structural_sl_tp_2025_check"
 )
@@ -43,8 +44,7 @@ StructuralSlTpRuntime = _structural.StructuralSlTpRuntime
 _assert_baseline = getattr(_structural, "_assert_baseline")
 _summary_text = getattr(_structural, "_summary_text")
 _lifecycle = importlib.import_module(
-    "run_algorithm_workspace_candidate_f_"
-    "trend_lifecycle_entry_quality_2025_check"
+    "run_algorithm_workspace_candidate_f_" "trend_lifecycle_entry_quality_2025_check"
 )
 PIVOT_SIDE_BARS = _lifecycle.PIVOT_SIDE_BARS
 _is_pivot_high = getattr(_lifecycle, "_is_pivot_high")
@@ -68,9 +68,7 @@ REACTION_LOOKAHEAD_BARS = 4
 REJECTION_THRESHOLD_PIPS = 6.0
 
 OUTPUT_DIR = (
-    Path(tempfile.gettempdir())
-    / "LavrGPT05"
-    / "RM103_7O_Significant_SR_Zones_2025"
+    Path(tempfile.gettempdir()) / "LavrGPT05" / "RM103_7O_Significant_SR_Zones_2025"
 )
 OUTPUT_CSV = OUTPUT_DIR / "candidate_f_significant_sr_zones_2025.csv"
 
@@ -223,7 +221,7 @@ def _rejection_pips(
         if start > stop:
             values.append(0.0)
             continue
-        future = events[start:stop + 1]
+        future = events[start : stop + 1]
         if kind == "SUPPORT":
             displacement = max(event.high - zone_high for event in future)
         else:
@@ -253,7 +251,7 @@ def _break_metrics(
         start = cluster[-1] + 1
         stop = min(signal_index, cluster[-1] + REACTION_LOOKAHEAD_BARS)
         recovered = False
-        for event in events[start:stop + 1]:
+        for event in events[start : stop + 1]:
             if kind == "SUPPORT" and event.close >= zone_low:
                 recovered = True
                 break
@@ -308,9 +306,7 @@ def _build_zones(
             zone_high=high,
             touch_clusters=touch_clusters,
         )
-        rejection_count = sum(
-            value >= REJECTION_THRESHOLD_PIPS for value in rejections
-        )
+        rejection_count = sum(value >= REJECTION_THRESHOLD_PIPS for value in rejections)
         break_count, false_break_count = _break_metrics(
             events,
             start_index,
@@ -592,29 +588,21 @@ def _write_csv(
                                     "direction": trade.direction,
                                     "entry_price": f"{trade.entry_price:.5f}",
                                     "lookback_bars": lookback_bars,
-                                    "zone_half_width_pips": (
-                                        f"{half_width_pips:.1f}"
-                                    ),
+                                    "zone_half_width_pips": (f"{half_width_pips:.1f}"),
                                     "minimum_pivots": minimum_pivots,
                                     "role": role,
                                     "zone_kind": zone.kind,
                                     "zone_center": f"{zone.center:.5f}",
                                     "zone_low": f"{zone.low:.5f}",
                                     "zone_high": f"{zone.high:.5f}",
-                                    "distance_from_entry_pips": (
-                                        f"{distance:.1f}"
-                                    ),
+                                    "distance_from_entry_pips": (f"{distance:.1f}"),
                                     "pivot_count": zone.pivot_count,
                                     "touch_count": zone.touch_count,
                                     "distinct_touch_clusters": (
                                         zone.distinct_touch_clusters
                                     ),
-                                    "first_touch_age_bars": (
-                                        zone.first_touch_age_bars
-                                    ),
-                                    "last_touch_age_bars": (
-                                        zone.last_touch_age_bars
-                                    ),
+                                    "first_touch_age_bars": (zone.first_touch_age_bars),
+                                    "last_touch_age_bars": (zone.last_touch_age_bars),
                                     "rejection_count": zone.rejection_count,
                                     "max_rejection_pips": (
                                         f"{zone.max_rejection_pips:.1f}"
@@ -623,9 +611,7 @@ def _write_csv(
                                         f"{zone.median_rejection_pips:.1f}"
                                     ),
                                     "break_count": zone.break_count,
-                                    "false_break_count": (
-                                        zone.false_break_count
-                                    ),
+                                    "false_break_count": (zone.false_break_count),
                                     "time_span_bars": zone.time_span_bars,
                                     "recentness": f"{zone.recentness:.6f}",
                                 }
@@ -663,9 +649,7 @@ def main() -> None:
         runtime.strategy_events[timestamp]
         for timestamp in sorted(runtime.strategy_events)
     )
-    event_index = {
-        event.timestamp: index for index, event in enumerate(events)
-    }
+    event_index = {event.timestamp: index for index, event in enumerate(events)}
 
     inventory: dict[tuple[int, float, int], dict[str, int]] = {}
     for lookback_bars in LOOKBACK_VARIANTS_BARS:
@@ -719,17 +703,13 @@ def main() -> None:
         for half_width_pips in ZONE_HALF_WIDTHS_PIPS:
             rows = []
             for minimum_pivots in SIGNIFICANT_PIVOT_COUNTS:
-                counts = inventory[
-                    (lookback_bars, half_width_pips, minimum_pivots)
-                ]
+                counts = inventory[(lookback_bars, half_width_pips, minimum_pivots)]
                 rows.append(
                     f"piv>={minimum_pivots}:stop:{counts['stop']}/59,"
                     f"take_any:{counts['take_any']}/59,"
                     f"take_24plus:{counts['take_24plus']}/59"
                 )
-            print(
-                f"      width=+/-{half_width_pips:.0f}p " + " | ".join(rows)
-            )
+            print(f"      width=+/-{half_width_pips:.0f}p " + " | ".join(rows))
 
     focus_lookback = 160
     focus_width = 3.0

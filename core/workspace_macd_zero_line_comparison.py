@@ -94,9 +94,7 @@ class WorkspaceMacdZeroLineSignalSource(WorkspaceMacdSignalSource):
         return None
 
 
-class WorkspaceMacdZeroLineReplayAlgorithm(
-    WorkspaceMacdAlligatorReplayAlgorithm
-):
+class WorkspaceMacdZeroLineReplayAlgorithm(WorkspaceMacdAlligatorReplayAlgorithm):
     """Production RailAlgorithm behavior with one experiment-only filter."""
 
     def __init__(
@@ -211,17 +209,11 @@ def build_workspace_macd_zero_line_comparison(
                 win_rate_percent=summary.win_rate_percent,
                 net_profit=summary.net_profit,
                 profit_factor=summary.profit_factor,
-                maximum_drawdown_percent=(
-                    summary.maximum_drawdown_percent
-                ),
+                maximum_drawdown_percent=(summary.maximum_drawdown_percent),
                 average_trade=summary.average_trade,
                 stop_loss_closes=summary.close_reason_count("STOP_LOSS"),
-                take_profit_closes=summary.close_reason_count(
-                    "TAKE_PROFIT"
-                ),
-                profit_drawdown_closes=summary.close_reason_count(
-                    "PROFIT_DRAWDOWN"
-                ),
+                take_profit_closes=summary.close_reason_count("TAKE_PROFIT"),
+                profit_drawdown_closes=summary.close_reason_count("PROFIT_DRAWDOWN"),
                 replay_elapsed_seconds=summary.replay_elapsed_seconds,
             )
         )

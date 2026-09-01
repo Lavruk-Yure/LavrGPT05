@@ -152,12 +152,8 @@ def _print_period(
     """Надрукувати baseline, selection groups, rates та removed factual rows."""
 
     baseline = _assert_population(period, rows)
-    survivors = tuple(
-        row for row in rows if abs(row.signed_kd) < ABS_KD_THRESHOLD
-    )
-    removed = tuple(
-        row for row in rows if abs(row.signed_kd) >= ABS_KD_THRESHOLD
-    )
+    survivors = tuple(row for row in rows if abs(row.signed_kd) < ABS_KD_THRESHOLD)
+    removed = tuple(row for row in rows if abs(row.signed_kd) >= ABS_KD_THRESHOLD)
     survivor_stats = _stats(survivors)
     removed_stats = _stats(removed)
     assert baseline.trades == survivor_stats.trades + removed_stats.trades

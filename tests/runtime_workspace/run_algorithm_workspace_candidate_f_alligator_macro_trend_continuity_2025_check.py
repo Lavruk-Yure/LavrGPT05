@@ -199,13 +199,10 @@ def _split_macro_trends(
         direction = _regime_direction(observation)
         interval_allowed = (
             previous_timestamp is None
-            or observation.timestamp - previous_timestamp
-            <= MAX_OBSERVATION_INTERVAL
+            or observation.timestamp - previous_timestamp <= MAX_OBSERVATION_INTERVAL
         )
         must_break = current and (
-            direction is None
-            or direction != current_direction
-            or not interval_allowed
+            direction is None or direction != current_direction or not interval_allowed
         )
         if must_break:
             assert current_direction is not None
@@ -286,9 +283,7 @@ def _interruption(
         kind=kind,
         observed_nonactive_bars=len(between),
         missing_m15_bars=missing_bars,
-        phases="|".join(
-            sorted({observation.regime_phase for observation in between})
-        ),
+        phases="|".join(sorted({observation.regime_phase for observation in between})),
         states="|".join(sorted({observation.state for observation in between})),
         minimum_opening=min(openings) if openings else None,
         minimum_slope=min(slopes) if slopes else None,
@@ -422,30 +417,35 @@ def main() -> None:
     active_runs, macros, runtime = _run_diagnostic()
 
     macros_with_active = tuple(macro for macro in macros if macro.active_runs)
-    active_run_distribution = Counter(
-        len(macro.active_runs) for macro in macros
-    )
+    active_run_distribution = Counter(len(macro.active_runs) for macro in macros)
     assert len(active_runs) == 1077
     assert len(macros) == 957
     assert len(macros_with_active) == 672
-    assert sum(
-        len(macro.active_runs) for macro in macros
-    ) == len(active_runs)
-    assert sum(
-        count
-        for run_count, count in active_run_distribution.items()
-        if run_count >= 2
-    ) == 230
-    assert sum(
-        count
-        for run_count, count in active_run_distribution.items()
-        if run_count >= 3
-    ) == 102
-    assert sum(
-        count
-        for run_count, count in active_run_distribution.items()
-        if run_count >= 4
-    ) == 46
+    assert sum(len(macro.active_runs) for macro in macros) == len(active_runs)
+    assert (
+        sum(
+            count
+            for run_count, count in active_run_distribution.items()
+            if run_count >= 2
+        )
+        == 230
+    )
+    assert (
+        sum(
+            count
+            for run_count, count in active_run_distribution.items()
+            if run_count >= 3
+        )
+        == 102
+    )
+    assert (
+        sum(
+            count
+            for run_count, count in active_run_distribution.items()
+            if run_count >= 4
+        )
+        == 46
+    )
 
     case_run = next(
         active_run
@@ -456,13 +456,10 @@ def main() -> None:
         macro
         for macro in macros
         if any(
-            active_run.run_id == CASE_ACTIVE_RUN_ID
-            for active_run in macro.active_runs
+            active_run.run_id == CASE_ACTIVE_RUN_ID for active_run in macro.active_runs
         )
     )
-    case_run_ids = tuple(
-        active_run.run_id for active_run in case_macro.active_runs
-    )
+    case_run_ids = tuple(active_run.run_id for active_run in case_macro.active_runs)
     assert case_run.direction == "BUY"
     assert case_run.start_utc.isoformat() == "2025-09-08T12:15:00+00:00"
     assert case_run.end_utc.isoformat() == "2025-09-08T17:15:00+00:00"
@@ -475,9 +472,7 @@ def main() -> None:
     case_active_bars = sum(
         len(active_run.observations) for active_run in case_macro.active_runs
     )
-    case_expected_bars = int(
-        (case_macro.end_utc - case_macro.start_utc) / M15
-    ) + 1
+    case_expected_bars = int((case_macro.end_utc - case_macro.start_utc) / M15) + 1
     case_missing_bars = max(
         0,
         case_expected_bars - len(case_macro.observations),
@@ -495,12 +490,8 @@ def main() -> None:
         )
     )
     assert len(interruptions) == 5
-    assert sum(
-        item.kind == "OBSERVED_PHASE_PAUSE" for item in interruptions
-    ) == 3
-    assert sum(
-        item.kind == "MISSING_DATA_GAP" for item in interruptions
-    ) == 2
+    assert sum(item.kind == "OBSERVED_PHASE_PAUSE" for item in interruptions) == 3
+    assert sum(item.kind == "MISSING_DATA_GAP" for item in interruptions) == 2
     assert sum(item.missing_m15_bars for item in interruptions) == 3
     assert all(
         _regime_direction(observation) == "BUY"
@@ -574,10 +565,7 @@ def main() -> None:
         f"nonactive_observed_bars:{len(case_macro.observations) - case_active_bars},"
         f"missing_bars:{case_missing_bars}"
     )
-    print(
-        "    active_run_ids="
-        + "|".join(str(run_id) for run_id in case_run_ids)
-    )
+    print("    active_run_ids=" + "|".join(str(run_id) for run_id in case_run_ids))
     print("    interruptions:")
     for item in interruptions:
         print(

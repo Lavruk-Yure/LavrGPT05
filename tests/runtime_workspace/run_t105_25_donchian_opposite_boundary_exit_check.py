@@ -257,8 +257,7 @@ def _print_period(spec) -> None:
     events = tuple(session.events)
     index_by_timestamp = _event_index_by_timestamp(events)
     rows = tuple(
-        _paired_trade(trade, events, index_by_timestamp)
-        for trade in baseline_trades
+        _paired_trade(trade, events, index_by_timestamp) for trade in baseline_trades
     )
     baseline_rows = _baseline_rows(
         baseline_trades,
@@ -298,9 +297,7 @@ def _print_period(spec) -> None:
     assert paired.same_entries
     assert paired.donchian_exit_events == len(exits)
     assert (
-        paired.unchanged_trades
-        + paired.improved_trades
-        + paired.worsened_trades
+        paired.unchanged_trades + paired.improved_trades + paired.worsened_trades
         == baseline_entry_count
     )
     assert math.isclose(
@@ -315,9 +312,7 @@ def _print_period(spec) -> None:
     pf_delta = (
         "NONE"
         if variant_metrics.profit_factor is None
-        else (
-            f"{variant_metrics.profit_factor - baseline_metrics.profit_factor:+.4f}"
-        )
+        else (f"{variant_metrics.profit_factor - baseline_metrics.profit_factor:+.4f}")
     )
     print(f"  period={spec.code}")
     print(f"    BASELINE={_summary_text(baseline_metrics)}")

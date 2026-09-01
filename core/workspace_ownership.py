@@ -303,8 +303,7 @@ class WorkspacePositionSnapshot:
         volume = _mapping_float(row.get("volume"), 0.0)
         active_value = row.get("active")
         active = (
-            volume > 0.0
-            and reconciliation_status not in TERMINAL_POSITION_STATUSES
+            volume > 0.0 and reconciliation_status not in TERMINAL_POSITION_STATUSES
             if active_value is None
             else bool(active_value)
         )
@@ -314,9 +313,7 @@ class WorkspacePositionSnapshot:
             account_id=_mapping_optional_text(row.get("account_id")),
             symbol=str(row.get("symbol") or ""),
             position_id=str(row.get("position_id") or ""),
-            broker_position_id=_mapping_optional_text(
-                row.get("broker_position_id")
-            ),
+            broker_position_id=_mapping_optional_text(row.get("broker_position_id")),
             side=str(row.get("side") or ""),
             volume=volume,
             entry_price=_mapping_optional_float(row.get("entry_price")),

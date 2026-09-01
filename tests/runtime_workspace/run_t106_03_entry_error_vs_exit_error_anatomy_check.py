@@ -114,12 +114,8 @@ def _bar_excursions(
     else:
         favorable_price = event.low
         adverse_price = event.high
-    favorable = (
-        favorable_price - trade.entry_price
-    ) * trade.volume * direction
-    adverse = (
-        adverse_price - trade.entry_price
-    ) * trade.volume * direction
+    favorable = (favorable_price - trade.entry_price) * trade.volume * direction
+    adverse = (adverse_price - trade.entry_price) * trade.volume * direction
     return max(favorable, 0.0), min(adverse, 0.0)
 
 
@@ -129,9 +125,7 @@ def _close_excursions(
     """Відтворити factual close point без припущення intrabar ordering."""
 
     direction = 1.0 if trade.direction == "BUY" else -1.0
-    profit = (
-        trade.close_price - trade.entry_price
-    ) * trade.volume * direction
+    profit = (trade.close_price - trade.entry_price) * trade.volume * direction
     return max(profit, 0.0), min(profit, 0.0)
 
 
@@ -166,9 +160,7 @@ def _classify(
 
     if mfe_r + EPSILON < MEANINGFUL_FAVORABLE_R:
         return False, ENTRY_BAD
-    mfe_before_adverse = (
-        bars_to_adverse is not None and bars_to_mfe < bars_to_adverse
-    )
+    mfe_before_adverse = bars_to_adverse is not None and bars_to_mfe < bars_to_adverse
     if mfe_before_adverse:
         return True, WHIPSAW_REVERSAL
     return False, ENTRY_GOOD_EXIT_BAD
@@ -355,9 +347,7 @@ def _print_summary(
     print(f"    LOSS_count={total}")
     for anatomy_class in ANATOMY_CLASSES:
         count = counts[anatomy_class]
-        print(
-            f"    {anatomy_class}=count:{count},percent:{count / total * 100:.2f}"
-        )
+        print(f"    {anatomy_class}=count:{count},percent:{count / total * 100:.2f}")
     print("    anatomy_x_close_reason")
     matrix: dict[str, Counter[str]] = defaultdict(Counter)
     for row in rows:
@@ -365,8 +355,7 @@ def _print_summary(
     close_reasons = sorted({row.trade.close_reason for row in rows})
     for anatomy_class in ANATOMY_CLASSES:
         values = ",".join(
-            f"{reason}:{matrix[anatomy_class][reason]}"
-            for reason in close_reasons
+            f"{reason}:{matrix[anatomy_class][reason]}" for reason in close_reasons
         )
         print(f"      {anatomy_class}|{values}")
 
@@ -380,15 +369,12 @@ def _print_summary(
         f"    MAE_R=mean:{_mean(mae_values):.4f},"
         f"median:{statistics.median(mae_values):.4f}"
     )
-    stop_loss = tuple(
-        row for row in rows if row.trade.close_reason == "STOP_LOSS"
-    )
+    stop_loss = tuple(row for row in rows if row.trade.close_reason == "STOP_LOSS")
     profit_drawdown = tuple(
         row for row in rows if row.trade.close_reason == "PROFIT_DRAWDOWN"
     )
     pd_meaningfully_profitable = sum(
-        row.mfe_r + EPSILON >= MEANINGFUL_FAVORABLE_R
-        for row in profit_drawdown
+        row.mfe_r + EPSILON >= MEANINGFUL_FAVORABLE_R for row in profit_drawdown
     )
     print(f"    STOP_LOSS_losses={len(stop_loss)}")
     print(f"    PROFIT_DRAWDOWN_losses={len(profit_drawdown)}")
@@ -397,10 +383,7 @@ def _print_summary(
         f"{pd_meaningfully_profitable}/{len(profit_drawdown)}"
     )
     print(f"    potential_entry_problem={counts[ENTRY_BAD]}")
-    print(
-        "    potential_exit_or_PD_problem="
-        f"{counts[ENTRY_GOOD_EXIT_BAD]}"
-    )
+    print("    potential_exit_or_PD_problem=" f"{counts[ENTRY_GOOD_EXIT_BAD]}")
     print(f"    whipsaw_or_reversal={counts[WHIPSAW_REVERSAL]}")
 
 

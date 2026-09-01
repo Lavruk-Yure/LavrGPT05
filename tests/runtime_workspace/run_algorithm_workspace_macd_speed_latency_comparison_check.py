@@ -220,8 +220,7 @@ def print_run(run: MacdPeriodRun) -> None:
 
 def main() -> None:
     print(
-        "Algorithm Workspace MACD Speed/Latency Comparison Check — "
-        "RoadMap99_04E",
+        "Algorithm Workspace MACD Speed/Latency Comparison Check — " "RoadMap99_04E",
         flush=True,
     )
     print(
@@ -284,13 +283,8 @@ def main() -> None:
         run.raw_report.average_price_to_signal_bars for run in completed
     )
     raw_crosses = tuple(run.classic_crosses for run in completed)
-    assert all(
-        left > right
-        for left, right in zip(raw_latencies, raw_latencies[1:])
-    )
-    assert all(
-        left < right for left, right in zip(raw_crosses, raw_crosses[1:])
-    )
+    assert all(left > right for left, right in zip(raw_latencies, raw_latencies[1:]))
+    assert all(left < right for left, right in zip(raw_crosses, raw_crosses[1:]))
 
     repeated_fast = run_variant(events, VARIANTS[-1])
     assert repeated_fast == completed[-1]

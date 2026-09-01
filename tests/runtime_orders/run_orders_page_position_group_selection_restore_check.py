@@ -52,9 +52,7 @@ def main() -> int:
         assert restored.parent() is not None
         assert restored.parent().isExpanded()
 
-        runtime.close_runtime_position_leg(
-            "22222222-2222-2222-2222-222222222222"
-        )
+        runtime.close_runtime_position_leg("22222222-2222-2222-2222-222222222222")
         assert page.refresh_positions()
         app.processEvents()
         assert page.ui.tblOpenPositions.currentItem() is None

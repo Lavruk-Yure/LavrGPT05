@@ -122,10 +122,7 @@ def main() -> None:
     assert gap_engine.pending_orders_count == 0
     assert gap_engine.active_positions_count == 0
     assert not gap_snapshot.positions
-    assert (
-        gap_snapshot.orders[0].status
-        == REPLAY_ORDER_STATUS_EXPIRED_NEXT_BAR_GAP
-    )
+    assert gap_snapshot.orders[0].status == REPLAY_ORDER_STATUS_EXPIRED_NEXT_BAR_GAP
     assert not gap_snapshot.orders[0].active
 
     exact_engine = _engine()

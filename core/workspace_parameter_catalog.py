@@ -365,10 +365,12 @@ def build_workspace_parameter_catalog() -> WorkspaceParameterCatalog:
                     "Two timeframes higher",
                 ),
             ),
-            legacy_choice_aliases=((
-                WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED,
-                WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME,
-            ),),
+            legacy_choice_aliases=(
+                (
+                    WORKSPACE_ALLIGATOR_CONFIRMATION_DISABLED,
+                    WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME,
+                ),
+            ),
         ),
         _risk_float_parameter(
             key="risk.risk_percent",

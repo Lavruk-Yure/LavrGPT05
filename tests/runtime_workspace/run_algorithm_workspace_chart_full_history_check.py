@@ -93,8 +93,7 @@ def main() -> None:
         controller.scroll_workspace_chart_to(workspace.workspace_uid, 0)
         first = runtime.chart_snapshot()
         home_reaches_first = (
-            first.visible_start == 0
-            and first.visible_events[0] == session.events[0]
+            first.visible_start == 0 and first.visible_events[0] == session.events[0]
         )
         assert home_reaches_first
 
@@ -112,9 +111,7 @@ def main() -> None:
 
         controller.scroll_workspace_chart_to_latest(workspace.workspace_uid)
         end = runtime.chart_snapshot()
-        expected_last_start = (
-            HISTORY_EVENTS - DEFAULT_WORKSPACE_CHART_VISIBLE_EVENTS
-        )
+        expected_last_start = HISTORY_EVENTS - DEFAULT_WORKSPACE_CHART_VISIBLE_EVENTS
         end_reaches_last = (
             end.visible_start == expected_last_start
             and end.visible_events[-1] == session.events[-1]
@@ -122,9 +119,7 @@ def main() -> None:
         )
         assert end_reaches_last
 
-        full_scroll_range = (
-            end.total_events - end.visible_count == expected_last_start
-        )
+        full_scroll_range = end.total_events - end.visible_count == expected_last_start
         assert full_scroll_range
 
         print("Algorithm Workspace Chart Full History result")

@@ -84,9 +84,7 @@ WORKSPACE_PARAMETER_FEATURE_ADVANCED_RISK = "WSP_ADVANCED_RISK"
 WORKSPACE_PARAMETER_EDITABLE_STATE_STOPPED = "STOPPED"
 WORKSPACE_PARAMETER_EDITABLE_STATE_RESTORED = "RESTORED"
 
-WORKSPACE_PARAMETER_AVAILABLE_KEY = (
-    "WorkspaceParameterAvailability.available"
-)
+WORKSPACE_PARAMETER_AVAILABLE_KEY = "WorkspaceParameterAvailability.available"
 WORKSPACE_PARAMETER_AVAILABLE_FALLBACK = "Available"
 WORKSPACE_PARAMETER_LOCKED_KEY = "WorkspaceParameterAvailability.locked"
 WORKSPACE_PARAMETER_LOCKED_FALLBACK = "Locked by license"
@@ -96,15 +94,9 @@ WORKSPACE_PARAMETER_FEATURE_REQUIRED_KEY = (
 WORKSPACE_PARAMETER_FEATURE_REQUIRED_FALLBACK = (
     "This parameter requires the {feature_code} feature."
 )
-WORKSPACE_PARAMETER_RUNTIME_LOCKED_KEY = (
-    "WorkspaceParameterAvailability.runtimeLocked"
-)
-WORKSPACE_PARAMETER_RUNTIME_LOCKED_FALLBACK = (
-    "Read-only while workspace is active"
-)
-WORKSPACE_PARAMETER_STOP_REQUIRED_KEY = (
-    "WorkspaceParameterAvailability.stopRequired"
-)
+WORKSPACE_PARAMETER_RUNTIME_LOCKED_KEY = "WorkspaceParameterAvailability.runtimeLocked"
+WORKSPACE_PARAMETER_RUNTIME_LOCKED_FALLBACK = "Read-only while workspace is active"
+WORKSPACE_PARAMETER_STOP_REQUIRED_KEY = "WorkspaceParameterAvailability.stopRequired"
 WORKSPACE_PARAMETER_STOP_REQUIRED_FALLBACK = (
     "Stop the workspace before editing this parameter."
 )
@@ -250,9 +242,7 @@ class WorkspaceParameterDefinition:
                 and self.maximum is not None
                 and self.minimum > self.maximum
             ):
-                raise WorkspaceParameterSchemaError(
-                    "minimum cannot exceed maximum"
-                )
+                raise WorkspaceParameterSchemaError("minimum cannot exceed maximum")
             if self.step is not None:
                 step = _finite_number(self.step, "step")
                 if step <= 0:
@@ -261,10 +251,7 @@ class WorkspaceParameterDefinition:
                     )
             return
 
-        if any(
-            value is not None
-            for value in (self.minimum, self.maximum, self.step)
-        ):
+        if any(value is not None for value in (self.minimum, self.maximum, self.step)):
             raise WorkspaceParameterSchemaError(
                 "non-numeric parameter cannot define numeric constraints"
             )
@@ -274,8 +261,7 @@ class WorkspaceParameterDefinition:
                     "choice parameter requires allowed_values"
                 )
             normalized_values = tuple(
-                _required_text(value, "allowed value")
-                for value in self.allowed_values
+                _required_text(value, "allowed value") for value in self.allowed_values
             )
             if len(set(normalized_values)) != len(normalized_values):
                 raise WorkspaceParameterSchemaError(
@@ -392,9 +378,7 @@ class WorkspaceParameterCatalog:
             for parameter in self.parameters
         ]
         if len(set(storage_addresses)) != len(storage_addresses):
-            raise WorkspaceParameterSchemaError(
-                "duplicate parameter storage address"
-            )
+            raise WorkspaceParameterSchemaError("duplicate parameter storage address")
         known_groups = set(group_codes)
         for parameter in self.parameters:
             if parameter.group_code not in known_groups:
@@ -451,20 +435,12 @@ class WorkspaceParameterCatalog:
         for key, raw_value in updates.items():
             parameter = self.definition(str(key))
             normalized = parameter.normalize_value(raw_value)
-            sections[parameter.storage_section][parameter.storage_key] = (
-                normalized
-            )
+            sections[parameter.storage_section][parameter.storage_key] = normalized
         return WorkspaceParameterStorageUpdate(
             parameters=sections[WORKSPACE_PARAMETER_STORAGE_PARAMETERS],
-            risk_settings=sections[
-                WORKSPACE_PARAMETER_STORAGE_RISK_SETTINGS
-            ],
-            profit_protection=sections[
-                WORKSPACE_PARAMETER_STORAGE_PROFIT_PROTECTION
-            ],
-            replay_settings=sections[
-                WORKSPACE_PARAMETER_STORAGE_REPLAY_SETTINGS
-            ],
+            risk_settings=sections[WORKSPACE_PARAMETER_STORAGE_RISK_SETTINGS],
+            profit_protection=sections[WORKSPACE_PARAMETER_STORAGE_PROFIT_PROTECTION],
+            replay_settings=sections[WORKSPACE_PARAMETER_STORAGE_REPLAY_SETTINGS],
         )
 
     def availability(
@@ -474,9 +450,7 @@ class WorkspaceParameterCatalog:
     ) -> WorkspaceParameterAvailability:
         """Визначити доступність feature без умов за назвою редакції."""
         parameter = self.definition(key)
-        available = (
-            parameter.feature_code in profile.granted_feature_codes
-        )
+        available = parameter.feature_code in profile.granted_feature_codes
         if available:
             return WorkspaceParameterAvailability(
                 available=True,
@@ -579,9 +553,7 @@ def _required_text(value: object, field_name: str) -> str:
 def _required_code(value: object, field_name: str) -> str:
     code = _required_text(value, field_name).upper()
     if any(character.isspace() for character in code):
-        raise WorkspaceParameterSchemaError(
-            f"{field_name} cannot contain whitespace"
-        )
+        raise WorkspaceParameterSchemaError(f"{field_name} cannot contain whitespace")
     return code
 
 
@@ -605,9 +577,7 @@ def _finite_float(value: object, field_name: str) -> float:
         else:
             raise TypeError
     except (TypeError, ValueError) as exc:
-        raise WorkspaceParameterSchemaError(
-            f"{field_name} must be a number"
-        ) from exc
+        raise WorkspaceParameterSchemaError(f"{field_name} must be a number") from exc
     if not math.isfinite(number):
         raise WorkspaceParameterSchemaError(f"{field_name} must be finite")
     return number
@@ -628,18 +598,14 @@ def _integer(value: object, field_name: str) -> int:
         else:
             raise TypeError
     except (TypeError, ValueError) as exc:
-        raise WorkspaceParameterSchemaError(
-            f"{field_name} must be an integer"
-        ) from exc
+        raise WorkspaceParameterSchemaError(f"{field_name} must be an integer") from exc
     return number
 
 
 def _non_negative_int(value: object, field_name: str) -> int:
     number = _integer(value, field_name)
     if number < 0:
-        raise WorkspaceParameterSchemaError(
-            f"{field_name} cannot be negative"
-        )
+        raise WorkspaceParameterSchemaError(f"{field_name} cannot be negative")
     return number
 
 

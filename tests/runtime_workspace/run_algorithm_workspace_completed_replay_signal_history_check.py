@@ -169,9 +169,9 @@ def main() -> None:
     assert completed_ui[0].timestamp < bounded[0].timestamp
     assert broker_probe.requests == 0
 
-    area_source = (
-        PROJECT_ROOT / "core" / "algorithm_workspace_area.py"
-    ).read_text(encoding="utf-8")
+    area_source = (PROJECT_ROOT / "core" / "algorithm_workspace_area.py").read_text(
+        encoding="utf-8"
+    )
     assert "window.set_signal_records(runtime.signal_records_for_ui())" in area_source
 
     print("Algorithm Workspace Completed Replay Signal History result")

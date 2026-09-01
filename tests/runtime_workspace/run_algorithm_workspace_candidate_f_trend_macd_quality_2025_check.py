@@ -164,9 +164,7 @@ def main() -> None:
         for window in strong_windows
     )
     quality_segments = tuple(
-        item
-        for item in coverage
-        if item.coverage == trend.COVERAGE_MACD_QUALITY_REJECT
+        item for item in coverage if item.coverage == trend.COVERAGE_MACD_QUALITY_REJECT
     )
     assert len(quality_segments) == 12
 
@@ -211,8 +209,7 @@ def main() -> None:
 
     details_tuple = tuple(all_details)
     primary_counts = {
-        code: _count_reason(details_tuple, code)
-        for code in QUALITY_REJECT_CODES
+        code: _count_reason(details_tuple, code) for code in QUALITY_REJECT_CODES
     }
     criterion_counts = {
         "extremum": _criterion_fail_count(details_tuple, "extremum_found"),
@@ -223,7 +220,8 @@ def main() -> None:
     single_fail = sum(len(failed_criteria(item)) == 1 for item in details_tuple)
     multi_fail = sum(len(failed_criteria(item)) > 1 for item in details_tuple)
     parse_complete = all(
-        None not in (
+        None
+        not in (
             item.extremum_found,
             item.prominence_pass,
             item.distance_pass,

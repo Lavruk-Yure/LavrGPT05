@@ -288,8 +288,7 @@ def _run_window(window: Any) -> dict[str, Any]:
     assert starting_candidates
     assert expansion_candidates
     assert all(
-        0 <= item.delay_bars < CONFIRMATION_WINDOW_BARS
-        for item in expansion_candidates
+        0 <= item.delay_bars < CONFIRMATION_WINDOW_BARS for item in expansion_candidates
     )
     assert all(
         item.start_timestamp <= item.confirm_timestamp == item.entry_timestamp
@@ -371,9 +370,7 @@ def main() -> None:
         assert isinstance(expansion_macd_exit, VariantSummary)
 
         expansion_positive.append(_net(expansion_sltp) > 0.0)
-        macd_exit_not_worse.append(
-            _net(expansion_macd_exit) >= _net(expansion_sltp)
-        )
+        macd_exit_not_worse.append(_net(expansion_macd_exit) >= _net(expansion_sltp))
         lead_counts = result["lead_counts"]
         assert isinstance(lead_counts, Counter)
         print(
@@ -406,8 +403,7 @@ def main() -> None:
             f"b3:{lead_counts[3]},b4:{lead_counts[4]}"
         )
         print(
-            f"  {window.label}/EXPANSION_SLTP_ONLY="
-            f"{_summary_text(expansion_sltp)}"
+            f"  {window.label}/EXPANSION_SLTP_ONLY=" f"{_summary_text(expansion_sltp)}"
         )
         print(
             f"  {window.label}/EXPANSION_MACD_EXIT="
@@ -420,10 +416,7 @@ def main() -> None:
             f"unchanged:{expansion_pair['unchanged']}"
         )
 
-    print(
-        "  expansion_sltp_net_positive_both_periods="
-        f"{all(expansion_positive)}"
-    )
+    print("  expansion_sltp_net_positive_both_periods=" f"{all(expansion_positive)}")
     print(
         "  opposite_macd_cross_exit_not_worse_both_periods="
         f"{all(macd_exit_not_worse)}"

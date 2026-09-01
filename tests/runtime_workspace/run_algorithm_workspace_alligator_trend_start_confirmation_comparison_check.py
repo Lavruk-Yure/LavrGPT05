@@ -103,9 +103,7 @@ def _workspace(start_utc: str, end_utc: str) -> AlgorithmWorkspace:
             "macd_signal_enabled": True,
             "macd_signal_mode": "EXTENDED",
             "alligator_filter_enabled": True,
-            "alligator_confirmation": (
-                WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME
-            ),
+            "alligator_confirmation": (WORKSPACE_ALLIGATOR_CONFIRMATION_SAME_TIMEFRAME),
             "spread_limit": 0.00020,
             "warmup_bars": 3,
             "macd_extremum_min_prominence": 0.000015,
@@ -241,10 +239,13 @@ def _format_removed(
         for signature in current.position_signatures
         if (signature[0], signature[1]) not in candidate_keys
     ]
-    return "; ".join(
-        f"{timestamp} {side} {reason} {profit:+.2f}"
-        for timestamp, side, reason, profit in removed
-    ) or "NONE"
+    return (
+        "; ".join(
+            f"{timestamp} {side} {reason} {profit:+.2f}"
+            for timestamp, side, reason, profit in removed
+        )
+        or "NONE"
+    )
 
 
 def main() -> None:
@@ -272,13 +273,11 @@ def main() -> None:
 
     current_dev_signals = {
         timestamp
-        for timestamp, _side, _reason, _profit
-        in development_current.position_signatures
+        for timestamp, _side, _reason, _profit in development_current.position_signatures
     }
     candidate_dev_signals = {
         timestamp
-        for timestamp, _side, _reason, _profit
-        in development_candidate.position_signatures
+        for timestamp, _side, _reason, _profit in development_candidate.position_signatures
     }
 
     assert development_current.trades == 9
@@ -302,8 +301,7 @@ def main() -> None:
     assert _same_metrics(validation_current, validation_candidate)
     assert _same_metrics(holdout_current, holdout_candidate)
     assert (
-        workspace_alligator.ALLIGATOR_REGIME_TREND_START_CONFIRMATION_BARS
-        == original
+        workspace_alligator.ALLIGATOR_REGIME_TREND_START_CONFIRMATION_BARS == original
     )
 
     print("Algorithm Workspace Alligator trend-start confirmation comparison result")

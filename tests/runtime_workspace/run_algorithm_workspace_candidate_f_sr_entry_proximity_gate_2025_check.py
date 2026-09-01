@@ -49,9 +49,7 @@ PIP = 0.0001
 THRESHOLDS_PIPS = (3.0, 6.0, 9.0, 12.0, 15.0)
 
 OUTPUT_DIR = (
-    Path(tempfile.gettempdir())
-    / "LavrGPT05"
-    / "RM103_7T_SR_Entry_Proximity_Gate_2025"
+    Path(tempfile.gettempdir()) / "LavrGPT05" / "RM103_7T_SR_Entry_Proximity_Gate_2025"
 )
 OUTPUT_CSV = OUTPUT_DIR / "candidate_f_sr_entry_proximity_gate_2025.csv"
 
@@ -145,8 +143,7 @@ def _proximity_for_trade(
         and item.effective_role != "INVALIDATED"
     )
     edge_distances = tuple(
-        _edge_distance_pips(trade.entry_price, item.zone)
-        for item in valid
+        _edge_distance_pips(trade.entry_price, item.zone) for item in valid
     )
     any_distance = min(edge_distances) if edge_distances else None
     inside = any(distance <= EPSILON for distance in edge_distances)
@@ -175,8 +172,8 @@ def _build_rows(runtime: Any) -> tuple[ProximityRow, ...]:
 
     rows: list[ProximityRow] = []
     for context in contexts:
-        inside, stop_distance, take_distance, any_distance = (
-            _proximity_for_trade(context.trade, observations)
+        inside, stop_distance, take_distance, any_distance = _proximity_for_trade(
+            context.trade, observations
         )
         rows.append(
             ProximityRow(
@@ -239,9 +236,7 @@ def _gate_result(
         loss_capture=(
             rejected_performance.losses / total_losses if total_losses else 0.0
         ),
-        win_capture=(
-            rejected_performance.wins / total_wins if total_wins else 0.0
-        ),
+        win_capture=(rejected_performance.wins / total_wins if total_wins else 0.0),
     )
 
 

@@ -1,5 +1,14 @@
-# -*- coding: utf-8 -*-
-"""Runtime check for broker-backed WSP Live Read-only market events."""
+"""run_algorithm_workspace_live_readonly_check.py — BROKER runtime regression.
+
+Перевірка проводить локальні CTRADER/IB quote snapshots через реальні
+``RuntimeEngineWorkspaceMarketProvider`` і ``WorkspaceRuntime`` без мережі та
+broker execution. Поточний M15 bucket накопичується всередині provider і не
+доходить до algorithm; попередній immutable completed bar стає доступним рівно
+на rollover. Сценарії також перевіряють warm-up, spread guard, незалежну зупинку,
+reconnect, невалідні quotes і збереження chart/algorithm state.
+
+Runner не змінює Replay, торгову математику, risk policy або persisted history.
+"""
 
 from __future__ import annotations
 
@@ -37,6 +46,8 @@ from core.workspace_runtime import (  # noqa: E402
 
 @dataclass(frozen=True, slots=True)
 class FakeBar:
+    """Один завершений historical bar локального warm-up."""
+
     timestamp: datetime
     open: float
     high: float
@@ -47,10 +58,14 @@ class FakeBar:
 
 @dataclass(frozen=True, slots=True)
 class FakeHistoryResult:
+    """Мінімальний результат наявного history downloader contract."""
+
     bars: tuple[FakeBar, ...]
 
 
 class FakeRuntimeEngine:
+    """Відтворити deterministic quotes через штатний provider adapter API."""
+
     def __init__(self) -> None:
         self.validated: list[tuple[str, str | None]] = []
         self.quote_calls: list[tuple[str, tuple[str, ...]]] = []
@@ -63,11 +78,14 @@ class FakeRuntimeEngine:
                 ("2026-07-28T08:30:00Z", 1.17074, 1.17086),
                 ("2026-07-28T08:30:10Z", 1.17080, 1.17092),
                 ("2026-07-28T08:45:00Z", 1.17082, 1.17094),
+                ("2026-07-28T09:00:00Z", 1.17084, 1.17096),
+                ("2026-07-28T09:15:00Z", 1.17086, 1.17098),
             ),
             "IB": (
                 ("2026-07-28T09:30:00Z", 1.35000, 1.35030),
-                ("2026-07-28T09:30:01Z", 1.35005, 1.35015),
-                ("2026-07-28T09:30:10Z", 1.35008, 1.35018),
+                ("2026-07-28T09:45:00Z", 1.35005, 1.35015),
+                ("2026-07-28T10:00:00Z", 1.35008, 1.35018),
+                ("2026-07-28T10:15:00Z", 1.35010, 1.35020),
             ),
         }
 
@@ -207,6 +225,7 @@ def _workspace(
     account_id: str,
     symbol: str,
 ) -> AlgorithmWorkspace:
+    """Побудувати один BROKER M15 workspace для локального runtime."""
     return AlgorithmWorkspace.create(
         broker=broker,
         account_id=account_id,
@@ -227,6 +246,7 @@ def _start_running_pair() -> tuple[
     WorkspaceRuntime,
     WorkspaceRuntime,
 ]:
+    """Запустити CTRADER та IB після першого completed live bar."""
     engine = FakeRuntimeEngine()
     provider = RuntimeEngineWorkspaceMarketProvider(engine)
     ctrader_runtime = WorkspaceRuntime(
@@ -250,8 +270,12 @@ def _start_running_pair() -> tuple[
         runtime.begin_start()
         runtime.complete_start()
 
+    assert ctrader_runtime.advance_broker_market() is None
+    assert ctrader_runtime.advance_broker_market() is None
+    assert ctrader_runtime.advance_broker_market() is None
     assert ctrader_runtime.advance_broker_market() is not None
     assert ctrader_runtime.context.runtime_state == WORKSPACE_STATE_RUNNING
+    assert ib_runtime.advance_broker_market() is None
     assert ib_runtime.advance_broker_market() is not None
     assert ib_runtime.context.runtime_state == WORKSPACE_STATE_STARTING
     assert ib_runtime.advance_broker_market() is not None
@@ -260,18 +284,20 @@ def _start_running_pair() -> tuple[
 
 
 def _check_invalid_live_quotes() -> None:
+    """Перевірити, що invalid quotes не псують відкритий bucket або runtime."""
     engine, ctrader_runtime, ib_runtime = _start_running_pair()
     chart_before = ctrader_runtime.chart_snapshot().events
     current_event_before = ctrader_runtime.context.current_market_event
     engine.replace_quotes(
         "CTRADER",
         (
-            ("2026-07-28T08:30:20Z", 1.17120, 1.17110),
-            ("2026-07-28T08:30:21Z", 0.0, 1.17110),
-            ("2026-07-28T08:30:22Z", -1.0, 1.17110),
-            ("2026-07-28T08:30:23Z", 1.17110, 0.0),
-            ("2026-07-28T08:30:24Z", 1.17110, -1.0),
-            ("2026-07-28T08:30:20Z", 1.17110, 1.17120),
+            ("2026-07-28T09:00:20Z", 1.17120, 1.17110),
+            ("2026-07-28T09:00:21Z", 0.0, 1.17110),
+            ("2026-07-28T09:00:22Z", -1.0, 1.17110),
+            ("2026-07-28T09:00:23Z", 1.17110, 0.0),
+            ("2026-07-28T09:00:24Z", 1.17110, -1.0),
+            ("2026-07-28T09:00:20Z", 1.17110, 1.17120),
+            ("2026-07-28T09:15:00Z", 1.17112, 1.17122),
         ),
     )
 
@@ -284,6 +310,8 @@ def _check_invalid_live_quotes() -> None:
         assert ctrader_runtime.chart_snapshot().events == chart_before
         assert ctrader_runtime.can_form_signal()
 
+    previous_completed_event = ctrader_runtime.advance_broker_market()
+    assert previous_completed_event is not None
     recovered_event = ctrader_runtime.advance_broker_market()
     assert recovered_event is not None
     assert recovered_event.bid == 1.17110
@@ -304,6 +332,7 @@ def _check_invalid_live_quotes() -> None:
             ("2026-07-28T08:30:20Z", 1.17120, 1.17110),
             ("2026-07-28T08:30:21Z", 0.0, 1.17110),
             ("2026-07-28T08:30:20Z", 1.17110, 1.17120),
+            ("2026-07-28T08:45:00Z", 1.17112, 1.17122),
         ),
     )
     startup_provider = RuntimeEngineWorkspaceMarketProvider(startup_engine)
@@ -329,6 +358,7 @@ def _check_invalid_live_quotes() -> None:
         assert startup_runtime.context.last_error is None
         assert startup_runtime.chart_snapshot().events == startup_chart
 
+    assert startup_runtime.advance_broker_market() is None
     assert startup_runtime.advance_broker_market() is not None
     assert startup_runtime.context.runtime_state == WORKSPACE_STATE_RUNNING
     assert startup_runtime.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING
@@ -338,6 +368,7 @@ def _check_invalid_live_quotes() -> None:
 
 
 def main() -> None:
+    """Перевірити completed-bar delivery і read-only lifecycle обох brokers."""
     engine = FakeRuntimeEngine()
     provider = RuntimeEngineWorkspaceMarketProvider(engine)
     ctrader_runtime = WorkspaceRuntime(
@@ -376,6 +407,12 @@ def main() -> None:
         assert len(runtime.chart_snapshot().events) == 2
         assert not runtime.can_form_signal()
 
+    first_partial = ctrader_runtime.advance_broker_market()
+    assert first_partial is None
+    duplicate = ctrader_runtime.advance_broker_market()
+    assert duplicate is None
+    updated_partial = ctrader_runtime.advance_broker_market()
+    assert updated_partial is None
     ctrader_event = ctrader_runtime.advance_broker_market()
     assert ctrader_event is not None
     assert ctrader_event.broker == "CTRADER"
@@ -385,6 +422,8 @@ def main() -> None:
     assert ctrader_runtime.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING
     assert ctrader_runtime.can_form_signal()
 
+    ib_partial_event = ib_runtime.advance_broker_market()
+    assert ib_partial_event is None
     ib_wide_event = ib_runtime.advance_broker_market()
     assert ib_wide_event is not None
     assert ib_wide_event.broker == "IB"
@@ -396,17 +435,15 @@ def main() -> None:
     assert ib_runtime.context.runtime_state == WORKSPACE_STATE_RUNNING
     assert ib_runtime.can_form_signal()
 
-    duplicate = ctrader_runtime.advance_broker_market()
-    assert duplicate is None
-    updated = ctrader_runtime.advance_broker_market()
-    assert updated is not None
-    assert updated.timestamp == ctrader_event.timestamp
-    assert updated.high > ctrader_event.high
-    assert len(ctrader_runtime.chart_snapshot().events) == 3
     next_bar = ctrader_runtime.advance_broker_market()
     assert next_bar is not None
-    assert next_bar.timestamp > updated.timestamp
+    assert next_bar.timestamp > ctrader_event.timestamp
+    assert ctrader_event.high > ctrader_event.open
     assert len(ctrader_runtime.chart_snapshot().events) == 4
+    following_bar = ctrader_runtime.advance_broker_market()
+    assert following_bar is not None
+    assert following_bar.timestamp > next_bar.timestamp
+    assert len(ctrader_runtime.chart_snapshot().events) == 5
 
     assert engine.validated == [
         ("CTRADER", "46368962"),
@@ -462,10 +499,9 @@ def main() -> None:
     second_ib.complete_stop()
     assert second_ib.context.runtime_state == WORKSPACE_STATE_STOPPED
     ctrader_calls_before = len(second_stop_engine.quote_calls)
-    assert second_ctrader.advance_broker_market() is None
     assert second_ctrader.advance_broker_market() is not None
     assert second_ctrader.context.runtime_state == WORKSPACE_STATE_RUNNING
-    assert len(second_stop_engine.quote_calls) == ctrader_calls_before + 2
+    assert len(second_stop_engine.quote_calls) == ctrader_calls_before + 1
     assert second_stop_engine.quote_calls[-1] == (
         "CTRADER",
         ("EURUSD",),
@@ -507,12 +543,11 @@ def main() -> None:
 
     validated_before_reconnect = len(reconnect_engine.validated)
     reconnect_engine.set_connected("CTRADER", True)
-    assert reconnect_ctrader.advance_broker_market() is None
+    assert reconnect_ctrader.advance_broker_market() is not None
     assert (
-        reconnect_ctrader.context.startup_phase == WORKSPACE_STARTUP_PHASE_WAIT_SPREAD
+        reconnect_ctrader.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING
     )
     assert len(reconnect_engine.validated) == validated_before_reconnect + 1
-    assert reconnect_ctrader.advance_broker_market() is not None
     assert reconnect_ctrader.context.runtime_state == WORKSPACE_STATE_RUNNING
     assert reconnect_ctrader.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING
     assert reconnect_ctrader.can_form_signal()
@@ -549,10 +584,12 @@ def main() -> None:
     assert startup_runtime.algorithm is not None
     assert not startup_runtime.chart_snapshot().events
     startup_engine.set_connected("IB", True)
-    assert startup_runtime.advance_broker_market() is not None
+    assert startup_runtime.advance_broker_market() is None
     assert startup_runtime.context.warmup_bars_processed == 2
     assert startup_runtime.context.runtime_state == WORKSPACE_STATE_STARTING
     assert startup_runtime.context.startup_phase == WORKSPACE_STARTUP_PHASE_WAIT_SPREAD
+    assert startup_runtime.advance_broker_market() is not None
+    assert startup_runtime.context.runtime_state == WORKSPACE_STATE_STARTING
     assert startup_runtime.advance_broker_market() is not None
     assert startup_runtime.context.runtime_state == WORKSPACE_STATE_RUNNING
     startup_runtime.begin_stop()
@@ -569,8 +606,8 @@ def main() -> None:
     print("  ib_wide_spread_blocked=True")
     print("  ib_spread_recovery_running=True")
     print("  duplicate_quote_ignored=True")
-    print("  current_bar_replaced=True")
-    print("  next_timeframe_bucket_opened=True")
+    print("  partial_bucket_not_dispatched=True")
+    print("  completed_bucket_dispatched_on_rollover=True")
     print("  cross_broker_events_isolated=True")
     print("  broker_execution_attempted=False")
     print("  subscriptions_released_on_stop=True")

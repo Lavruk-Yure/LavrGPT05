@@ -152,8 +152,7 @@ def _prior_mean_range(
 ) -> float:
     start = max(0, signal_index - SIGNAL_RANGE_REFERENCE_BARS)
     values = [
-        events[index].high - events[index].low
-        for index in range(start, signal_index)
+        events[index].high - events[index].low for index in range(start, signal_index)
     ]
     assert values
     result = statistics.mean(values)
@@ -466,12 +465,8 @@ def main() -> None:
     features = _build_features(dataset)
     assert len(features) == len(dataset.episodes)
 
-    good = tuple(
-        item for item in features if item.outcome == OUTCOME_GOOD_TRANSITION
-    )
-    false = tuple(
-        item for item in features if item.outcome == OUTCOME_FALSE_OR_MIXED
-    )
+    good = tuple(item for item in features if item.outcome == OUTCOME_GOOD_TRANSITION)
+    false = tuple(item for item in features if item.outcome == OUTCOME_FALSE_OR_MIXED)
     assert good
     assert false
 
@@ -504,25 +499,27 @@ def main() -> None:
             "signal_opening_deteriorating",
             good,
             false,
-            lambda item: None
-            if item.opening_delta_1 is None
-            else item.opening_delta_1 < 0.0,
+            lambda item: (
+                None if item.opening_delta_1 is None else item.opening_delta_1 < 0.0
+            ),
         ),
         _cohort(
             "signal_slope_deteriorating",
             good,
             false,
-            lambda item: None
-            if item.slope_delta_1 is None
-            else item.slope_delta_1 < 0.0,
+            lambda item: (
+                None if item.slope_delta_1 is None else item.slope_delta_1 < 0.0
+            ),
         ),
         _cohort(
             "signal_both_deteriorating",
             good,
             false,
-            lambda item: None
-            if item.opening_delta_1 is None or item.slope_delta_1 is None
-            else item.opening_delta_1 < 0.0 and item.slope_delta_1 < 0.0,
+            lambda item: (
+                None
+                if item.opening_delta_1 is None or item.slope_delta_1 is None
+                else item.opening_delta_1 < 0.0 and item.slope_delta_1 < 0.0
+            ),
         ),
         _cohort(
             "signal_wick_break_8",
@@ -568,16 +565,18 @@ def main() -> None:
             "follow_1_2_3_all_positive",
             good,
             false,
-            lambda item: None
-            if (
-                item.follow_1_tr is None
-                or item.follow_2_tr is None
-                or item.follow_3_tr is None
-            )
-            else (
-                item.follow_1_tr > 0.0
-                and item.follow_2_tr > 0.0
-                and item.follow_3_tr > 0.0
+            lambda item: (
+                None
+                if (
+                    item.follow_1_tr is None
+                    or item.follow_2_tr is None
+                    or item.follow_3_tr is None
+                )
+                else (
+                    item.follow_1_tr > 0.0
+                    and item.follow_2_tr > 0.0
+                    and item.follow_3_tr > 0.0
+                )
             ),
         ),
         _cohort(
@@ -596,24 +595,28 @@ def main() -> None:
             "signal_both_deteriorating_and_follow_3_positive",
             good,
             false,
-            lambda item: None
-            if (
-                item.opening_delta_1 is None
-                or item.slope_delta_1 is None
-                or item.follow_3_tr is None
-            )
-            else (
-                item.opening_delta_1 < 0.0
-                and item.slope_delta_1 < 0.0 < item.follow_3_tr
+            lambda item: (
+                None
+                if (
+                    item.opening_delta_1 is None
+                    or item.slope_delta_1 is None
+                    or item.follow_3_tr is None
+                )
+                else (
+                    item.opening_delta_1 < 0.0
+                    and item.slope_delta_1 < 0.0 < item.follow_3_tr
+                )
             ),
         ),
         _cohort(
             "signal_close_break_8_and_follow_3_positive",
             good,
             false,
-            lambda item: None
-            if item.follow_3_tr is None
-            else item.close_break_8 and item.follow_3_tr > 0.0,
+            lambda item: (
+                None
+                if item.follow_3_tr is None
+                else item.close_break_8 and item.follow_3_tr > 0.0
+            ),
         ),
     )
 
@@ -692,7 +695,7 @@ def main() -> None:
             key=lambda item: (
                 item.follow_3_tr if item.follow_3_tr is not None else 999.0,
                 item.close_break_8,
-            )
+            ),
         )[:8]
     )
     print("  priority_good_examples:")

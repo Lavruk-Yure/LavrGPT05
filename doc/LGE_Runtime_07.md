@@ -1,16 +1,16 @@
-# LGE Runtime 07 — RoadMap101–105
+# LGE Runtime 07 — RoadMap101–106
 
-## MACD Quality, Alligator Regime та Candidate F
+## Якість MACD, режим Alligator та Candidate F
 
 Дата початку: 2026-08-17  
 Дата базового checkpoint: 2026-08-21  
-Дата актуалізації: 2026-08-31
+Дата актуалізації: 2026-09-01
 
 ---
 
 # 1. Призначення MD7
 
-`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-105.
+`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-106.
 
 RoadMap101 продовжив стабілізований Historical Replay після RoadMap100 і був
 присвячений не механічному підбору PnL, а побудові причинно-часової логіки
@@ -62,7 +62,7 @@ defect.
 
 ---
 
-# 3. Незмінні invariants RoadMap101
+# 3. Незмінні інваріанти RoadMap101
 
 Для production і comparison Replay обов'язкові:
 
@@ -83,23 +83,23 @@ bars і не включає signal bar.
 
 ---
 
-# 4. Time-series windows
+# 4. Часові вікна
 
 Канонічний дослідний split RoadMap101:
 
-## 4.1. Development
+## 4.1. Розробка
 
 ```text
 2026-01-02 -> 2026-02-28
 ```
 
-## 4.2. Validation
+## 4.2. Валідація
 
 ```text
 2026-03-01 -> 2026-05-31
 ```
 
-## 4.3. Holdout
+## 4.3. Контрольний період
 
 ```text
 2026-06-01 -> 2026-08-11
@@ -113,7 +113,7 @@ holdout. Для майбутньої незалежної оцінки потр�
 
 ---
 
-# 5. MACD Quality — production checkpoint
+# 5. Якість MACD — контрольна точка робочої версії
 
 Після comparison `12/26/9`, `8/17/5`, `6/13/4` і подальшої time-series
 перевірки канонічним MACD-профілем RoadMap101 став:
@@ -144,7 +144,7 @@ extremum/prominence/distance/ABC angle без підміни самого crosso
 
 ---
 
-# 6. Alligator regime model
+# 6. Модель режимів Alligator
 
 Канонічний Alligator signal-timeframe baseline:
 
@@ -189,7 +189,7 @@ history `t-2 / t-1 / t`.
 
 ---
 
-# 7. Candidate F — production Alligator profile
+# 7. Candidate F — робочий профіль Alligator
 
 RoadMap101 зафіксував окремий immutable built-in profile:
 
@@ -203,7 +203,7 @@ logic_mode       = CANDIDATE_F
 Fresh workspace default не змінено: legacy `LGE Classic Smoothed` збережений.
 Candidate F вибирається явно або через profile binding WSP.
 
-## 7.1. Candidate F parameters
+## 7.1. Параметри Candidate F
 
 ```text
 trend_start_confirmation_bars = 4
@@ -222,7 +222,7 @@ overextended_min_slope        = 0.200
 overextended_min_opening      = 3.000
 ```
 
-## 7.2. ARMED / deferred lifecycle
+## 7.2. Життєвий цикл ARMED / відкладеного сигналу
 
 Якісний MACD signal не втрачається автоматично, якщо Alligator ще у
 `STARTING` того самого напрямку.
@@ -250,9 +250,9 @@ TTL expired
 Deferred release проходить ті самі downstream Candidate F guards, що й
 звичайний MACD CROSS.
 
-## 7.3. Candidate F structural guards
+## 7.3. Структурні запобіжники Candidate F
 
-### Opening collapse
+### Схлопування розкриття
 
 ```text
 normalized_opening(t) - normalized_opening(t-2) < -0.700
@@ -262,7 +262,7 @@ normalized_opening(t) - normalized_opening(t-2) < -0.700
 Guard ловить формально ACTIVE trend, у якого Alligator уже швидко
 закривається.
 
-### Weak opening / too early ACTIVE
+### Слабке розкриття / надто ранній ACTIVE
 
 ```text
 active_age <= 2
@@ -273,7 +273,7 @@ AND normalized_opening < 0.500
 Guard відсікає формальний ранній ACTIVE, коли Alligator ще недостатньо
 розкритий.
 
-### Volatility spike with deterioration
+### Сплеск волатильності з погіршенням
 
 ```text
 range_ratio >= 3.500
@@ -287,7 +287,7 @@ AND (
 `range_ratio` порівнює signal-bar range із середнім range попередніх 20
 завершених M15 bars.
 
-### Overextended trend
+### Надмірно розтягнутий тренд
 
 ```text
 normalized_slope >= 0.200
@@ -299,7 +299,7 @@ Guard відсікає надмірно розігнаний / розкрити�
 
 ---
 
-# 8. Canonical reason codes
+# 8. Канонічні коди причин
 
 Candidate F робить рішення видимим у Signals tooltip і Journal detail.
 Ключові production reason codes:
@@ -321,7 +321,7 @@ ALLIGATOR_OVEREXTENDED_TREND_REJECT
 
 ---
 
-# 9. Candidate F production parity
+# 9. Відповідність Candidate F робочій версії
 
 Candidate F був спочатку сформований як test-only controlled candidate, після
 чого перенесений у production algorithm без зміни очікуваного Replay result.
@@ -348,7 +348,7 @@ Candidate F у дослідному split зберіг усі 20 winners і пр
 включно з 5 STOP_LOSS. Це є факт цього dataset, а не гарантія майбутньої
 прибутковості.
 
-## 9.1. Development
+## 9.1. Розробка
 
 ```text
 trades = 7
@@ -359,7 +359,7 @@ Max DD = 0.17 USD
 PF = 7.2353
 ```
 
-## 9.2. Validation
+## 9.2. Валідація
 
 ```text
 trades = 16
@@ -370,7 +370,7 @@ Max DD = 3.24 USD
 PF = 0.8049
 ```
 
-## 9.3. Holdout
+## 9.3. Контрольний період
 
 ```text
 trades = 7
@@ -404,7 +404,7 @@ ALGORITHM_WORKSPACE_ALLIGATOR_CANDIDATE_F_PRODUCTION_CHECK=OK
 
 ---
 
-# 10. Manual LGE acceptance
+# 10. Ручне приймальне тестування LGE
 
 Production Candidate F перевірений не тільки synthetic/runtime tests, а й
 реальним Historical Replay через LGE із профілями:
@@ -458,7 +458,7 @@ Holdout     = 7 trades / 4W / 3L / 0 SL / +0.11
 
 ---
 
-# 11. Signals / Journal / UI observability
+# 11. Спостережуваність Signals / Journal / UI
 
 RoadMap101 закрив також observability для ручного algorithm analysis:
 
@@ -487,7 +487,7 @@ Parameters WSP -> "Алгоритм"
 
 ---
 
-# 12. Profile / revision invariants
+# 12. Інваріанти профілів і ревізій
 
 Канонічна profile model після RoadMap101:
 
@@ -515,7 +515,7 @@ WORKSPACE_INDICATOR_PROFILE_CANDIDATE_F_REVISION_UI_CHECK=OK
 
 ---
 
-# 13. Final regression RoadMap101
+# 13. Фінальна регресійна перевірка RoadMap101
 
 Фінальний regression після production Candidate F:
 
@@ -568,7 +568,7 @@ Paper / Live execution
 
 ---
 
-# 15. Boundary для RoadMap102
+# 15. Межа RoadMap102
 
 RoadMap102 починається вже від GREEN production Candidate F.
 
@@ -605,7 +605,7 @@ Historical Replay invariants = completed bars / no-look-ahead /
 
 ---
 
-# 16. RoadMap102 — production stabilization Candidate F
+# 16. RoadMap102 — стабілізація робочої Candidate F
 
 RoadMap102 не змінював production signal gate Candidate F без окремої
 перевірки. Основний результат етапу — стабілізація WSP/Replay observability та
@@ -635,7 +635,7 @@ Alligator = LGE Candidate F Smoothed r1,
 
 ---
 
-# 17. Candidate F negative-PD recovery — production 6K historical checkpoint
+# 17. Відновлення Candidate F після від’ємного PD — історична контрольна точка робочої версії 6K
 
 RoadMap102 / 6K переносить у production лише перевірену exit state-machine для
 negative `PROFIT_DRAWDOWN`. Positive profit drawdown, як і раніше, закривається
@@ -729,7 +729,7 @@ ALGORITHM_WORKSPACE_CANDIDATE_F_PRODUCTION_EXIT_RECOVERY_2025_CHECK=OK
 
 ---
 
-# 18. Manual LGE acceptance production 6K
+# 18. Ручне приймальне тестування робочої версії 6K у LGE
 
 23.08.2026 production 6K перевірений через реальний LGE Historical Replay, а
 не тільки через test runner.
@@ -792,7 +792,7 @@ Candidate F production exit baseline = -4.05 / PF 0.7808 / DD 5.80
 
 ---
 
-# 19. Boundary для RoadMap103 / 7A
+# 19. Межа RoadMap103 / 7A
 
 Після GREEN production 6K exit recovery вважається зафіксованою production
 базою і не повинна змінюватися під час наступного дослідження Stop-Loss.
@@ -815,12 +815,12 @@ RoadMap103 починається з:
 
 ---
 
-# 20. RoadMap103 — Stop-Loss / Structural SL/TP checkpoint
+# 20. RoadMap103 — контрольна точка Stop-Loss / структурних SL/TP
 
 RoadMap103 не змінював production 6K exit policy. Дослідження SL/TP виконувалося
 як causal paired diagnostic на тих самих production entries.
 
-## 20.1. Stop-Loss anatomy
+## 20.1. Анатомія Stop-Loss
 
 Production baseline 2025:
 
@@ -844,7 +844,7 @@ next-bar adverse gap: min +0.005R, median +0.053R, max +0.075R
 One-bar impulse gate був сильним diagnostic у 2025, але cross-period показав,
 що його не можна переносити в production як універсальний entry gate.
 
-## 20.2. Structural support/resistance geometry
+## 20.2. Геометрія структурних рівнів підтримки й опору
 
 Досліджено causal support/resistance zones тільки з завершених M15 bars.
 Фінальна bounded geometry RoadMap103 / 8A:
@@ -882,9 +882,9 @@ Cross-period paired diagnostic:
 
 ---
 
-# 21. RoadMap104 — ранній Alligator opening та exit/re-entry research
+# 21. RoadMap104 — раннє розкриття Alligator та дослідження виходу/повторного входу
 
-## 21.1. GREEN entry baseline 8C.1
+## 21.1. GREEN-база входів 8C.1
 
 `FIRST_EXPANSION_FROM_CANONICAL_COMPRESSED_MOUTH` прийнято як сильний test-only
 entry baseline. Використовується існуючий поріг `normalized_opening <= 0.600`,
@@ -903,7 +903,7 @@ median lead до formal STARTING = 3 M15 bars
 Simple opposite MACD cross як exit відхилено: у 2026 він погіршив результат до
 `net -17.70`. Entry pipeline 8C.1 лишається frozen під час exit research.
 
-## 21.2. Exit і Donchian
+## 21.2. Вихід і Donchian
 
 Ранні MACD contraction/slope reversal events самі по собі виявилися надто
 частими і як direct exit погіршували baseline. Alligator state у момент раннього
@@ -927,7 +927,7 @@ Donchian midline як прямий exit нестабільний. Opposite bound
 Post-TP Donchian re-entry і pullback/re-breakout без додаткового momentum
 filter також нестабільні між періодами.
 
-## 21.3. Relative MACD restart і identity blocker
+## 21.3. Відносний перезапуск MACD та блокувальник ідентичності
 
 `dominant acceleration` diagnostic:
 
@@ -941,7 +941,7 @@ T104-13 виявив causal identity collisions у first-leg, re-entry і select
 re-entry inventory. До production/re-entry висновків ці collisions мають бути
 усунені або канонічно нормалізовані; diagnostic collapse не є execution policy.
 
-## 21.4. Alligator forward displacement projection
+## 21.4. Проєкція випереджувального зміщення Alligator
 
 Forward shifted Alligator lines — це не price forecast. Це відома display
 geometry, яку можна обчислити causal без future market data.
@@ -958,7 +958,7 @@ permission.
 
 ---
 
-# 22. Manual indicator screening — TradingView reference
+# 22. Ручний відбір індикаторів — орієнтир TradingView
 
 Manual screening на EURUSD M15 виконується як visual hypothesis generation,
 а не як доказ performance. Community scripts не є runtime dependency LGE;
@@ -985,7 +985,7 @@ DMI/ADX     -> trend strength guard, якщо буде потрібен післ
 
 ---
 
-# 23. RoadMap104 boundary — historical checkpoint
+# 23. Межа RoadMap104 — історична контрольна точка
 
 Перед новим SL/TP-indicator screening завершити незакриті quantitative роботи
 і не змішувати одночасно entry, exit, re-entry та protection policy.
@@ -1018,17 +1018,18 @@ Donchian                         -> already researched structural boundary refer
 
 Цей порядок є історичним boundary RoadMap104. На момент його завершення жоден
 із BBW / AC / Stochastic / DMI/ADX не був перенесений у production logic.
-Поточну production-істину після RoadMap105 задає розділ 24; пізніше прийнятий
-Stochastic CURRENT_BAR reject зафіксовано окремо в 24.4.
+Поточну production-істину після RoadMap106 задає розділ 24; прийнятий
+Stochastic CURRENT_BAR reject зафіксовано в 24.4, а no-change verdict
+RoadMap106 — у розділі 25.
 
 ---
 
-# 24. RoadMap105 — current production truth
+# 24. RoadMap105 — поточна істина робочої версії
 
 RoadMap105 очистив production exit stack після експериментів RoadMap104 і
 зафіксував фактичну runtime-істину Candidate F.
 
-## 24.1. Stop-Loss / Take-Profit geometry
+## 24.1. Геометрія Stop-Loss / Take-Profit
 
 Поточний production `WorkspaceRuntime` використовує динамічну геометрію:
 
@@ -1055,7 +1056,7 @@ SUPERTREND_NO_EFFECT_UNDER_CURRENT_PRODUCTION_EXIT_STACK
 
 Supertrend не входить у поточну production exit logic.
 
-## 24.3. Profit Drawdown threshold
+## 24.3. Поріг Profit Drawdown
 
 Cross-period fine sweep T105-09 підтвердив невелике, але стабільне покращення
 при `35%` проти попереднього production default `30%`. Тому canonical default
@@ -1109,7 +1110,7 @@ broker_execution_attempted=False
 completed market events only
 ```
 
-## 24.4. Candidate F Stochastic CURRENT_BAR entry gate
+## 24.4. Вхідний запобіжник CURRENT_BAR Stochastic для Candidate F
 
 У production прийнято вузьке правило Stochastic `14/1/3` для actual registered
 Candidate F `WorkspaceRuntime` (`WorkspaceMacdAlligatorReplayAlgorithm`): стан
@@ -1171,3 +1172,45 @@ completed_market_events_only=True
 no_look_ahead=True
 production_exit_logic_changed=False
 ```
+
+---
+
+# 25. RoadMap106 — прийняте рішення без змін
+
+RoadMap106 перевірив temporal robustness чинного production baseline, causal
+entry-time anatomy та післявхідну anatomy фактичних LOSS без зміни production
+logic. T106-02 не знайшов causal entry feature з одночасно стабільним напрямком
+WIN/LOSS і non-overlapping IQR у 2025 та 2026. T106-03 класифікував усі `13/13`
+фактичних LOSS як `ENTRY_BAD`, але не виявив causal discriminator, який можна
+безпечно перенести в production; exit/PD problem не підтверджено.
+
+Прийняте рішення:
+
+```text
+roadmap106_decision=VARIANT_C_NO_CHANGE
+stable_causal_entry_discriminator_found=False
+exit_problem_supported=False
+new_candidate_rule_created=False
+production_change_required=False
+```
+
+Чинний production truth лишається рівно за розділом 24: Candidate F із
+поточним Alligator wiring, Stochastic `14/1/3` CURRENT_BAR reject, `PD=35%`,
+`SL=max(signal_bar_range, spread*10)`, `TP=2R` та незмінною negative-PD
+recovery state-machine. Donchian production gate і Supertrend production
+wiring відсутні.
+
+Фінальний registered-path regression підтвердив deterministic Replay лише на
+completed market events, без look-ahead, broker requests або production-змін:
+
+```text
+T106_04_NO_CHANGE_PRODUCTION_TRUTH_REGRESSION=OK
+broker_requests=0
+broker_execution_attempted=False
+production_logic_changed=False
+```
+
+Наступний RoadMap не повинен починатися з нового ad-hoc threshold або зміни
+exit policy. Перший крок має сформулювати одну нову causal structural entry
+hypothesis, відокремлену від outcome labels, і перевірити її однаковими
+baseline/candidate метриками на 2025 та 2026 до будь-якого production рішення.

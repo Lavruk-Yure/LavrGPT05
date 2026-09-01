@@ -57,8 +57,7 @@ class IBFxExternalExposure:
     def is_active(self) -> bool:
         return bool(
             self.evidence_status in IB_FX_EXTERNAL_EXPOSURE_ACTIVE_STATUSES
-            and abs(self.signed_volume)
-            > IB_POSITION_QUANTITY_ABS_TOLERANCE
+            and abs(self.signed_volume) > IB_POSITION_QUANTITY_ABS_TOLERANCE
         )
 
     @property

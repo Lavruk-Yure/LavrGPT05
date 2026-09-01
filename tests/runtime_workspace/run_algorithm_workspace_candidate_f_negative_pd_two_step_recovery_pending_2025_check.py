@@ -277,9 +277,7 @@ def _run_variant() -> TwoStepRecoveryResult:
         trade.close_reason == "TAKE_PROFIT" for trade in pending_terminal_trades
     )
     known_decision_ids = (
-        guard.recovery_close_ids
-        | guard.early_abort_close_ids
-        | guard.timeout_close_ids
+        guard.recovery_close_ids | guard.early_abort_close_ids | guard.timeout_close_ids
     )
     pending_other = sum(
         trade.position_id not in known_decision_ids
@@ -298,9 +296,7 @@ def _run_variant() -> TwoStepRecoveryResult:
     )
 
     terminal_ids = (
-        guard.recovery_close_ids
-        | guard.early_abort_close_ids
-        | guard.timeout_close_ids
+        guard.recovery_close_ids | guard.early_abort_close_ids | guard.timeout_close_ids
     )
     assert signals.macd_quality_accept == BASELINE_MACD_QUALITY_PASS
     assert signals.macd_quality_reject == BASELINE_MACD_QUALITY_REJECT

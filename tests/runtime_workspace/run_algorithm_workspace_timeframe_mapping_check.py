@@ -62,10 +62,13 @@ def main() -> None:
                 WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_1,
             )
         else:
-            assert resolve_alligator_confirmation_timeframe(
-                base_timeframe,
-                WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_1,
-            ) == resolved
+            assert (
+                resolve_alligator_confirmation_timeframe(
+                    base_timeframe,
+                    WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_1,
+                )
+                == resolved
+            )
 
     for base_timeframe, resolved in expected_higher_2.items():
         if resolved is None:
@@ -74,10 +77,13 @@ def main() -> None:
                 WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_2,
             )
         else:
-            assert resolve_alligator_confirmation_timeframe(
-                base_timeframe,
-                WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_2,
-            ) == resolved
+            assert (
+                resolve_alligator_confirmation_timeframe(
+                    base_timeframe,
+                    WORKSPACE_ALLIGATOR_CONFIRMATION_HIGHER_2,
+                )
+                == resolved
+            )
 
     invalid_mode_blocked = _blocked("M15", "HIGHER_UNKNOWN")
     invalid_timeframe_blocked = False

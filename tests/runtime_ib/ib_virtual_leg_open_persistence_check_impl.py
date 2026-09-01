@@ -107,8 +107,7 @@ class DummyIBRuntimeService(IBRuntimeServiceProtocol):
         self.place_calls += 1
 
         if comment != "[LGE:M] RoadMap90 automatic persistence check" and (
-            comment
-            != "[LGE:M] RoadMap90 persistence failure reporting check"
+            comment != "[LGE:M] RoadMap90 persistence failure reporting check"
         ):
             raise AssertionError("Unexpected synthetic IB broker comment")
 
@@ -449,9 +448,7 @@ def main() -> int:
             if set(roles) != expected_roles:
                 raise AssertionError("Persisted IB order roles differ")
 
-            expected_order_ref = (
-                "[LGE:M] RoadMap90 automatic persistence check"
-            )
+            expected_order_ref = "[LGE:M] RoadMap90 automatic persistence check"
 
             if any(
                 str(row.get("order_ref") or "") != expected_order_ref
@@ -481,9 +478,7 @@ def main() -> int:
             ):
                 raise AssertionError("Persisted Trade comment differs")
 
-            if broker_order_row is None or broker_order_row[0] != (
-                expected_order_ref
-            ):
+            if broker_order_row is None or broker_order_row[0] != (expected_order_ref):
                 raise AssertionError("Persisted BrokerOrder comment differs")
 
             if service.position_calls != 2:
@@ -513,10 +508,7 @@ def main() -> int:
             print(f"  place_calls={service.place_calls}")
             print("  virtual_fx_quantity=-1000.0")
             print(f"  evidence_calls={service.evidence_calls}")
-            print(
-                "  trade_comment="
-                "RoadMap90 automatic persistence check"
-            )
+            print("  trade_comment=" "RoadMap90 automatic persistence check")
             print(
                 "  broker_order_comment="
                 "[LGE:M] RoadMap90 automatic persistence check"

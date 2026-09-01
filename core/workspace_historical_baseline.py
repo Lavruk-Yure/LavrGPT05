@@ -32,9 +32,7 @@ class WorkspaceHistoricalClosedTrade:
         if not trade_uid:
             raise WorkspaceHistoricalBaselineError("trade_uid is required")
         if not math.isfinite(realized_profit):
-            raise WorkspaceHistoricalBaselineError(
-                "realized_profit must be finite"
-            )
+            raise WorkspaceHistoricalBaselineError("realized_profit must be finite")
         if not close_reason:
             raise WorkspaceHistoricalBaselineError("close_reason is required")
         object.__setattr__(self, "trade_uid", trade_uid)
@@ -84,32 +82,20 @@ def build_workspace_historical_baseline_metrics(
         raise WorkspaceHistoricalBaselineError("duplicate trade_uid")
 
     tolerance = 1e-12
-    winning_trades = sum(
-        trade.realized_profit > tolerance for trade in trades
-    )
-    losing_trades = sum(
-        trade.realized_profit < -tolerance for trade in trades
-    )
+    winning_trades = sum(trade.realized_profit > tolerance for trade in trades)
+    losing_trades = sum(trade.realized_profit < -tolerance for trade in trades)
     break_even_trades = len(trades) - winning_trades - losing_trades
     gross_profit = math.fsum(
-        trade.realized_profit
-        for trade in trades
-        if trade.realized_profit > tolerance
+        trade.realized_profit for trade in trades if trade.realized_profit > tolerance
     )
     gross_loss = math.fsum(
-        trade.realized_profit
-        for trade in trades
-        if trade.realized_profit < -tolerance
+        trade.realized_profit for trade in trades if trade.realized_profit < -tolerance
     )
     net_profit = math.fsum(trade.realized_profit for trade in trades)
     trade_count = len(trades)
-    win_rate_percent = (
-        winning_trades / trade_count * 100.0 if trade_count else 0.0
-    )
+    win_rate_percent = winning_trades / trade_count * 100.0 if trade_count else 0.0
     average_trade = net_profit / trade_count if trade_count else 0.0
-    profit_factor = (
-        gross_profit / abs(gross_loss) if gross_loss < -tolerance else None
-    )
+    profit_factor = gross_profit / abs(gross_loss) if gross_loss < -tolerance else None
     close_reason_counts = Counter(trade.close_reason for trade in trades)
     close_reasons = tuple(
         WorkspaceHistoricalCloseReasonCount(

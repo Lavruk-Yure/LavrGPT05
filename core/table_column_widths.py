@@ -40,8 +40,7 @@ class TableColumnWidthPersistence(QObject):
         self._table_key = str(table_key).strip()
         self._repository = repository or SessionRepository()
         self._default_widths = tuple(
-            max(TABLE_COLUMN_WIDTH_MINIMUM, int(width))
-            for width in default_widths
+            max(TABLE_COLUMN_WIDTH_MINIMUM, int(width)) for width in default_widths
         )
         self._restoring = False
         self._dirty = False
@@ -112,8 +111,7 @@ class TableColumnWidthPersistence(QObject):
             return
 
         restored_widths = [
-            max(TABLE_COLUMN_WIDTH_MINIMUM, int(width))
-            for width in widths
+            max(TABLE_COLUMN_WIDTH_MINIMUM, int(width)) for width in widths
         ]
         self._restoring = True
         try:

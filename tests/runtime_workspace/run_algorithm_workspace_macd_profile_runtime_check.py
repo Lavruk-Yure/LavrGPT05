@@ -174,9 +174,7 @@ def _revised_user_profile(
     name: str,
     parameters: dict[str, object],
 ) -> WorkspaceIndicatorProfile:
-    built_in = built_in_workspace_indicator_profile(
-        MACD_PROFILE_UID_LGE_CLASSIC
-    )
+    built_in = built_in_workspace_indicator_profile(MACD_PROFILE_UID_LGE_CLASSIC)
     duplicate = built_in.duplicate_as_user(name)
     return duplicate.revised(name=name, parameters=parameters)
 
@@ -233,9 +231,7 @@ def _run(
     replay_settings["speed"] = speed
     run_workspace = replace(workspace, replay_settings=replay_settings)
     if combined_algorithm:
-        algorithm = WorkspaceMacdAlligatorReplayAlgorithm(
-            run_workspace.algorithm
-        )
+        algorithm = WorkspaceMacdAlligatorReplayAlgorithm(run_workspace.algorithm)
     else:
         algorithm = WorkspaceMacdReplayAlgorithm(run_workspace.algorithm)
     probe = BrokerRequestProbe()
@@ -270,9 +266,7 @@ def _run(
 
 def main() -> None:
     default_run = _run(_workspace(None), speed=1)
-    default_records, default_warmup, default_source, default_requests, _ = (
-        default_run
-    )
+    default_records, default_warmup, default_source, default_requests, _ = default_run
     assert default_warmup == MACD_REQUIRED_BARS
     assert default_source.profile_uid == MACD_PROFILE_UID_LGE_CLASSIC
     assert default_source.profile_revision == 1
@@ -296,9 +290,7 @@ def main() -> None:
     fast_1x = _run(fast_workspace, speed=1)
     fast_10x = _run(fast_workspace, speed=10)
     fast_step = _run(fast_workspace, speed=1, step_mode=True)
-    fast_records, fast_warmup, fast_source, fast_requests, fast_bindings = (
-        fast_1x
-    )
+    fast_records, fast_warmup, fast_source, fast_requests, fast_bindings = fast_1x
     assert fast_10x[0] == fast_records
     assert fast_step[0] == fast_records
     assert fast_warmup == 8
@@ -320,9 +312,7 @@ def main() -> None:
     assert fast_requests == 0
     assert fast_10x[3] == 0
     assert fast_step[3] == 0
-    assert fast_bindings["FUTURE_INDICATOR"] == {
-        "future_key": "preserved"
-    }
+    assert fast_bindings["FUTURE_INDICATOR"] == {"future_key": "preserved"}
     assert fast_workspace.parameters["warmup_bars"] == 2
     assert fast_workspace.parameters["future_parameter"] == "preserved"
 
@@ -358,9 +348,7 @@ def main() -> None:
             "shift": 2,
         },
     )
-    mixed_binding = WorkspaceIndicatorProfileBinding.from_profile(
-        mixed_profile
-    )
+    mixed_binding = WorkspaceIndicatorProfileBinding.from_profile(mixed_profile)
     mixed_workspace = _workspace(mixed_binding)
     mixed_1x = _run(mixed_workspace, speed=1)
     mixed_10x = _run(mixed_workspace, speed=10)
@@ -376,9 +364,7 @@ def main() -> None:
     )
     assert mixed_source.runtime_profile.shift == 2
     first_event = _events()[0]
-    expected_typical = (
-        first_event.high + first_event.low + first_event.close
-    ) / 3.0
+    expected_typical = (first_event.high + first_event.low + first_event.close) / 3.0
     assert math_is_close(
         mixed_source.observations[0].source_value,
         expected_typical,

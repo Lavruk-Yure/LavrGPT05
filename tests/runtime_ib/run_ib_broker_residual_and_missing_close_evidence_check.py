@@ -316,19 +316,13 @@ def main() -> int:
                 "persisted_entry_price": persisted_leg.entry_price,
                 "persisted_opened_utc": persisted_leg.opened_utc,
                 "persisted_parent_order_id": persisted_leg.parent_order_id,
-                "persisted_stop_loss_order_id": (
-                    persisted_leg.stop_loss_order_id
-                ),
-                "persisted_take_profit_order_id": (
-                    persisted_leg.take_profit_order_id
-                ),
+                "persisted_stop_loss_order_id": (persisted_leg.stop_loss_order_id),
+                "persisted_take_profit_order_id": (persisted_leg.take_profit_order_id),
                 "persisted_stop_loss": persisted_leg.stop_loss,
                 "persisted_take_profit": persisted_leg.take_profit,
                 "persisted_oca_group": persisted_leg.oca_group,
                 "persisted_leg_status": persisted_leg.leg_status,
-                "persisted_protection_status": (
-                    persisted_leg.protection_status
-                ),
+                "persisted_protection_status": (persisted_leg.protection_status),
                 "persisted_reconciliation_status": (
                     persisted_leg.reconciliation_status
                 ),
@@ -352,11 +346,9 @@ def main() -> int:
     ):
         raise AssertionError("Persisted broker residual did not survive restart")
 
-    restarted_residual = (
-        restarted_reconciliation.group_broker_residual_signed_volumes[
-            EURUSD_ID
-        ]
-    )
+    restarted_residual = restarted_reconciliation.group_broker_residual_signed_volumes[
+        EURUSD_ID
+    ]
 
     if restarted_residual != 2000.0:
         raise AssertionError("Restarted broker residual volume differs")
@@ -383,9 +375,7 @@ def main() -> int:
     supported_open_reconciliation = reconcile_ib_virtual_position_legs(
         [build_usdzar_leg(), build_usdzar_closed_sell_leg()],
         build_snapshot(
-            positions=[
-                build_position(USDZAR_ID, "USD", "ZAR", 1000.0)
-            ],
+            positions=[build_position(USDZAR_ID, "USD", "ZAR", 1000.0)],
             open_orders=[],
             executions=[build_usdzar_sell_leg_close_execution()],
         ),
@@ -426,9 +416,7 @@ def main() -> int:
     supported_group_snapshot = build_ib_position_group_snapshot(
         reconciliation_snapshot=supported_open_reconciliation,
         evidence_snapshot=build_snapshot(
-            positions=[
-                build_position(USDZAR_ID, "USD", "ZAR", 1000.0)
-            ],
+            positions=[build_position(USDZAR_ID, "USD", "ZAR", 1000.0)],
             open_orders=[],
             executions=[build_usdzar_sell_leg_close_execution()],
         ),
@@ -440,9 +428,7 @@ def main() -> int:
     external_evidence_reconciliation = reconcile_ib_virtual_position_legs(
         [build_usdzar_leg(), build_usdzar_closed_sell_leg()],
         build_snapshot(
-            positions=[
-                build_position(USDZAR_ID, "USD", "ZAR", 1000.0)
-            ],
+            positions=[build_position(USDZAR_ID, "USD", "ZAR", 1000.0)],
             open_orders=[],
             executions=[
                 build_usdzar_sell_leg_close_execution(),

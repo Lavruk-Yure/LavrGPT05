@@ -111,8 +111,7 @@ def _baseline_close_index(run: Any, candidate: Any) -> int:
 def _strictly_lower(values: list[float]) -> bool:
     """True, якщо кожний наступний causal value нижчий за попередній."""
     return all(
-        current < previous - EPSILON
-        for previous, current in zip(values, values[1:])
+        current < previous - EPSILON for previous, current in zip(values, values[1:])
     )
 
 
@@ -140,8 +139,7 @@ def _sequence_observation(
         < first.directional_normalized_center_slope - EPSILON
     )
     lips_jaw_lower = (
-        last.directional_lips_jaw_gap
-        < first.directional_lips_jaw_gap - EPSILON
+        last.directional_lips_jaw_gap < first.directional_lips_jaw_gap - EPSILON
     )
 
     return SequenceObservation(
@@ -189,28 +187,20 @@ def _summary(rows: list[SequenceObservation]) -> dict[str, Any]:
     return {
         "eligible": len(rows),
         "median_opening_change": _median([row.opening_change for row in rows]),
-        "median_slope_change": _median(
-            [row.directional_slope_change for row in rows]
-        ),
+        "median_slope_change": _median([row.directional_slope_change for row in rows]),
         "median_lips_jaw_change": _median([row.lips_jaw_change for row in rows]),
         "opening_lower": sum(row.opening_lower for row in rows),
         "slope_lower": sum(row.directional_slope_lower for row in rows),
         "lips_jaw_lower": sum(row.lips_jaw_lower for row in rows),
         "all_three_lower": sum(row.all_three_lower for row in rows),
         "opening_down_streak": sum(row.opening_down_streak for row in rows),
-        "slope_down_streak": sum(
-            row.directional_slope_down_streak for row in rows
-        ),
+        "slope_down_streak": sum(row.directional_slope_down_streak for row in rows),
         "lips_jaw_down_streak": sum(row.lips_jaw_down_streak for row in rows),
         "all_three_down_streak": sum(row.all_three_down_streak for row in rows),
         "center_break_within": sum(row.center_break_within for row in rows),
         "lips_jaw_break_within": sum(row.lips_jaw_break_within for row in rows),
-        "full_order_break_within": sum(
-            row.full_order_break_within for row in rows
-        ),
-        "regime_misaligned_within": sum(
-            row.regime_misaligned_within for row in rows
-        ),
+        "full_order_break_within": sum(row.full_order_break_within for row in rows),
+        "regime_misaligned_within": sum(row.regime_misaligned_within for row in rows),
     }
 
 
@@ -283,8 +273,7 @@ def _event_sequence_groups(
 
     summaries = {
         horizon: {
-            group: _summary(group_rows)
-            for group, group_rows in horizon_rows.items()
+            group: _summary(group_rows) for group, group_rows in horizon_rows.items()
         }
         for horizon, horizon_rows in rows.items()
     }
@@ -326,11 +315,14 @@ def _run_window(window: Any) -> dict[str, Any]:
 
 
 def _counter_text(counter: Counter[str]) -> str:
-    return "|".join(
-        f"{key}:{counter[key]}"
-        for key in ("STOP_LOSS", "TAKE_PROFIT", "OTHER")
-        if counter[key]
-    ) or "NONE"
+    return (
+        "|".join(
+            f"{key}:{counter[key]}"
+            for key in ("STOP_LOSS", "TAKE_PROFIT", "OTHER")
+            if counter[key]
+        )
+        or "NONE"
+    )
 
 
 def main() -> None:

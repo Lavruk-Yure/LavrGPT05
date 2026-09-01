@@ -200,9 +200,7 @@ def _alligator_runtime_profile() -> WorkspaceAlligatorRuntimeProfile:
         lips_shift=baseline.lips_shift,
         ma_type=baseline.ma_type,
         logic_mode=baseline.logic_mode,
-        trend_start_confirmation_bars=(
-            baseline.trend_start_confirmation_bars
-        ),
+        trend_start_confirmation_bars=(baseline.trend_start_confirmation_bars),
         deferred_expiry_bars=baseline.deferred_expiry_bars,
         opening_collapse_threshold=baseline.opening_collapse_threshold,
         volatility_lookback_bars=baseline.volatility_lookback_bars,
@@ -380,8 +378,7 @@ def _confirmed_candidates(
         direction = _alligator_direction(run.alligator[start_index])
         assert direction is not None
         previous_aligned = bool(
-            start_index > 0
-            and _macd_aligned(run.macd[start_index - 1], direction)
+            start_index > 0 and _macd_aligned(run.macd[start_index - 1], direction)
         )
         found_index = None
         candidate_invalidated = False

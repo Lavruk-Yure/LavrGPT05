@@ -476,20 +476,17 @@ def main() -> int:
         )
         old_parent_repaired = int(old_parent_row["perm_id"]) == 1900828147
         old_close_not_rebound = (
-            old_close_row["perm_id"] is None
-            and int(old_close_row["is_active"]) == 0
+            old_close_row["perm_id"] is None and int(old_close_row["is_active"]) == 0
         )
         current_eur_active = {
-            (row["order_role"], int(row["perm_id"]))
-            for row in current_eur_orders
+            (row["order_role"], int(row["perm_id"])) for row in current_eur_orders
         } == {
             (IB_LEG_ORDER_ROLE_PARENT, 963655516),
             (IB_LEG_ORDER_ROLE_STOP_LOSS, 963655518),
             (IB_LEG_ORDER_ROLE_TAKE_PROFIT, 963655517),
         }
         current_gbp_active = {
-            (row["order_role"], int(row["perm_id"]))
-            for row in current_gbp_orders
+            (row["order_role"], int(row["perm_id"])) for row in current_gbp_orders
         } == {
             (IB_LEG_ORDER_ROLE_PARENT, 963655532),
             (IB_LEG_ORDER_ROLE_STOP_LOSS, 963655534),

@@ -134,9 +134,7 @@ def main() -> None:
         "btnSave",
         "btnClose",
     ):
-        assert ui_root.find(
-            f".//widget[@name='{object_name}']"
-        ) is not None
+        assert ui_root.find(f".//widget[@name='{object_name}']") is not None
     for obsolete_name in (
         "btnParameterTree",
         "cmbMacdSignalMode",
@@ -144,9 +142,7 @@ def main() -> None:
         "spnSpreadLimit",
         "spnWarmupBars",
     ):
-        assert ui_root.find(
-            f".//widget[@name='{obsolete_name}']"
-        ) is None
+        assert ui_root.find(f".//widget[@name='{obsolete_name}']") is None
 
     source = (
         PROJECT_ROOT / "core" / "algorithm_workspace_parameters_dialog.py"
@@ -172,15 +168,18 @@ def main() -> None:
     assert signal_group.childCount() == 7
     assert filter_group.childCount() == 2
     assert risk_group.childCount() == 6
-    assert sum(
-        _group_item(dialog, code).childCount() == 0
-        for code in (
-            "DATA_REPLAY",
-            "ALGORITHM",
-            "EXECUTION",
-            "DIAGNOSTICS",
+    assert (
+        sum(
+            _group_item(dialog, code).childCount() == 0
+            for code in (
+                "DATA_REPLAY",
+                "ALGORITHM",
+                "EXECUTION",
+                "DIAGNOSTICS",
+            )
         )
-    ) == 4
+        == 4
+    )
 
     dialog.select_parameter("signals.macd_enabled")
     assert dialog.cmb_boolean_value.isEnabled()
@@ -201,23 +200,16 @@ def main() -> None:
     assert dialog.spn_float_value.singleStep() == 0.000001
     assert dialog.spn_float_value.value() == 0.00001
     dialog.spn_float_value.setValue(0.000012)
-    assert (
-        dialog.schema_updates()["signals.macd_extremum_min_prominence"]
-        == 0.000012
-    )
+    assert dialog.schema_updates()["signals.macd_extremum_min_prominence"] == 0.000012
 
-    dialog.select_parameter(
-        "signals.macd_extremum_to_cross_min_distance"
-    )
+    dialog.select_parameter("signals.macd_extremum_to_cross_min_distance")
     assert dialog.spn_float_value.isEnabled()
     assert dialog.spn_float_value.decimals() == 6
     assert dialog.spn_float_value.singleStep() == 0.000001
     assert dialog.spn_float_value.value() == 0.00005
     dialog.spn_float_value.setValue(0.00006)
     assert (
-        dialog.schema_updates()[
-            "signals.macd_extremum_to_cross_min_distance"
-        ]
+        dialog.schema_updates()["signals.macd_extremum_to_cross_min_distance"]
         == 0.00006
     )
 
@@ -245,9 +237,7 @@ def main() -> None:
     assert dialog.spn_float_value.singleStep() == 0.01
     assert dialog.spn_float_value.value() == 2.0
     dialog.spn_float_value.setValue(2.25)
-    assert (
-        dialog.schema_updates()["signals.macd_cross_min_abc_angle"] == 2.25
-    )
+    assert dialog.schema_updates()["signals.macd_cross_min_abc_angle"] == 2.25
 
     dialog.select_parameter("filters.alligator_enabled")
     true_index = dialog.cmb_boolean_value.findData(True)
@@ -258,10 +248,7 @@ def main() -> None:
     assert dialog.cmb_choice_value.itemText(1) == "uk:One timeframe higher"
     higher_index = dialog.cmb_choice_value.findData("HIGHER_2")
     dialog.cmb_choice_value.setCurrentIndex(higher_index)
-    assert (
-        dialog.schema_updates()["filters.alligator_confirmation"]
-        == "HIGHER_2"
-    )
+    assert dialog.schema_updates()["filters.alligator_confirmation"] == "HIGHER_2"
 
     dialog.select_parameter("risk.risk_percent")
     assert dialog.spn_float_value.isEnabled()
@@ -273,10 +260,7 @@ def main() -> None:
     dialog.spn_integer_value.setValue(6)
     assert dialog.schema_updates()["risk.maximum_open_positions"] == 6
     assert dialog.schema_updates()["signals.macd_enabled"] is False
-    assert (
-        dialog.schema_updates()["filters.alligator_confirmation"]
-        == "HIGHER_2"
-    )
+    assert dialog.schema_updates()["filters.alligator_confirmation"] == "HIGHER_2"
 
     dialog.select_parameter("risk.require_stop_loss")
     assert dialog.cmb_boolean_value.isEnabled()
@@ -315,20 +299,16 @@ def main() -> None:
     assert "Locked by license" in locked_dialog.lbl_status_value.text()
 
     free_profile = workspace_parameter_feature_profile_for_edition("free")
-    pro_plus_profile = workspace_parameter_feature_profile_for_edition(
-        "pro_plus"
-    )
+    pro_plus_profile = workspace_parameter_feature_profile_for_edition("pro_plus")
     assert (
         WORKSPACE_PARAMETER_FEATURE_RISK_MANAGEMENT
         in free_profile.granted_feature_codes
     )
     assert (
-        WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES
-        in free_profile.granted_feature_codes
+        WORKSPACE_PARAMETER_FEATURE_SIGNAL_SOURCES in free_profile.granted_feature_codes
     )
     assert (
-        WORKSPACE_PARAMETER_FEATURE_SIGNAL_FILTERS
-        in free_profile.granted_feature_codes
+        WORKSPACE_PARAMETER_FEATURE_SIGNAL_FILTERS in free_profile.granted_feature_codes
     )
     assert (
         WORKSPACE_PARAMETER_FEATURE_ADVANCED_RISK
@@ -346,14 +326,8 @@ def main() -> None:
     assert "WorkspaceParameterGroup.filters.title" in translation_keys
     assert "AlgorithmWorkspaceParametersDialog.macdLinear" in translation_keys
     assert "WorkspaceParameter.riskPercent.description" in translation_keys
-    assert (
-        "WorkspaceParameter.macdExtremumMinProminence.title"
-        in translation_keys
-    )
-    assert (
-        "WorkspaceParameter.macdExtremumToCrossMinDistance.title"
-        in translation_keys
-    )
+    assert "WorkspaceParameter.macdExtremumMinProminence.title" in translation_keys
+    assert "WorkspaceParameter.macdExtremumToCrossMinDistance.title" in translation_keys
     assert "WorkspaceParameter.macdCrossMinAngle.title" in translation_keys
     assert "WorkspaceParameter.macdCrossAngleModel.title" in translation_keys
     assert "WorkspaceParameter.macdCrossMinAbcAngle.title" in translation_keys

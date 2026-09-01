@@ -79,9 +79,7 @@ def _without_position_observation() -> dict:
 def _managed_only_position_observation() -> dict:
     snapshot = support.build_live_like_evidence(include_external_execution=False)
     snapshot["captured_utc"] = "2026-08-04T09:00:00+00:00"
-    snapshot["positions"] = [
-        fixture.build_position(POSITION_ID, "EUR", "USD", -1000.0)
-    ]
+    snapshot["positions"] = [fixture.build_position(POSITION_ID, "EUR", "USD", -1000.0)]
     snapshot["executions"] = [
         {
             "account": ACCOUNT_ID,
@@ -104,22 +102,16 @@ def _managed_only_position_observation() -> dict:
 def _pure_external_gbpusd_observation() -> dict:
     snapshot = _without_position_observation()
     snapshot["captured_utc"] = "2026-08-04T08:30:00+00:00"
-    snapshot["positions"] = [
-        fixture.build_position(GBPUSD_ID, "GBP", "USD", 1000.0)
-    ]
+    snapshot["positions"] = [fixture.build_position(GBPUSD_ID, "GBP", "USD", 1000.0)]
     return snapshot
 
 
 def _group(engine: RuntimeEngine, symbol_name: str):
     snapshot = engine.sync_active_broker_position_groups()
-    matches = [
-        group for group in snapshot.groups if group.symbol_name == symbol_name
-    ]
+    matches = [group for group in snapshot.groups if group.symbol_name == symbol_name]
 
     if len(matches) != 1:
-        raise AssertionError(
-            f"Expected one {symbol_name} IB group, got {len(matches)}"
-        )
+        raise AssertionError(f"Expected one {symbol_name} IB group, got {len(matches)}")
 
     return matches[0]
 
@@ -163,9 +155,7 @@ def main() -> int:
         restart_engine = RuntimeEngine(db_path=str(db_path))
 
         try:
-            restart_service = support.EvidenceService(
-                _without_position_observation()
-            )
+            restart_service = support.EvidenceService(_without_position_observation())
             restart_engine.set_ib_runtime_service(restart_service)
             restart_engine.set_broker("IB")
             stale_group = _group(restart_engine, "EURUSD")
@@ -204,12 +194,10 @@ def main() -> int:
                 symbol_name="EURUSD",
                 runtime_mode=IB_FX_GUARD_MODE_REPLAY,
             )
-            live_read_only = (
-                restart_engine.evaluate_ib_fx_external_exposure_guard(
-                    account_id=ACCOUNT_ID,
-                    symbol_name="EURUSD",
-                    runtime_mode=IB_FX_GUARD_MODE_LIVE_READ_ONLY,
-                )
+            live_read_only = restart_engine.evaluate_ib_fx_external_exposure_guard(
+                account_id=ACCOUNT_ID,
+                symbol_name="EURUSD",
+                runtime_mode=IB_FX_GUARD_MODE_LIVE_READ_ONLY,
             )
             paper_same = restart_engine.evaluate_ib_fx_external_exposure_guard(
                 account_id=ACCOUNT_ID,
@@ -221,12 +209,10 @@ def main() -> int:
                 symbol_name="EURUSD",
                 runtime_mode=IB_FX_GUARD_MODE_LIVE,
             )
-            paper_other_symbol = (
-                restart_engine.evaluate_ib_fx_external_exposure_guard(
-                    account_id=ACCOUNT_ID,
-                    symbol_name="GBPUSD",
-                    runtime_mode=IB_FX_GUARD_MODE_PAPER,
-                )
+            paper_other_symbol = restart_engine.evaluate_ib_fx_external_exposure_guard(
+                account_id=ACCOUNT_ID,
+                symbol_name="GBPUSD",
+                runtime_mode=IB_FX_GUARD_MODE_PAPER,
             )
 
             if not replay.allowed or not live_read_only.allowed:
@@ -307,10 +293,7 @@ def main() -> int:
                 restart_engine.repository.get_active_ib_fx_external_exposures()
             )
 
-            if any(
-                exposure.symbol_name == "EURUSD"
-                for exposure in active_after_clear
-            ):
+            if any(exposure.symbol_name == "EURUSD" for exposure in active_after_clear):
                 raise AssertionError(
                     "Current EURUSD evidence did not clear matching exposure"
                 )
@@ -320,9 +303,7 @@ def main() -> int:
                 and exposure.evidence_status == IB_FX_EXTERNAL_EXPOSURE_STALE
                 for exposure in active_after_clear
             ):
-                raise AssertionError(
-                    "Unobserved GBPUSD external exposure was erased"
-                )
+                raise AssertionError("Unobserved GBPUSD external exposure was erased")
 
             event_counts = {
                 str(row["event_type"]): int(row["event_count"])

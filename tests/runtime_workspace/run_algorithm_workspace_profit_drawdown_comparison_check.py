@@ -176,9 +176,7 @@ def _elapsed(value: float | None) -> str:
 
 def main() -> None:
     if not M1_FILE.is_file():
-        raise FileNotFoundError(
-            "Real EURUSD M1 history is required: " + str(M1_FILE)
-        )
+        raise FileNotFoundError("Real EURUSD M1 history is required: " + str(M1_FILE))
 
     print(
         "Profit Drawdown Comparison: validating 30% baseline first ...",
@@ -202,35 +200,25 @@ def main() -> None:
     assert baseline_summary.signals.total == EXPECTED_SIGNALS
     assert baseline_summary.signals.buy == EXPECTED_BUY_SIGNALS
     assert baseline_summary.signals.sell == EXPECTED_SELL_SIGNALS
-    assert (
-        baseline_summary.signals.alligator_allow
-        == EXPECTED_ALLIGATOR_ALLOW
-    )
-    assert (
-        baseline_summary.signals.alligator_reject
-        == EXPECTED_ALLIGATOR_REJECT
-    )
+    assert baseline_summary.signals.alligator_allow == EXPECTED_ALLIGATOR_ALLOW
+    assert baseline_summary.signals.alligator_reject == EXPECTED_ALLIGATOR_REJECT
     assert baseline_summary.opened_trades == EXPECTED_BASELINE_30_TRADES
-    assert (
-        abs(baseline_summary.net_profit - EXPECTED_BASELINE_30_NET_PNL)
-        < 0.01
-    )
+    assert abs(baseline_summary.net_profit - EXPECTED_BASELINE_30_NET_PNL) < 0.01
     print(
         "Profit Drawdown Comparison: baseline 30% validated=True",
         flush=True,
     )
 
-    completed_by_key: dict[
-        tuple[bool, float | None], ProfitDrawdownRunResult
-    ] = {(True, 30.0): baseline_result}
+    completed_by_key: dict[tuple[bool, float | None], ProfitDrawdownRunResult] = {
+        (True, 30.0): baseline_result
+    }
     for enabled, drawdown_percent in DRAW_DOWN_VARIANTS:
         key = enabled, drawdown_percent
         if key in completed_by_key:
             continue
         label = "OFF" if not enabled else f"{drawdown_percent:g}%"
         print(
-            "Profit Drawdown Comparison: running "
-            f"drawdown={label} ...",
+            "Profit Drawdown Comparison: running " f"drawdown={label} ...",
             flush=True,
         )
         result = _run(

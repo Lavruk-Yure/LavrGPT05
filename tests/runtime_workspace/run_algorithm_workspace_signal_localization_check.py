@@ -77,57 +77,38 @@ def main() -> None:
     )
     presentation = build_workspace_signal_presentation(record, _uk_tr)
     assert (
-        workspace_signal_alligator_regime_text(record, _uk_tr)
-        == "Початок тренду вгору"
+        workspace_signal_alligator_regime_text(record, _uk_tr) == "Початок тренду вгору"
     )
 
     assert presentation.reason_text == (
-        "Класичний перетин MACD. "
-        "Alligator HIGHER_1 не підтверджує BUY."
+        "Класичний перетин MACD. " "Alligator HIGHER_1 не підтверджує BUY."
     )
     assert "MACD Quality:" in presentation.tooltip_text
     assert "Рішення: REJECT" in presentation.tooltip_text
     assert "Профіль MACD:" not in presentation.tooltip_text
     assert "Діагностична причина:" not in presentation.tooltip_text
-    assert (
-        "Причина MACD: Класичний перетин MACD."
-        in presentation.detail_text
-    )
-    assert (
-        "Профіль MACD: macd-lge-classic (ревізія 1)"
-        in presentation.detail_text
-    )
+    assert "Причина MACD: Класичний перетин MACD." in presentation.detail_text
+    assert "Профіль MACD: macd-lge-classic (ревізія 1)" in presentation.detail_text
     assert (
         "Причина Alligator: Alligator HIGHER_1 не підтверджує BUY."
         in presentation.detail_text
     )
     assert "Режим Alligator: HIGHER_1" in presentation.detail_text
     assert "Режим Alligator: Початок тренду вгору" in presentation.detail_text
-    assert (
-        "Нормалізований нахил Alligator: 0.031250"
-        in presentation.detail_text
-    )
-    assert (
-        "Нормалізоване розкриття Alligator: 0.440000"
-        in presentation.detail_text
-    )
+    assert "Нормалізований нахил Alligator: 0.031250" in presentation.detail_text
+    assert "Нормалізоване розкриття Alligator: 0.440000" in presentation.detail_text
     assert "Таймфрейм Alligator: H1" in presentation.detail_text
     assert (
         "Профіль Alligator: alligator-lge-classic (ревізія 3)"
         in presentation.detail_text
     )
     assert (
-        f"Час спостереження: {observation_time.isoformat()}"
-        in presentation.detail_text
+        f"Час спостереження: {observation_time.isoformat()}" in presentation.detail_text
     )
-    assert (
-        f"Доступно з: {available_at.isoformat()}"
-        in presentation.detail_text
-    )
+    assert f"Доступно з: {available_at.isoformat()}" in presentation.detail_text
     assert (
         "Технічні коди причини: MACD_CLASSIC_CROSS, "
-        "ALLIGATOR_HIGHER_1_BUY_REJECT"
-        in presentation.detail_text
+        "ALLIGATOR_HIGHER_1_BUY_REJECT" in presentation.detail_text
     )
     assert "Діагностична причина:" in presentation.detail_text
 
@@ -160,8 +141,7 @@ def main() -> None:
     assert "Причина: Спред завеликий." in runtime_presentation.tooltip_text
     assert "Профіль MACD:" not in runtime_presentation.tooltip_text
     assert (
-        "Профіль MACD: macd-lge-classic (ревізія 1)"
-        in runtime_presentation.detail_text
+        "Профіль MACD: macd-lge-classic (ревізія 1)" in runtime_presentation.detail_text
     )
     assert "MACD_CLASSIC_CROSS" in runtime_presentation.detail_text
 
@@ -174,12 +154,10 @@ def main() -> None:
     assert "AlgorithmWorkspaceAlligatorRegime.trendUpStarting" in i18n_entries
     assert "AlgorithmWorkspaceAlligatorRegime.trendDownEnding" in i18n_entries
     assert (
-        "AlgorithmWorkspaceSignalReason.alligatorSameBuyStartingReject"
-        in i18n_entries
+        "AlgorithmWorkspaceSignalReason.alligatorSameBuyStartingReject" in i18n_entries
     )
     assert (
-        "AlgorithmWorkspaceSignalReason.alligatorSameSellEndingReject"
-        in i18n_entries
+        "AlgorithmWorkspaceSignalReason.alligatorSameSellEndingReject" in i18n_entries
     )
     for key in (
         "AlgorithmWorkspaceSignalReason.macdDeferredRelease",

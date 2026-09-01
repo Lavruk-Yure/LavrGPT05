@@ -76,9 +76,7 @@ class WorkspaceParameterTreeModel:
         for group in self.groups:
             if group.code == normalized:
                 return group
-        raise WorkspaceParameterTreeError(
-            f"unknown parameter tree group: {normalized}"
-        )
+        raise WorkspaceParameterTreeError(f"unknown parameter tree group: {normalized}")
 
     def parameter(self, key: str) -> WorkspaceParameterTreeNode:
         """Знайти параметр за стабільним schema key."""
@@ -87,9 +85,7 @@ class WorkspaceParameterTreeModel:
             for parameter in group.parameters:
                 if parameter.key == normalized:
                     return parameter
-        raise WorkspaceParameterTreeError(
-            f"unknown parameter tree key: {normalized}"
-        )
+        raise WorkspaceParameterTreeError(f"unknown parameter tree key: {normalized}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,9 +121,7 @@ class WorkspaceParameterTreeBuilder:
                     runtime_state=normalized_state,
                     localized=localized,
                 )
-                for parameter in self.catalog.parameters_for_group(
-                    definition.code
-                )
+                for parameter in self.catalog.parameters_for_group(definition.code)
             )
             groups.append(
                 WorkspaceParameterTreeGroup(
@@ -157,16 +151,14 @@ class WorkspaceParameterTreeBuilder:
     ) -> WorkspaceParameterTreeNode:
         parameter = self.catalog.definition(definition.key)
         availability = self.catalog.availability(parameter.key, profile)
-        editable_by_runtime = (
-            runtime_state in parameter.editable_runtime_states
-        )
+        editable_by_runtime = runtime_state in parameter.editable_runtime_states
         editable = availability.available and editable_by_runtime
 
         if not availability.available:
             status = localized[WORKSPACE_PARAMETER_LOCKED_KEY]
-            reason = localized[
-                WORKSPACE_PARAMETER_FEATURE_REQUIRED_KEY
-            ].format(feature_code=availability.feature_code)
+            reason = localized[WORKSPACE_PARAMETER_FEATURE_REQUIRED_KEY].format(
+                feature_code=availability.feature_code
+            )
         elif not editable_by_runtime:
             status = localized[WORKSPACE_PARAMETER_RUNTIME_LOCKED_KEY]
             reason = localized[WORKSPACE_PARAMETER_STOP_REQUIRED_KEY]
@@ -230,7 +222,5 @@ def _required_text(value: object, field_name: str) -> str:
 def _required_code(value: object, field_name: str) -> str:
     code = _required_text(value, field_name).upper()
     if any(character.isspace() for character in code):
-        raise WorkspaceParameterTreeError(
-            f"{field_name} cannot contain whitespace"
-        )
+        raise WorkspaceParameterTreeError(f"{field_name} cannot contain whitespace")
     return code

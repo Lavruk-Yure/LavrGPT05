@@ -177,8 +177,7 @@ def _rolling_scale(
     values = tuple(
         abs(observation.histogram)
         for observation in observations[start:cross_index]
-        if observation.histogram is not None
-        and abs(observation.histogram) > 0.0
+        if observation.histogram is not None and abs(observation.histogram) > 0.0
     )
     if not values:
         raise AssertionError("rolling histogram scale is unavailable")
@@ -242,13 +241,10 @@ def _run_variant(
     assert len(raw_prominence) == len(found)
     assert len(raw_distance) == len(found)
 
-    prominence_pass = sum(
-        value >= REFERENCE_PROMINENCE for value in raw_prominence
-    )
+    prominence_pass = sum(value >= REFERENCE_PROMINENCE for value in raw_prominence)
     distance_pass = sum(value >= REFERENCE_DISTANCE for value in raw_distance)
     combined_pass = sum(
-        prominence >= REFERENCE_PROMINENCE
-        and distance >= REFERENCE_DISTANCE
+        prominence >= REFERENCE_PROMINENCE and distance >= REFERENCE_DISTANCE
         for prominence, distance in zip(raw_prominence, raw_distance)
     )
 
@@ -263,12 +259,8 @@ def _run_variant(
                 cross_index=cross_index,
                 lookback_bars=lookback_bars,
             )
-            normalized_prominence.append(
-                diagnostic.extremum_prominence / scale
-            )
-            normalized_distance.append(
-                diagnostic.extremum_to_cross_distance / scale
-            )
+            normalized_prominence.append(diagnostic.extremum_prominence / scale)
+            normalized_distance.append(diagnostic.extremum_to_cross_distance / scale)
         rolling_statistics.append(
             RollingScaleStatistics(
                 lookback_bars=lookback_bars,
@@ -301,9 +293,7 @@ def _ratio(values: tuple[float, ...]) -> float:
 def _primary_rolling(run: MacdQualityScaleStatistics) -> RollingScaleStatistics:
     """Знайти diagnostic для reference lookback=64 bars."""
     return next(
-        item
-        for item in run.rolling
-        if item.lookback_bars == PRIMARY_ROLLING_LOOKBACK
+        item for item in run.rolling if item.lookback_bars == PRIMARY_ROLLING_LOOKBACK
     )
 
 
@@ -339,8 +329,7 @@ def _print_run(run: MacdQualityScaleStatistics) -> None:
 def main() -> None:
     """Запустити RoadMap99_04I cross-profile scale diagnostic."""
     print(
-        "Algorithm Workspace MACD Quality Scale Normalization Check — "
-        "RoadMap99_04I"
+        "Algorithm Workspace MACD Quality Scale Normalization Check — " "RoadMap99_04I"
     )
     print(
         "  Compare 12/26/9 -> 8/17/5 -> 6/13/4. Test raw "
@@ -368,9 +357,7 @@ def main() -> None:
         completed.append(_run_variant(events, variant))
     runs = tuple(completed)
 
-    raw_prominence_ratio = _ratio(
-        tuple(run.raw_prominence_median for run in runs)
-    )
+    raw_prominence_ratio = _ratio(tuple(run.raw_prominence_median for run in runs))
     raw_distance_ratio = _ratio(tuple(run.raw_distance_median for run in runs))
     normalized_prominence_ratio = _ratio(
         tuple(_primary_rolling(run).prominence_median for run in runs)
@@ -384,12 +371,9 @@ def main() -> None:
     normalization_improves_prominence = (
         normalized_prominence_ratio < raw_prominence_ratio
     )
-    normalization_improves_distance = (
-        normalized_distance_ratio < raw_distance_ratio
-    )
+    normalization_improves_distance = normalized_distance_ratio < raw_distance_ratio
     normalization_improves_both = (
-        normalization_improves_prominence
-        and normalization_improves_distance
+        normalization_improves_prominence and normalization_improves_distance
     )
     raw_combined_selectivity_profile_stable = combined_pass_spread_pp < 2.0
 

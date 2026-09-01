@@ -111,8 +111,7 @@ def _assert_fresh_workspace_default() -> None:
     runtime = WorkspaceRuntime(workspace)
     assert runtime.context.profit_drawdown_close_percent == PRODUCTION_PD_THRESHOLD
     assert (
-        runtime.profit_protection_policy.max_drawdown_percent
-        == PRODUCTION_PD_THRESHOLD
+        runtime.profit_protection_policy.max_drawdown_percent == PRODUCTION_PD_THRESHOLD
     )
 
 
@@ -196,10 +195,7 @@ def _run(spec: PeriodSpec) -> None:
         rel_tol=0.0,
         abs_tol=0.005,
     )
-    assert (
-        summary.close_reason_count("PROFIT_DRAWDOWN")
-        == spec.profit_drawdown_closes
-    )
+    assert summary.close_reason_count("PROFIT_DRAWDOWN") == spec.profit_drawdown_closes
     assert summary.close_reason_count("STOP_LOSS") == spec.stop_loss_closes
     assert summary.close_reason_count("TAKE_PROFIT") == spec.take_profit_closes
     assert summary.close_reason_count("SESSION_END") == 0

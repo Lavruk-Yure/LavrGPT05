@@ -102,8 +102,7 @@ def load_observations():
 
 def main() -> None:
     print(
-        "Algorithm Workspace MACD Cross Angle ABC Regression Check — "
-        "RoadMap99_04G",
+        "Algorithm Workspace MACD Cross Angle ABC Regression Check — " "RoadMap99_04G",
         flush=True,
     )
     print(
@@ -154,9 +153,7 @@ def main() -> None:
     legacy_by_time = {item.timestamp: item for item in legacy.signals}
     abc_by_time = {item.timestamp: item for item in abc.diagnostics}
     angles = tuple(
-        item.angle_degrees
-        for item in abc.diagnostics
-        if item.angle_degrees is not None
+        item.angle_degrees for item in abc.diagnostics if item.angle_degrees is not None
     )
     assert len(angles) == abc.total_crosses
 
@@ -226,9 +223,7 @@ def main() -> None:
             f"cross={abc_item.cross_timestamp.isoformat()}"
         )
 
-    visual_reference = abc_by_time[
-        datetime(2026, 1, 9, 14, 15, tzinfo=UTC)
-    ]
+    visual_reference = abc_by_time[datetime(2026, 1, 9, 14, 15, tzinfo=UTC)]
     assert visual_reference.angle_degrees is not None
     assert 2.06 < visual_reference.angle_degrees < 2.07
 

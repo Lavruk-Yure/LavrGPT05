@@ -107,8 +107,7 @@ def main() -> None:
     assert "lblMacdQualityRejectsCaption" in summary_ui
 
     records = tuple(
-        _signal(index, reason)
-        for index, reason in enumerate(QUALITY_REASONS)
+        _signal(index, reason) for index, reason in enumerate(QUALITY_REASONS)
     )
     metrics = build_workspace_historical_signal_metrics(records)
     assert metrics.macd_quality_accept == 1

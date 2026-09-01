@@ -55,8 +55,7 @@ UPPER_OVERLAP_PROMINENCE = 0.000025
 def main() -> None:
     """Запустити boundary sweep і перевірити controlled-variable invariants."""
     print(
-        "Algorithm Workspace MACD Prominence Boundary Sweep Check — "
-        "RoadMap99_03C",
+        "Algorithm Workspace MACD Prominence Boundary Sweep Check — " "RoadMap99_03C",
         flush=True,
     )
     print(
@@ -73,8 +72,7 @@ def main() -> None:
     )
     assert base_sweep.PROMINENCE_SWEEP_HELPER_API_VERSION == "RoadMap99_03E"
     print(
-        "  helper_api="
-        f"{base_sweep.PROMINENCE_SWEEP_HELPER_API_VERSION}",
+        "  helper_api=" f"{base_sweep.PROMINENCE_SWEEP_HELPER_API_VERSION}",
         flush=True,
     )
     if not base_sweep.M1_FILE.is_file():
@@ -170,10 +168,7 @@ def main() -> None:
     for variant in report.variants:
         base_sweep.print_prominence_variant(
             variant,
-            baseline=(
-                abs(variant.parameter_value - UPPER_OVERLAP_PROMINENCE)
-                < 1e-12
-            ),
+            baseline=(abs(variant.parameter_value - UPPER_OVERLAP_PROMINENCE) < 1e-12),
         )
     print("  production_signal_logic_changed=False")
     print("  distance_parameter_changed=False")
@@ -183,10 +178,7 @@ def main() -> None:
     print("  risk_policy_changed=False")
     print(f"  deterministic={report.deterministic}")
     print(f"  broker_requests={report.broker_requests}")
-    print(
-        "  broker_execution_attempted="
-        f"{report.broker_execution_attempted}"
-    )
+    print("  broker_execution_attempted=" f"{report.broker_execution_attempted}")
     print("ALGORITHM_WORKSPACE_MACD_PROMINENCE_BOUNDARY_SWEEP_CHECK=OK")
 
 

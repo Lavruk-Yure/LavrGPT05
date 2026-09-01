@@ -91,9 +91,9 @@ class TestableSessionManager(CTraderSessionManager):
 
 def _source_contract() -> tuple[bool, bool]:
     """Verify production source uses event waiting instead of sleep polling."""
-    manager_source = (
-        PROJECT_ROOT / "engine" / "ctrader_session_manager.py"
-    ).read_text(encoding="utf-8")
+    manager_source = (PROJECT_ROOT / "engine" / "ctrader_session_manager.py").read_text(
+        encoding="utf-8"
+    )
     wait_start = manager_source.index("    def _wait_for_late_connect(")
     wait_end = manager_source.index(
         "    @staticmethod\n    def _get_ctrader_host_port",
@@ -101,9 +101,9 @@ def _source_contract() -> tuple[bool, bool]:
     )
     wait_source = manager_source[wait_start:wait_end]
 
-    adapter_source = (
-        PROJECT_ROOT / "engine" / "ctrader_adapter.py"
-    ).read_text(encoding="utf-8")
+    adapter_source = (PROJECT_ROOT / "engine" / "ctrader_adapter.py").read_text(
+        encoding="utf-8"
+    )
     adapter_wait_start = adapter_source.index("    def wait_for_connect_result(")
     adapter_wait_end = adapter_source.index(
         "    def is_connected(",
@@ -164,16 +164,12 @@ def main() -> int:
 
     checks = {
         "late_success_event_driven": (
-            late_success
-            and late_adapter.connected
-            and late_adapter.wait_calls == 1
+            late_success and late_adapter.connected and late_adapter.wait_calls == 1
         ),
         "immediate_connected_no_wait": (
             immediate_success and immediate_adapter.wait_calls == 0
         ),
-        "retired_skips_wait": (
-            not retired_result and retired_adapter.wait_calls == 0
-        ),
+        "retired_skips_wait": (not retired_result and retired_adapter.wait_calls == 0),
         "timeout_bounded": (
             not timeout_result
             and timeout_adapter.wait_calls == 1

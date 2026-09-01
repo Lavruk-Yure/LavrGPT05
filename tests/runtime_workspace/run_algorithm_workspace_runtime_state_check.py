@@ -151,9 +151,7 @@ def main() -> None:
     print(f"  startup_phase={startup_phase_before_stop}")
     print("  warmup_bars=2")
     print(f"  profit_drawdown={profit_drawdown:.1f}%")
-    print(
-        f"  unsupported_broker_mode_blocked={unsupported_broker_mode_blocked}"
-    )
+    print(f"  unsupported_broker_mode_blocked={unsupported_broker_mode_blocked}")
     print(f"  broker_error_state={broker_runtime.context.runtime_state}")
     print("ALGORITHM_WORKSPACE_RUNTIME_STATE_CHECK=OK")
 

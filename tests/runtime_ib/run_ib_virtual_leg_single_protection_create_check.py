@@ -264,9 +264,7 @@ def main() -> int:
     if pair_adapter.execution_evidence_calls != 1:
         raise AssertionError("Existing child guard evidence request count differs")
 
-    orphan_adapter = SyntheticIBAdapter(
-        [_stop_loss_row(oca_group=OLD_OCA_GROUP)]
-    )
+    orphan_adapter = SyntheticIBAdapter([_stop_loss_row(oca_group=OLD_OCA_GROUP)])
     orphan_result = _modify(
         orphan_adapter,
         stop_loss_order_id=EXISTING_STOP_LOSS_ORDER_ID,

@@ -57,9 +57,11 @@ def main() -> None:
         assert first_state.current_widths() == (110, 120, 130)
         first.setColumnWidth(1, 222)
         first_state.flush()
-        assert repository.load_table_column_widths(
-            "algorithm_workspace.signals"
-        ) == (110, 222, 130)
+        assert repository.load_table_column_widths("algorithm_workspace.signals") == (
+            110,
+            222,
+            130,
+        )
 
         restored = _table(3)
         restored_state = TableColumnWidthPersistence(
@@ -82,9 +84,12 @@ def main() -> None:
         replay_orders.setColumnHidden(1, True)
         replay_orders.setColumnWidth(2, 275)
         replay_orders_state.flush()
-        assert repository.load_table_column_widths(
-            "algorithm_workspace.orders"
-        ) == (100, 120, 275, 160)
+        assert repository.load_table_column_widths("algorithm_workspace.orders") == (
+            100,
+            120,
+            275,
+            160,
+        )
 
         restored_orders = _table(4)
         restored_orders_state = TableColumnWidthPersistence(
@@ -106,9 +111,11 @@ def main() -> None:
         )
         tree.setColumnWidth(2, 180)
         tree_state.flush()
-        assert repository.load_table_column_widths(
-            "orders_page.open_positions"
-        ) == (105, 60, 180)
+        assert repository.load_table_column_widths("orders_page.open_positions") == (
+            105,
+            60,
+            180,
+        )
 
         restored_tree = _tree(3)
         restored_tree_state = TableColumnWidthPersistence(

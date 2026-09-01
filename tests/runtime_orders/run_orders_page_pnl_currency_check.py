@@ -72,9 +72,7 @@ def main() -> int:
 
         assert eur_leg.text(COL_PNL) == "≈ 6.00 USD"
         assert zar_leg.text(COL_PNL) == "≈ -7.50 ZAR"
-        assert page.ui.lblPnlSummary.text() == (
-            "Σ PnL: ≈ 6.00 USD; ≈ -7.50 ZAR"
-        )
+        assert page.ui.lblPnlSummary.text() == ("Σ PnL: ≈ 6.00 USD; ≈ -7.50 ZAR")
 
         print("OrdersPage PnL currency result")
         print(f"  eurusd_pnl={eur_leg.text(COL_PNL)}")

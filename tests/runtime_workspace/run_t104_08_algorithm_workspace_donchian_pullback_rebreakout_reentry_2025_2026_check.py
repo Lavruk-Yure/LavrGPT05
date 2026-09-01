@@ -149,9 +149,7 @@ def _simulate_pullback_rebreakout_reentry(
                 continue
             if _is_favorable_half_pullback(snapshot):
                 pullback_index = index
-                pullback_channel_position = float(
-                    snapshot.directional_channel_position
-                )
+                pullback_channel_position = float(snapshot.directional_channel_position)
             continue
 
         if snapshot.adverse_midline_break:
@@ -218,9 +216,7 @@ def _number(value: float | None) -> str:
 
 
 def _counter_text(counter: Counter[str]) -> str:
-    text = "|".join(
-        f"{key}:{value}" for key, value in sorted(counter.items())
-    )
+    text = "|".join(f"{key}:{value}" for key, value in sorted(counter.items()))
     return text or "NONE"
 
 

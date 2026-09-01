@@ -49,9 +49,7 @@ _ALLIGATOR_REGIME_LABELS: dict[str, tuple[str, str]] = {
     ),
 }
 
-_ALLIGATOR_REGIME_PHASE_LABELS: dict[
-    tuple[str, str], tuple[str, str]
-] = {
+_ALLIGATOR_REGIME_PHASE_LABELS: dict[tuple[str, str], tuple[str, str]] = {
     (
         "ALLIGATOR_REGIME_TREND_UP",
         "ALLIGATOR_REGIME_PHASE_STARTING",
@@ -403,12 +401,8 @@ _TOOLTIP_ENTRIES: dict[str, str] = {
     "AlgorithmWorkspaceSignalSummary.lifecycle": "Candidate F",
     "AlgorithmWorkspaceSignalSummary.lifecycleSnapshot": "Lifecycle state",
     "AlgorithmWorkspaceSignalSummary.lifecycleReason": "Lifecycle reason",
-    "AlgorithmWorkspaceSignalSummary.alligatorConfirmation": (
-        "Alligator confirmation"
-    ),
-    "AlgorithmWorkspaceSignalSummary.confirmationPassedRelease": (
-        "PASSED → RELEASE"
-    ),
+    "AlgorithmWorkspaceSignalSummary.alligatorConfirmation": ("Alligator confirmation"),
+    "AlgorithmWorkspaceSignalSummary.confirmationPassedRelease": ("PASSED → RELEASE"),
     "AlgorithmWorkspaceSignalSummary.structuralGuard": "Structural guard",
     "AlgorithmWorkspaceSignalSummary.filter": "Filter / guard",
     "AlgorithmWorkspaceSignalSummary.finalDecision": "Final decision",
@@ -1031,15 +1025,18 @@ def _build_compact_summary_lines(
                     snapshot,
                 )
             )
-    lifecycle_reason_code = str(
-        record.candidate_f_lifecycle_reason or ""
-    ).strip().upper()
+    lifecycle_reason_code = (
+        str(record.candidate_f_lifecycle_reason or "").strip().upper()
+    )
     if lifecycle_reason_code and lifecycle_reason_code != "ALLIGATOR_DEFERRED_RELEASE":
-        lifecycle_reason = _translated_code(
-            lifecycle_reason_code,
-            _CANDIDATE_F_LIFECYCLE_REASON_LABELS,
-            tr,
-        ) or lifecycle_reason_code
+        lifecycle_reason = (
+            _translated_code(
+                lifecycle_reason_code,
+                _CANDIDATE_F_LIFECYCLE_REASON_LABELS,
+                tr,
+            )
+            or lifecycle_reason_code
+        )
         lines.append(
             _summary_line(
                 tr,
@@ -1125,17 +1122,23 @@ def _candidate_f_lifecycle_summary_text(
             action = "RELEASE"
     if not action:
         return ""
-    action_text = _translated_code(
-        action,
-        _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
-        tr,
-    ) or action
-    if record.filter_reason_code == "ALLIGATOR_DEFERRED_ARMED" and action != "ARMED":
-        armed_text = _translated_code(
-            "ARMED",
+    action_text = (
+        _translated_code(
+            action,
             _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
             tr,
-        ) or "ARMED"
+        )
+        or action
+    )
+    if record.filter_reason_code == "ALLIGATOR_DEFERRED_ARMED" and action != "ARMED":
+        armed_text = (
+            _translated_code(
+                "ARMED",
+                _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
+                tr,
+            )
+            or "ARMED"
+        )
         return f"{armed_text} → {action_text}"
     return action_text
 
@@ -1190,17 +1193,24 @@ def _candidate_f_lifecycle_reason_suffix(
     action = str(record.candidate_f_lifecycle_action or "").strip().upper()
     if not action or action == "ARMED":
         return ""
-    action_text = _translated_code(
-        action,
-        _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
-        tr,
-    ) or action
+    action_text = (
+        _translated_code(
+            action,
+            _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
+            tr,
+        )
+        or action
+    )
     reason_code = str(record.candidate_f_lifecycle_reason or "").strip().upper()
-    reason_text = _translated_code(
-        reason_code,
-        _CANDIDATE_F_LIFECYCLE_REASON_LABELS,
-        tr,
-    ) if reason_code else None
+    reason_text = (
+        _translated_code(
+            reason_code,
+            _CANDIDATE_F_LIFECYCLE_REASON_LABELS,
+            tr,
+        )
+        if reason_code
+        else None
+    )
     if reason_text:
         return f"→ {action_text}: {reason_text}"
     return f"→ {action_text}."
@@ -1220,20 +1230,23 @@ def _append_candidate_f_lifecycle_lines(
     if not action:
         return
 
-    action_text = _translated_code(
-        action,
-        _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
-        tr,
-    ) or action
-    if (
-        record.filter_reason_code == "ALLIGATOR_DEFERRED_ARMED"
-        and action != "ARMED"
-    ):
-        armed_text = _translated_code(
-            "ARMED",
+    action_text = (
+        _translated_code(
+            action,
             _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
             tr,
-        ) or "ARMED"
+        )
+        or action
+    )
+    if record.filter_reason_code == "ALLIGATOR_DEFERRED_ARMED" and action != "ARMED":
+        armed_text = (
+            _translated_code(
+                "ARMED",
+                _CANDIDATE_F_LIFECYCLE_ACTION_LABELS,
+                tr,
+            )
+            or "ARMED"
+        )
         action_text = f"{armed_text} → {action_text}"
     lines.append(
         _tooltip_line(
@@ -1245,11 +1258,14 @@ def _append_candidate_f_lifecycle_lines(
     )
     reason_code = str(record.candidate_f_lifecycle_reason or "").strip().upper()
     if reason_code:
-        reason_text = _translated_code(
-            reason_code,
-            _CANDIDATE_F_LIFECYCLE_REASON_LABELS,
-            tr,
-        ) or reason_code
+        reason_text = (
+            _translated_code(
+                reason_code,
+                _CANDIDATE_F_LIFECYCLE_REASON_LABELS,
+                tr,
+            )
+            or reason_code
+        )
         lines.append(
             _tooltip_line(
                 tr,
@@ -1279,9 +1295,7 @@ def _append_candidate_f_lifecycle_lines(
     lifecycle_context = record.candidate_f_lifecycle_context
     if lifecycle_context is not None:
         lifecycle_regime = str(lifecycle_context.regime or "").strip().upper()
-        lifecycle_phase = str(
-            lifecycle_context.regime_phase or ""
-        ).strip().upper()
+        lifecycle_phase = str(lifecycle_context.regime_phase or "").strip().upper()
         snapshot_parts = [
             _translated_code(
                 lifecycle_regime,
@@ -1301,13 +1315,9 @@ def _append_candidate_f_lifecycle_lines(
         if lifecycle_context.active_age is not None:
             snapshot_parts.append(f"active_age={lifecycle_context.active_age}")
         if lifecycle_context.normalized_slope is not None:
-            snapshot_parts.append(
-                f"slope={lifecycle_context.normalized_slope:.6f}"
-            )
+            snapshot_parts.append(f"slope={lifecycle_context.normalized_slope:.6f}")
         if lifecycle_context.normalized_opening is not None:
-            snapshot_parts.append(
-                f"opening={lifecycle_context.normalized_opening:.6f}"
-            )
+            snapshot_parts.append(f"opening={lifecycle_context.normalized_opening:.6f}")
         lines.append(
             _tooltip_line(
                 tr,
@@ -1320,9 +1330,7 @@ def _append_candidate_f_lifecycle_lines(
 
 def _filter_observation_text(observation: object, tr: TranslationCallback) -> str:
     regime = str(getattr(observation, "regime", "") or "").strip().upper()
-    phase = str(
-        getattr(observation, "regime_phase", "") or ""
-    ).strip().upper()
+    phase = str(getattr(observation, "regime_phase", "") or "").strip().upper()
     regime_text = _translated_code(regime, _ALLIGATOR_REGIME_LABELS, tr) or regime
     phase_text = _translated_code(phase, _ALLIGATOR_PHASE_LABELS, tr) or phase
     timestamp = getattr(observation, "timestamp", None)

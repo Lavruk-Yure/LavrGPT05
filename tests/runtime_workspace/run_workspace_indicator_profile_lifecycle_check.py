@@ -78,9 +78,7 @@ def main() -> None:
         assert not built_in.can_archive
         assert not built_in.can_delete
         assert _delete_blocked(
-            lambda: lifecycle.delete_unused_profile(
-                MACD_PROFILE_UID_LGE_CLASSIC
-            )
+            lambda: lifecycle.delete_unused_profile(MACD_PROFILE_UID_LGE_CLASSIC)
         )
 
         unused = repository.duplicate_profile(
@@ -139,9 +137,7 @@ def main() -> None:
         assert archived.archived
         assert archived.revision == 2
         persisted_snapshot = workspace_indicator_profile_binding(
-            session_repository.load_workspace(
-                persisted_workspace.workspace_uid
-            ),
+            session_repository.load_workspace(persisted_workspace.workspace_uid),
             WORKSPACE_INDICATOR_MACD,
         )
         assert persisted_snapshot.profile_uid == bound.profile_uid
@@ -180,9 +176,7 @@ def main() -> None:
             lambda: lifecycle.delete_unused_profile(
                 pending_profile.profile_uid,
                 pending_workspace=pending_workspace,
-                pending_bindings=(
-                    pending_workspace.indicator_profile_bindings
-                ),
+                pending_bindings=(pending_workspace.indicator_profile_bindings),
             )
         )
         assert lifecycle.inspect(pending_profile.profile_uid).can_delete
@@ -194,9 +188,7 @@ def main() -> None:
         session_repository.ensure_storage()
         invalid_workspace.write_text("{broken", encoding="utf-8")
         assert _delete_blocked(
-            lambda: lifecycle.delete_unused_profile(
-                pending_profile.profile_uid
-            )
+            lambda: lifecycle.delete_unused_profile(pending_profile.profile_uid)
         )
         invalid_workspace.unlink()
         lifecycle.delete_unused_profile(pending_profile.profile_uid)
@@ -238,9 +230,7 @@ def _assert_future_fields_preserved(
     payload = json.loads(repository.path.read_text(encoding="utf-8"))
     assert payload["future_root"] == {"keep": True}
     item = next(
-        entry
-        for entry in payload["profiles"]
-        if entry["profile_uid"] == profile_uid
+        entry for entry in payload["profiles"] if entry["profile_uid"] == profile_uid
     )
     assert item["future_profile"] == {"keep": "profile"}
 

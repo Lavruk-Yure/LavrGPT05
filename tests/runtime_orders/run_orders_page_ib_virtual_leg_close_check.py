@@ -64,9 +64,7 @@ def main() -> int:
             page.ui.btnClosePosition.click()
             app.processEvents()
 
-        assert runtime.close_calls == [
-            "11111111-1111-1111-1111-111111111111"
-        ]
+        assert runtime.close_calls == ["11111111-1111-1111-1111-111111111111"]
         group_item = page.ui.tblOpenPositions.topLevelItem(0)
         assert group_item.childCount() == 1
         assert page.ui.tblOpenPositions.currentItem() is None
@@ -107,9 +105,7 @@ def main() -> int:
             pending_page.ui.btnClosePosition.click()
             app.processEvents()
 
-        assert pending_runtime.close_calls == [
-            "11111111-1111-1111-1111-111111111111"
-        ]
+        assert pending_runtime.close_calls == ["11111111-1111-1111-1111-111111111111"]
         assert pending_runtime.group_calls == 2
         assert len(warnings) == 1
         assert "Do not repeat Close" in warnings[0]

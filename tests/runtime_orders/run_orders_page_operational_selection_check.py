@@ -88,9 +88,7 @@ def main() -> int:
     page = OrdersPage(DummyLangManager())
 
     try:
-        page.set_runtime_engine(
-            TrackingGroupRuntimeEngine(build_reconciled_snapshot())
-        )
+        page.set_runtime_engine(TrackingGroupRuntimeEngine(build_reconciled_snapshot()))
         assert page.refresh_positions()
         app.processEvents()
 
@@ -113,9 +111,7 @@ def main() -> int:
             and page.ui.editTakeProfit.text() == "1.155"
         )
 
-        page.set_runtime_engine(
-            TrackingGroupRuntimeEngine(build_blocked_snapshot())
-        )
+        page.set_runtime_engine(TrackingGroupRuntimeEngine(build_blocked_snapshot()))
         assert page.refresh_positions()
         app.processEvents()
 
@@ -155,14 +151,18 @@ def main() -> int:
         print("  operation_buttons_follow_operational_row=True")
         print("ORDERS_PAGE_OPERATIONAL_SELECTION_CHECK=OK")
 
-        return 0 if all(
-            (
-                group_selection_blocked,
-                leg_selected,
-                net_only_selection_blocked,
-                ctrader_selected,
+        return (
+            0
+            if all(
+                (
+                    group_selection_blocked,
+                    leg_selected,
+                    net_only_selection_blocked,
+                    ctrader_selected,
+                )
             )
-        ) else 1
+            else 1
+        )
     finally:
         page.close()
         page.deleteLater()

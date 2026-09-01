@@ -34,10 +34,7 @@ def _copy_database_snapshot(source_path: Path, target_path: Path) -> None:
 def _create_backup() -> Path:
     BACKUP_DIRECTORY.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-    backup_path = (
-        BACKUP_DIRECTORY
-        / f"demo_before_ib_virtual_leg_close_{timestamp}.db"
-    )
+    backup_path = BACKUP_DIRECTORY / f"demo_before_ib_virtual_leg_close_{timestamp}.db"
     _copy_database_snapshot(DB_PATH, backup_path)
     return backup_path
 
@@ -79,9 +76,7 @@ def _select_open_leg(engine: RuntimeEngine) -> dict[str, Any]:
             continue
 
         if 1 <= selected_index <= len(seeds):
-            selected_leg = _mapping_to_text_key_dict(
-                seeds[selected_index - 1]
-            )
+            selected_leg = _mapping_to_text_key_dict(seeds[selected_index - 1])
             continue
 
         print("Немає leg з таким номером.")
@@ -113,9 +108,7 @@ def _confirm_close(leg: dict[str, Any]) -> bool:
     print(f"  parent_order_id={leg['parent_order_id']}")
     print(f"  stop_loss_order_id={leg['stop_loss_order_id']}")
     print(f"  take_profit_order_id={leg['take_profit_order_id']}")
-    confirmation = input(
-        "Для підтвердження введіть CLOSE: "
-    ).strip().upper()
+    confirmation = input("Для підтвердження введіть CLOSE: ").strip().upper()
     return confirmation == "CLOSE"
 
 
@@ -146,9 +139,7 @@ def main() -> int:
             raise RuntimeError("IB Paper connection was not established")
 
         result = engine.close_runtime_position_leg(position_uid)
-        persisted = engine.repository.get_ib_virtual_position_leg(
-            position_uid
-        )
+        persisted = engine.repository.get_ib_virtual_position_leg(position_uid)
 
         if persisted is None:
             raise RuntimeError("Closed persisted virtual leg was lost")
@@ -159,35 +150,27 @@ def main() -> int:
         if float(persisted.get("remaining_volume") or 0.0) != 0.0:
             raise RuntimeError("Persisted closed leg volume is not zero")
 
-        active_orders = (
-            engine.repository.get_ib_virtual_position_leg_orders(
-                position_uid=position_uid,
-                active_only=True,
-            )
+        active_orders = engine.repository.get_ib_virtual_position_leg_orders(
+            position_uid=position_uid,
+            active_only=True,
         )
         active_roles = {str(row["order_role"]) for row in active_orders}
 
         if active_roles != {IB_LEG_ORDER_ROLE_PARENT}:
             raise RuntimeError("Protective mapping remained active after Close")
 
-        order_history = (
-            engine.repository.get_ib_virtual_position_leg_orders(
-                position_uid=position_uid,
-                active_only=False,
-            )
+        order_history = engine.repository.get_ib_virtual_position_leg_orders(
+            position_uid=position_uid,
+            active_only=False,
         )
         close_rows = [
-            row
-            for row in order_history
-            if row["order_role"] == IB_LEG_ORDER_ROLE_CLOSE
+            row for row in order_history if row["order_role"] == IB_LEG_ORDER_ROLE_CLOSE
         ]
 
         if len(close_rows) != 1:
             raise RuntimeError("Close order mapping was not persisted uniquely")
 
-        open_seeds = (
-            engine.repository.get_open_ib_virtual_position_leg_seeds()
-        )
+        open_seeds = engine.repository.get_open_ib_virtual_position_leg_seeds()
         persistence = dict(result.get("persistence") or {})
         broker_result = dict(result.get("broker_result") or {})
 
@@ -197,18 +180,9 @@ def main() -> int:
         print(f"  close_side={result.get('close_side')}")
         print(f"  close_quantity={result.get('close_quantity')}")
         print(f"  leg_status={persisted.get('leg_status')}")
-        print(
-            "  remaining_volume="
-            f"{persisted.get('remaining_volume')}"
-        )
-        print(
-            "  cancelled_order_ids="
-            f"{broker_result.get('cancelled_order_ids')}"
-        )
-        print(
-            "  persistence_legs_written="
-            f"{persistence.get('legs_written')}"
-        )
+        print("  remaining_volume=" f"{persisted.get('remaining_volume')}")
+        print("  cancelled_order_ids=" f"{broker_result.get('cancelled_order_ids')}")
+        print("  persistence_legs_written=" f"{persistence.get('legs_written')}")
         print(f"  active_order_mappings={len(active_orders)}")
         print(f"  order_history_rows={len(order_history)}")
         print(f"  total_open_seeds={len(open_seeds)}")

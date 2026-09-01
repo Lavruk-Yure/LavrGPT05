@@ -114,8 +114,7 @@ def build_workspace_macd_pipeline_comparison(
     stages = tuple(run.stage for run in normalized)
     if stages != MACD_PIPELINE_STAGES:
         raise WorkspaceMacdPipelineComparisonError(
-            "MACD pipeline runs must be ordered LINEAR, EXTENDED, "
-            "EXTENDED+ALLIGATOR"
+            "MACD pipeline runs must be ordered LINEAR, EXTENDED, " "EXTENDED+ALLIGATOR"
         )
 
     baseline = normalized[0].summary
@@ -232,10 +231,8 @@ def _validate_stage_semantics(
             "EXTENDED stage must isolate MACD Quality without Alligator"
         )
     if (
-        extended.macd_quality_accept
-        != with_alligator.macd_quality_accept
-        or extended.macd_quality_reject
-        != with_alligator.macd_quality_reject
+        extended.macd_quality_accept != with_alligator.macd_quality_accept
+        or extended.macd_quality_reject != with_alligator.macd_quality_reject
     ):
         raise WorkspaceMacdPipelineComparisonError(
             "MACD Quality decisions changed when Alligator was enabled"

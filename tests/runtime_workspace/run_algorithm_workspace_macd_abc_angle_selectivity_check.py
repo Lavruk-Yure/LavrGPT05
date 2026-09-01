@@ -167,9 +167,7 @@ def _load_m15_events():
 
 def _runtime_profile(variant: MacdVariant) -> WorkspaceMacdRuntimeProfile:
     """Побудувати isolated Close/EMA/EMA/shift=0 runtime profile."""
-    periods = (
-        f"{variant.fast_period}_{variant.slow_period}_{variant.signal_period}"
-    )
+    periods = f"{variant.fast_period}_{variant.slow_period}_{variant.signal_period}"
     return WorkspaceMacdRuntimeProfile(
         profile_uid=f"RM99_ABC_SELECTIVITY_{periods}",
         profile_revision=1,
@@ -242,8 +240,7 @@ def _run_variant(events, variant: MacdVariant) -> MacdSelectivityResult:
 
     reference_accepted = sum(
         abc_by_timestamp[item.timestamp].angle_degrees is not None
-        and abc_by_timestamp[item.timestamp].angle_degrees
-        >= MANUAL_REFERENCE_ABC
+        and abc_by_timestamp[item.timestamp].angle_degrees >= MANUAL_REFERENCE_ABC
         for item in candidates
     )
     return MacdSelectivityResult(
@@ -287,9 +284,7 @@ def _print_result(result: MacdSelectivityResult) -> None:
 
 def main() -> None:
     """Запустити RoadMap99_04J conditional angle selectivity regression."""
-    print(
-        "Algorithm Workspace MACD ABC Angle Selectivity Check — RoadMap99_04J"
-    )
+    print("Algorithm Workspace MACD ABC Angle Selectivity Check — RoadMap99_04J")
     print(
         "  After the same EURUSD prominence=0.000005 and "
         "distance=0.000050 pool, compare legacy45 with ABC 1.50..2.50deg."
@@ -309,9 +304,11 @@ def main() -> None:
     assert data_set.report.accepted_rows == 224125
     assert aggregator.completed_bars == 14941
     assert tuple(result.crosses for result in results) == (1154, 1864, 2443)
-    assert tuple(
-        result.prominence_distance_candidates for result in results
-    ) == (337, 631, 897)
+    assert tuple(result.prominence_distance_candidates for result in results) == (
+        337,
+        631,
+        897,
+    )
     assert tuple(result.legacy_accepted for result in results) == (114, 122, 142)
 
     legacy_spread = _spread(tuple(result.legacy_pass_rate for result in results))
@@ -346,9 +343,7 @@ def main() -> None:
             time_unit_seconds=TIME_UNIT_SECONDS,
         ),
     )
-    manual_by_timestamp = {
-        item.timestamp: item for item in baseline_abc.diagnostics
-    }
+    manual_by_timestamp = {item.timestamp: item for item in baseline_abc.diagnostics}
     manual_match = True
     for code, timestamp, expected_pass in MANUAL_CASES:
         angle = manual_by_timestamp[timestamp].angle_degrees
@@ -372,9 +367,7 @@ def main() -> None:
             for threshold in ABC_THRESHOLDS
         )
     )
-    print(
-        f"  abc_manual_reference_2_06_spread={reference_spread:.2f}pp"
-    )
+    print(f"  abc_manual_reference_2_06_spread={reference_spread:.2f}pp")
     print(f"  abc_2_06_manual_anchor_match={manual_match}")
     print(
         "  abc_conditional_selectivity_more_profile_stable_than_legacy="
