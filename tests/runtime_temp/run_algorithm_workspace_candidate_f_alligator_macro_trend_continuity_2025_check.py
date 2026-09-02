@@ -366,15 +366,16 @@ def _write_csv(macros: tuple[MacroTrend, ...]) -> Path:
             missing_bars = max(0, expected_bars - len(macro.observations))
             first = macro.observations[0]
             last = macro.observations[-1]
+            elapsed_hours = (
+                macro.end_utc - macro.start_utc
+            ).total_seconds() / 3600
             writer.writerow(
                 {
                     "macro_id": macro.macro_id,
                     "direction": macro.direction,
                     "start_utc": macro.start_utc.isoformat(),
                     "end_utc": macro.end_utc.isoformat(),
-                    "elapsed_hours": (
-                        f"{(macro.end_utc - macro.start_utc).total_seconds() / 3600:.2f}"
-                    ),
+                    "elapsed_hours": f"{elapsed_hours:.2f}",
                     "observed_bars": len(macro.observations),
                     "active_bars": active_bars,
                     "nonactive_observed_bars": len(macro.observations) - active_bars,

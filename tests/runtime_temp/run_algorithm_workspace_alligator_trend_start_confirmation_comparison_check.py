@@ -273,11 +273,15 @@ def main() -> None:
 
     current_dev_signals = {
         timestamp
-        for timestamp, _side, _reason, _profit in development_current.position_signatures
+        for timestamp, _side, _reason, _profit in (
+            development_current.position_signatures
+        )
     }
     candidate_dev_signals = {
         timestamp
-        for timestamp, _side, _reason, _profit in development_candidate.position_signatures
+        for timestamp, _side, _reason, _profit in (
+            development_candidate.position_signatures
+        )
     }
 
     assert development_current.trades == 9

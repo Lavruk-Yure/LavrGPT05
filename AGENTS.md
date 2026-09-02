@@ -34,6 +34,22 @@
 - Після зміни executable logic запускати точний релевантний runnable/regression test.
 - Після кожної перевірки чітко фіксувати очікуваний і фактичний final marker.
 
+### Розміщення runtime tests
+
+- `tests/runtime_workspace/` містить тільки retained canonical
+  runnable/regression tests, які свідомо залишені як постійні контрольні
+  тести RoadMap.
+- `tests/runtime_temp/` містить temporary / exploratory / probe / diagnostic /
+  anatomy / sweep / counterfactual / prototype / one-off / helper runners,
+  створені під час дослідження.
+- Новий TEST_ONLY research runner за замовчуванням створювати в
+  `tests/runtime_temp/`.
+- У `tests/runtime_workspace/` переносити його лише після явного рішення, що
+  він стає retained canonical regression/checkpoint.
+- T-ID сам по собі не робить тест canonical.
+- Перед видаленням `runtime_temp` перевіряти, що retained tests не імпортують
+  його модулі.
+
 ---
 
 ## 3. Production і TEST_ONLY

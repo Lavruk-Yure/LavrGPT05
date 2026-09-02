@@ -34,11 +34,11 @@ from run_algorithm_workspace_candidate_f_frozen_oos_2025_check import (  # noqa:
     assert_frozen_oos_snapshot,
     frozen_oos_workspace,
 )
-from run_algorithm_workspace_candidate_f_negative_pd_fate_2025_check import (
+from run_algorithm_workspace_candidate_f_negative_pd_fate_2025_check import (  # noqa: E402,E501
     FATE_GOOD,
     FATE_PREMATURE,
 )  # noqa: E402
-from run_algorithm_workspace_candidate_f_negative_pd_recovery_paired_2025_check import (
+from run_algorithm_workspace_candidate_f_negative_pd_recovery_paired_2025_check import (  # noqa: E402,E501
     BASELINE_NET,
     DELTA_IMPROVED,
     DELTA_NEAR_FLAT,

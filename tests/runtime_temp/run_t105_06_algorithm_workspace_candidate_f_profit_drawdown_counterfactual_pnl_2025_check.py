@@ -26,7 +26,7 @@ from run_algorithm_workspace_candidate_f_frozen_oos_2025_check import (  # noqa:
     assert_frozen_oos_snapshot,
     frozen_oos_workspace,
 )
-from run_t105_05_algorithm_workspace_candidate_f_production_profit_drawdown_anatomy_2025_check import (  # noqa: E402
+from run_t105_05_algorithm_workspace_candidate_f_production_profit_drawdown_anatomy_2025_check import (  # noqa: E402,E501
     AnatomyRuntime,
     _anatomy_rows,
 )

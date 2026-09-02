@@ -1,8 +1,11 @@
 # Automated Workspace Runtime Checks
 
-This directory contains offline/synthetic or controlled read-only regression
-checks for Algorithm Workspace, Replay, indicators, risk, profiles, history,
-market-data ownership, and WSP lifecycle.
+This directory contains only retained canonical runnable and regression checks
+that are intentionally preserved as permanent RoadMap checkpoints for
+Algorithm Workspace, Replay, indicators, risk, profiles, history, market-data
+ownership, and WSP lifecycle.
+
+Temporary Work runners live in [`../runtime_temp/`](../runtime_temp/README.md).
 
 ## Rules
 
@@ -15,9 +18,14 @@ market-data ownership, and WSP lifecycle.
 
 ## Scope
 
-- `run_algorithm_workspace_*`
-- `run_workspace_*`
-- `run_runtime_engine_workspace_market_data_check.py`
+- retained canonical `run_algorithm_workspace_*` checks;
+- retained canonical `run_workspace_*` checks;
+- retained RoadMap `run_t*` checkpoints;
+- `run_runtime_engine_workspace_market_data_check.py`.
+
+Exploratory, probe, diagnostic, anatomy, sweep, counterfactual, prototype,
+one-off, helper, and temporary reproduction runners belong in
+`tests/runtime_temp`. A T-ID does not by itself make a runner canonical.
 
 ## External exposure safety hold
 
