@@ -22,6 +22,7 @@ from ctrader_open_api.endpoints import EndPoints
 
 from core import ctrader_lot as ctr_lot
 from core import ctrader_symbols as ctr_symbols
+from core import workspace_broker_live_trace as broker_live_trace
 from core.token_manager import load_tokens
 from engine.broker_account import BrokerAccount
 from engine.broker_connection_state import BrokerConnectionState
@@ -1132,6 +1133,17 @@ class CTraderAdapter(BrokerInterface):
 
         self._spot_prices[symbol_id] = current
         self._spot_event.set()
+        try:
+            symbol_name = ctr_symbols.get_symbol_name(symbol_id)
+        except KeyError:
+            symbol_name = str(symbol_id)
+        broker_live_trace.record_ctrader_spot_callback(
+            symbol=symbol_name,
+            broker_quote_timestamp=current.get("timestamp"),
+            bid=current.get("bid"),
+            ask=current.get("ask"),
+            volume=None,
+        )
 
     @staticmethod
     def _optional_proto_scalar(payload, field_name: str):

@@ -41,6 +41,7 @@ from core.algorithm_workspace import (
     WORKSPACE_STATE_STOPPING,
     AlgorithmWorkspace,
 )
+from core import workspace_broker_live_trace as broker_live_trace
 from core.workspace_algorithm import (
     WorkspaceAlgorithm,
     WorkspaceAlgorithmError,
@@ -1055,6 +1056,9 @@ class WorkspaceRuntime:
             {WORKSPACE_STATE_STARTING, WORKSPACE_STATE_RUNNING},
             "poll broker market",
         )
+        trace_state_before = (
+            f"{self.context.runtime_state}/{self.context.startup_phase}"
+        )
         if (
             self.context.runtime_state == WORKSPACE_STATE_STARTING
             and self.context.startup_phase
@@ -1098,8 +1102,37 @@ class WorkspaceRuntime:
             self.fail(exc)
             raise WorkspaceRuntimeError(str(exc)) from exc
         if event is None:
+            current_event = self.context.current_market_event
+            broker_live_trace.record_runtime_state(
+                workspace_uid=self.context.workspace_uid,
+                timeframe=self.context.timeframe,
+                incoming_event_timestamp=None,
+                spread=self.context.current_spread,
+                state_before=trace_state_before,
+                state_after=(
+                    f"{self.context.runtime_state}/"
+                    f"{self.context.startup_phase}"
+                ),
+                latest_bar_timestamp=(
+                    current_event.timestamp if current_event is not None else None
+                ),
+            )
             return None
         self._accept_market_event(event, origin="LIVE_READ_ONLY")
+        current_event = self.context.current_market_event
+        broker_live_trace.record_runtime_state(
+            workspace_uid=self.context.workspace_uid,
+            timeframe=self.context.timeframe,
+            incoming_event_timestamp=event.timestamp,
+            spread=event.spread,
+            state_before=trace_state_before,
+            state_after=(
+                f"{self.context.runtime_state}/{self.context.startup_phase}"
+            ),
+            latest_bar_timestamp=(
+                current_event.timestamp if current_event is not None else None
+            ),
+        )
         return event
 
     def _workspace_execution_guard_mode(self) -> str:

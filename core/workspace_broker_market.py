@@ -19,6 +19,7 @@ from typing import Any, Protocol
 
 from core.algorithm_workspace import WORKSPACE_DATA_MODE_BROKER
 from core.timeframes import get_timeframe
+from core import workspace_broker_live_trace as broker_live_trace
 from core.workspace_broker_accounting import (
     WorkspaceBrokerAccountingSnapshot,
     WorkspaceBrokerRequestAccounting,
@@ -214,8 +215,26 @@ class WorkspaceLiveBarAggregator:
         ask_value = float(ask)
         volume_value = max(float(volume), 0.0)
         if bid_value <= 0.0 or ask_value <= 0.0:
+            broker_live_trace.record_aggregator_update(
+                workspace_uid=self.binding.workspace_uid,
+                timeframe=self.binding.timeframe,
+                quote_timestamp=quote_time,
+                current_bucket=self._bucket_timestamp,
+                quote_accepted=False,
+                guard_result="INVALID_PRICE",
+                rollover=False,
+            )
             raise WorkspaceBrokerMarketError("Live quote prices must be positive")
         if ask_value < bid_value:
+            broker_live_trace.record_aggregator_update(
+                workspace_uid=self.binding.workspace_uid,
+                timeframe=self.binding.timeframe,
+                quote_timestamp=quote_time,
+                current_bucket=self._bucket_timestamp,
+                quote_accepted=False,
+                guard_result="ASK_BELOW_BID",
+                rollover=False,
+            )
             raise WorkspaceBrokerMarketError("Live ask cannot be below bid")
 
         bucket = self._bucket_start(quote_time)
@@ -228,8 +247,26 @@ class WorkspaceLiveBarAggregator:
                 midpoint=midpoint,
                 volume=volume_value,
             )
+            broker_live_trace.record_aggregator_update(
+                workspace_uid=self.binding.workspace_uid,
+                timeframe=self.binding.timeframe,
+                quote_timestamp=quote_time,
+                current_bucket=bucket,
+                quote_accepted=True,
+                guard_result="INITIAL_BUCKET_OPENED",
+                rollover=False,
+            )
             return None
         if bucket < self._bucket_timestamp:
+            broker_live_trace.record_aggregator_update(
+                workspace_uid=self.binding.workspace_uid,
+                timeframe=self.binding.timeframe,
+                quote_timestamp=quote_time,
+                current_bucket=self._bucket_timestamp,
+                quote_accepted=False,
+                guard_result="STALE_BUCKET",
+                rollover=False,
+            )
             raise WorkspaceBrokerMarketError(
                 "Live quote buckets must be ordered chronologically"
             )
@@ -240,6 +277,15 @@ class WorkspaceLiveBarAggregator:
             self._low = min(self._low, midpoint)
             self._close = midpoint
             self._volume = max(self._volume, volume_value)
+            broker_live_trace.record_aggregator_update(
+                workspace_uid=self.binding.workspace_uid,
+                timeframe=self.binding.timeframe,
+                quote_timestamp=quote_time,
+                current_bucket=bucket,
+                quote_accepted=True,
+                guard_result="CURRENT_BUCKET_UPDATED",
+                rollover=False,
+            )
             return None
 
         completed = WorkspaceMarketEvent(
@@ -263,6 +309,16 @@ class WorkspaceLiveBarAggregator:
             ask=ask_value,
             midpoint=midpoint,
             volume=volume_value,
+        )
+        broker_live_trace.record_aggregator_update(
+            workspace_uid=self.binding.workspace_uid,
+            timeframe=self.binding.timeframe,
+            quote_timestamp=quote_time,
+            current_bucket=bucket,
+            quote_accepted=True,
+            guard_result="ROLLOVER_COMPLETED",
+            rollover=True,
+            completed_bar_timestamp=completed.timestamp,
         )
         return completed
 
@@ -483,7 +539,19 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
         binding = self._bindings.get(str(workspace_uid))
         if binding is None:
             raise WorkspaceBrokerMarketError("Workspace broker feed is not active")
+        broker_live_trace.record_provider_poll(
+            workspace_uid=binding.workspace_uid,
+            timeframe=binding.timeframe,
+        )
         if binding.workspace_uid in self._suspended_workspaces:
+            broker_live_trace.record_provider_signature(
+                workspace_uid=binding.workspace_uid,
+                timeframe=binding.timeframe,
+                quote_timestamp=None,
+                signature=None,
+                signature_changed=False,
+                guard_result="SUSPENDED",
+            )
             return None
         snapshot_method = getattr(
             self._runtime_engine,
@@ -509,13 +577,37 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
         )
         quotes = payload.get("quotes")
         if not isinstance(quotes, dict):
+            broker_live_trace.record_provider_signature(
+                workspace_uid=binding.workspace_uid,
+                timeframe=binding.timeframe,
+                quote_timestamp=None,
+                signature=None,
+                signature_changed=False,
+                guard_result="QUOTES_MISSING",
+            )
             return None
         row = quotes.get(binding.symbol)
         if not isinstance(row, dict):
+            broker_live_trace.record_provider_signature(
+                workspace_uid=binding.workspace_uid,
+                timeframe=binding.timeframe,
+                quote_timestamp=None,
+                signature=None,
+                signature_changed=False,
+                guard_result="SYMBOL_QUOTE_MISSING",
+            )
             return None
         bid = self._positive_float(row.get("bid"))
         ask = self._positive_float(row.get("ask"))
         if bid is None or ask is None or ask < bid:
+            broker_live_trace.record_provider_signature(
+                workspace_uid=binding.workspace_uid,
+                timeframe=binding.timeframe,
+                quote_timestamp=row.get("timestamp"),
+                signature=None,
+                signature_changed=False,
+                guard_result="INVALID_BID_ASK",
+            )
             return None
         timestamp = self._quote_timestamp(
             row.get("timestamp"),
@@ -523,6 +615,14 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
         )
         previous_timestamp = self._last_quote_timestamps.get(binding.workspace_uid)
         if previous_timestamp is not None and timestamp < previous_timestamp:
+            broker_live_trace.record_provider_signature(
+                workspace_uid=binding.workspace_uid,
+                timeframe=binding.timeframe,
+                quote_timestamp=timestamp,
+                signature=None,
+                signature_changed=False,
+                guard_result="STALE_TIMESTAMP",
+            )
             return None
         volume = self._non_negative_float(row.get("volume"))
         signature = (
@@ -532,9 +632,25 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
             round(volume, 6),
         )
         if self._last_quote_signatures.get(binding.workspace_uid) == signature:
+            broker_live_trace.record_provider_signature(
+                workspace_uid=binding.workspace_uid,
+                timeframe=binding.timeframe,
+                quote_timestamp=timestamp,
+                signature=signature,
+                signature_changed=False,
+                guard_result="DUPLICATE_SIGNATURE",
+            )
             return None
         self._last_quote_signatures[binding.workspace_uid] = signature
         self._last_quote_timestamps[binding.workspace_uid] = timestamp
+        broker_live_trace.record_provider_signature(
+            workspace_uid=binding.workspace_uid,
+            timeframe=binding.timeframe,
+            quote_timestamp=timestamp,
+            signature=signature,
+            signature_changed=True,
+            guard_result="SIGNATURE_CHANGED",
+        )
         return self._aggregators[binding.workspace_uid].update(
             timestamp=timestamp,
             bid=bid,
