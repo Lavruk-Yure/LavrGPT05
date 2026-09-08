@@ -1,16 +1,16 @@
-# LGE Runtime 07 — RoadMap101–106
+# LGE Runtime 07 — RoadMap101–108
 
 ## Якість MACD, режим Alligator та Candidate F
 
 Дата початку: 2026-08-17  
 Дата базового checkpoint: 2026-08-21  
-Дата актуалізації: 2026-09-01
+Дата актуалізації: 2026-09-08
 
 ---
 
 # 1. Призначення MD7
 
-`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-106.
+`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-108.
 
 RoadMap101 продовжив стабілізований Historical Replay після RoadMap100 і був
 присвячений не механічному підбору PnL, а побудові причинно-часової логіки
@@ -1214,3 +1214,104 @@ production_logic_changed=False
 exit policy. Перший крок має сформулювати одну нову causal structural entry
 hypothesis, відокремлену від outcome labels, і перевірити її однаковими
 baseline/candidate метриками на 2025 та 2026 до будь-якого production рішення.
+
+---
+
+# 26. RoadMap107 — Entry sequence, BROKER completed bars, runtime/UI stabilization
+
+Factual entry sequence / signal maturity analysis не виявив стабільного
+cross-period discriminator між WIN і LOSS. Для обох outcomes переважає одна
+послідовність:
+
+```text
+ALLIGATOR_STATE_START > STOCH > MACD > ENTRY
+```
+
+Production trading logic і thresholds не змінені.
+
+BROKER runtime-path тепер підтримує completed bars: partial current bucket не
+передається algorithm, попередній completed bucket dispatch-иться один раз на
+rollover, timestamps лишаються strictly increasing, а MACD і Alligator
+приймають completed BROKER bars.
+
+Це не означає готовність broker execution. BROKER market-data та read-only
+signal observation operational, але AUTO і SEMI execution лишаються
+`PARTIAL / DATA_OPERATIONAL_EXECUTION_NOT_WIRED`.
+
+WSP profile refresh і MDI Tile/Cascade behavior стабілізовані без зміни
+Candidate F trading semantics.
+
+---
+
+# 27. RoadMap108 — Strict entry coverage and causal rescue research
+
+RoadMap108 підтвердив проблему низького strict production entry coverage у
+strong-trend opportunities:
+
+```text
+2025 coverage = 17.99%
+2026 coverage = 17.50%
+dominant reject = MACD_EXTREMUM_TOO_WEAK
+```
+
+Під tested semantics відхилені або закриті:
+
+```text
+global MACD prominence threshold lowering
+simple unweighted M/A/S multi-signal score in current form
+Supertrend direct directional vote standalone
+current tested M/A/S exit/reverse branch
+MS_BUY added-entry
+known confirmation rescue
+FIRST weak reject after causal population rebuild
+existing production minimum-distance gate as added-entry
+```
+
+Висновок щодо Supertrend обмежений direct standalone vote і не означає, що
+Supertrend загалом не має корисних ролей.
+
+Hindsight-selected strong/missed weak-reject population не є executable entry
+population. Causal rebuild охопив усі factual weak rejects:
+
+```text
+2025 = 1679
+2026 = 1209
+```
+
+FIRST reject advantage після causal rebuild не збереглася. Distance geometry
+мала descriptive separation, але existing production threshold `0.0000500000`
+як added-entry дав `net < 0` і `PF < 1` в обох періодах. Research-only cutoff
+не обирався.
+
+Broader multi-signal score-engine architecture лишається unresolved: відхилено
+просту поточну M/A/S implementation, а не всю ширшу architecture.
+
+Фінальне рішення RoadMap108:
+
+```text
+strict_entry_rescue_branch=EXHAUSTED_CURRENT_EVIDENCE
+production_change_required=False
+roadmap108_status=CLOSED_RESEARCH_ONLY
+```
+
+## 27.1. Канонічний baseline після RoadMap107–108
+
+RoadMap107–108 не змінили Candidate F trading rules, MACD/Stochastic
+production thresholds, production entry policy або canonical exit stack:
+
+```text
+SL = max(signal_bar_range, spread*10)
+TP = 2R
+Profit Drawdown = 35%
+negative-PD recovery = unchanged
+```
+
+Canonical registered-path baseline збережено:
+
+```text
+2025: 42 trades | 30W | 11L | 1 BE | net +4.03 | PF 1.5424 | DD 3.58
+2026: 18 trades | 15W | 2L  | 1 BE | net +3.68 | PF 3.7669 | DD 1.20
+```
+
+RoadMap107 змінив runtime compatibility для completed BROKER bars і пов’язані
+runtime/UI contracts, але не Candidate F trading semantics.

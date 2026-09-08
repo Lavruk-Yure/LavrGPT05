@@ -1,6 +1,6 @@
 # core/workspace_runtime.py — per-WSP runtime, lifecycle та журнал подій
 # -*- coding: utf-8 -*-
-"""Канонічний per-WSP runtime: lifecycle, market events, Replay і журнал.
+"""workspace_runtime.py — канонічний per-WSP runtime та журнал подій.
 
 WorkspaceRuntime ізолює стан WSP, керує Replay/Live Read-only startup,
 market guards, signals, chart history та virtual Replay execution. RoadMap100
@@ -17,6 +17,10 @@ broker API. Viewport navigation, risk та broker integration лишаються
 signal timestamp у structured Journal details для надійної навігації з Signals.
 RoadMap102 прикріплює terminal Candidate F lifecycle до початкового ARMED
 signal record без створення другого сигналу та без broker execution.
+RoadMap109 перед ``_record_signal`` додає broker-neutral trade intent лише до
+pre-risk accepted Candidate F proposal у BROKER AUTO/SEMI. Поля intent беруться
+з WSP risk policy та completed signal bar; risk лишається окремим наявним
+етапом, а RuntimeEngine/broker execution у цьому модулі не додається.
 """
 
 from __future__ import annotations
@@ -31,6 +35,7 @@ from typing import Any, cast
 
 from core.algorithm_workspace import (
     WORKSPACE_CONTROL_MODE_AUTO,
+    WORKSPACE_CONTROL_MODE_SEMI,
     WORKSPACE_DATA_MODE_BROKER,
     WORKSPACE_DATA_MODE_REPLAY,
     WORKSPACE_STATE_ERROR,
@@ -159,17 +164,8 @@ MAX_WORKSPACE_SIGNAL_RECORDS = 1000
 MAX_WORKSPACE_PROFIT_DECISIONS = 1000
 
 
-def _candidate_f_negative_pd_recovery_enabled(
-    workspace: AlgorithmWorkspace,
-) -> bool:
-    """Увімкнути fixed 6J exit лише для Candidate F M1->M15 Replay."""
-    if workspace.data_mode != WORKSPACE_DATA_MODE_REPLAY:
-        return False
-    if str(workspace.timeframe or "").strip().upper() != "M15":
-        return False
-    replay_settings = WorkspaceReplaySettings.from_workspace(workspace)
-    if replay_settings.source_timeframe != "M1":
-        return False
+def _candidate_f_enabled(workspace: AlgorithmWorkspace) -> bool:
+    """Підтвердити фактичний Candidate F profile конкретного WSP."""
     enabled = bool(
         workspace.parameters.get(
             WORKSPACE_ALLIGATOR_FILTER_ENABLED_KEY,
@@ -198,6 +194,20 @@ def _candidate_f_negative_pd_recovery_enabled(
         str(binding.profile.parameters.get("logic_mode") or "").strip().upper()
         == ALLIGATOR_LOGIC_MODE_CANDIDATE_F
     )
+
+
+def _candidate_f_negative_pd_recovery_enabled(
+    workspace: AlgorithmWorkspace,
+) -> bool:
+    """Увімкнути fixed 6J exit лише для Candidate F M1->M15 Replay."""
+    if workspace.data_mode != WORKSPACE_DATA_MODE_REPLAY:
+        return False
+    if str(workspace.timeframe or "").strip().upper() != "M15":
+        return False
+    replay_settings = WorkspaceReplaySettings.from_workspace(workspace)
+    if replay_settings.source_timeframe != "M1":
+        return False
+    return _candidate_f_enabled(workspace)
 
 
 class WorkspaceRuntimeError(RuntimeError):
@@ -414,6 +424,7 @@ class WorkspaceRuntime:
         signal_record_observer: Callable[[WorkspaceSignalRecord], None] | None = None,
     ) -> None:
         self.context = WorkspaceRuntimeContext.from_workspace(workspace)
+        self._candidate_f_enabled = _candidate_f_enabled(workspace)
         self.algorithm_parameters = dict(workspace.parameters)
         self.risk_settings = dict(workspace.risk_settings)
         self.risk_policy = WorkspaceRiskPolicy.from_workspace(workspace)
@@ -2160,8 +2171,72 @@ class WorkspaceRuntime:
             self.fail(exc)
             raise WorkspaceRuntimeError(str(exc)) from exc
         for proposal in proposals:
+            proposal = self._candidate_f_execution_intent(event, proposal)
             self._record_signal(event, proposal)
         self._apply_candidate_f_lifecycle_events(algorithm)
+
+    def _candidate_f_execution_intent(
+        self,
+        event: WorkspaceMarketEvent,
+        proposal: WorkspaceSignalProposal,
+    ) -> WorkspaceSignalProposal:
+        """Додати causal BROKER intent перед наявним risk branch.
+
+        Intent створюється тільки для pre-risk accepted Candidate F proposal у
+        AUTO/SEMI. Обсяг походить із WSP risk policy, а SL та estimated loss —
+        з canonical completed-bar Replay geometry. Rejected/runtime-blocked
+        proposals і вже наявний intent повертаються без змін. Метод не створює
+        order plan та не звертається до RuntimeEngine або broker adapter.
+        """
+        if proposal.trade_intent is not None:
+            return proposal
+        if self.context.data_mode != WORKSPACE_DATA_MODE_BROKER:
+            return proposal
+        if self.context.control_mode not in {
+            WORKSPACE_CONTROL_MODE_AUTO,
+            WORKSPACE_CONTROL_MODE_SEMI,
+        }:
+            return proposal
+        if not self.can_form_signal():
+            return proposal
+        if proposal.filter_decision != WORKSPACE_SIGNAL_FILTER_ALLOW:
+            return proposal
+        if not self._candidate_f_enabled:
+            return proposal
+        from core.workspace_alligator import (
+            WorkspaceMacdAlligatorReplayAlgorithm,
+        )
+
+        if not isinstance(self.algorithm, WorkspaceMacdAlligatorReplayAlgorithm):
+            return proposal
+
+        policy = WorkspaceReplayExecutionPolicy(
+            fixed_volume=self.risk_policy.maximum_position_volume,
+            maximum_open_positions=self.risk_policy.maximum_open_positions,
+        )
+        signal_range = max(event.high - event.low, 0.0)
+        spread_floor = event.spread * policy.minimum_spread_multiples
+        protection_distance = (
+            max(signal_range, spread_floor) * policy.stop_range_multiplier
+        )
+        if not math.isfinite(protection_distance) or protection_distance <= 0.0:
+            return proposal
+
+        reference_price = event.close
+        stop_loss = (
+            reference_price - protection_distance
+            if proposal.direction == "BUY"
+            else reference_price + protection_distance
+        )
+        requested_volume = policy.fixed_volume
+        return replace(
+            proposal,
+            trade_intent=WorkspaceTradeIntent(
+                requested_volume=requested_volume,
+                estimated_loss_at_stop=protection_distance * requested_volume,
+                stop_loss=stop_loss,
+            ),
+        )
 
     def _apply_candidate_f_lifecycle_events(
         self,
