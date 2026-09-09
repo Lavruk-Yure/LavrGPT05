@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
-"""engine.risk.constants
+"""constants.py — canonical constants і початкові WSP risk limits.
 
-Стабільні машинні константи та початкові policy limits
-risk-management для WSP.
+Модуль визначає persisted risk keys, безпечні defaults, risk decisions і
+broker-neutral FX position-size contract. Canonical Workspace volume означає
+кількість одиниць base currency тільки для FX; це не broker-native volume і
+не conversion quote-currency loss у currency торгового рахунку.
 """
 
 from __future__ import annotations
@@ -13,6 +14,20 @@ WORKSPACE_RISK_SETTING_MAXIMUM_POSITION_VOLUME = "maximum_position_volume"
 WORKSPACE_RISK_SETTING_MAXIMUM_OPEN_POSITIONS = "maximum_open_positions"
 WORKSPACE_RISK_SETTING_MAX_DAILY_LOSS_PERCENT = "max_daily_loss_percent"
 WORKSPACE_RISK_SETTING_REQUIRE_STOP_LOSS = "require_stop_loss"
+
+
+# Broker-neutral contract для volume у WSP risk chain. Числові значення
+# maximum_position_volume -> requested_volume -> approved_volume зберігаються
+# без conversion; одна BASE_UNIT означає одну одиницю base currency FX symbol.
+WORKSPACE_VOLUME_UNIT_BASE_UNITS = "BASE_UNITS"
+WORKSPACE_VOLUME_SCOPE_FX_POSITION_SIZE_ONLY = "FX_POSITION_SIZE_ONLY"
+WORKSPACE_CANONICAL_VOLUME_UNIT = WORKSPACE_VOLUME_UNIT_BASE_UNITS
+WORKSPACE_CANONICAL_VOLUME_SCOPE = WORKSPACE_VOLUME_SCOPE_FX_POSITION_SIZE_ONLY
+WORKSPACE_CANONICAL_VOLUME_FIELDS = (
+    "maximum_position_volume",
+    "requested_volume",
+    "approved_volume",
+)
 
 
 # Безпечні початкові policy limits для відсутніх
