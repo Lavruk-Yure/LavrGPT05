@@ -1,5 +1,11 @@
-# -*- coding: utf-8 -*-
-"""Broker-neutral account facts used by WSP risk evaluation."""
+"""account_snapshot.py.
+
+Broker-neutral immutable account facts для WSP risk evaluation. Snapshot
+нормалізує exact workspace/broker/account binding, cached account currency та
+наявні numeric risk inputs без broker execution. Replay factory зберігає
+детерміновані synthetic values, але не вигадує account currency за відсутності
+канонічного Replay source.
+"""
 
 from __future__ import annotations
 
@@ -31,6 +37,7 @@ class WorkspaceRiskAccountSnapshot:
     equity: float | None
     daily_realized_pnl: float | None
     open_positions_count: int | None
+    currency: str | None = None
     binding_verified: bool = True
     synthetic: bool = False
 
@@ -75,6 +82,11 @@ class WorkspaceRiskAccountSnapshot:
                 self.open_positions_count,
                 "open_positions_count",
             ),
+        )
+        object.__setattr__(
+            self,
+            "currency",
+            str(self.currency or "").strip().upper() or None,
         )
         object.__setattr__(
             self,
@@ -159,6 +171,7 @@ class WorkspaceRiskAccountSnapshot:
             equity=equity,
             daily_realized_pnl=daily_realized_pnl,
             open_positions_count=open_positions_count,
+            currency=None,
             binding_verified=True,
             synthetic=True,
         )

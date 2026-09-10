@@ -150,6 +150,11 @@
   системний Python проєктним середовищем.
 - GUI: PySide6.
 - Дотримуватися наявного стилю конкретного файлу.
+- Для generated protobuf-модулів, у яких message classes додаються динамічно
+  й IDE не бачить їх як статичні атрибути `*_pb2`, завантажувати модуль через
+  `importlib.import_module()` та отримувати message class через `getattr()`.
+  Не залишати прямі звернення виду `OpenApiMessages_pb2.Proto...`, якщо вони
+  створюють `Cannot find reference` / `Unresolved attribute` у PyCharm.
 - Українські comments/docstrings використовувати там, де це відповідає стилю модуля.
 - Для runnable/regression/diagnostic Python-модулів module docstring повинен бути змістовним:
   - точна назва модуля;

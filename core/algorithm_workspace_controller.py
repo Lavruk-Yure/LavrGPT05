@@ -1,6 +1,4 @@
-# core/algorithm_workspace_controller.py — controller algorithm WSP
-# -*- coding: utf-8 -*-
-"""Координатор algorithm workspace без прямого доступу до broker API.
+"""algorithm_workspace_controller.py — координатор algorithm WSP.
 
 Controller створює WSP і делегує lifecycle/Replay/chart операції
 WorkspaceRuntime без обходу RuntimeEngine/BrokerRuntimeService. RoadMap100
@@ -9,18 +7,22 @@ WorkspaceRuntime без обходу RuntimeEngine/BrokerRuntimeService. RoadMap
 або команду stepping controller-у, а paused-state, M1 chronology і virtual
 execution перевіряє WorkspaceRuntime. Broker adapters з цих шляхів не
 викликаються. Broker-history progress передається через neutral callback.
+RoadMap109 додає мінімальний cached account-state route: після успішного BROKER
+start controller переносить currency та equity лише з exact broker/account
+binding у WorkspaceRiskAccountSnapshot без refresh або нового broker request.
 """
 
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import replace
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from engine.ctrader_history import CTraderHistoryProgressCallback
 from engine.ib_history import IBHistoryProgressCallback
 from engine.runtime_constants import WORKSPACE_REPLAY_SOURCE_CSV
+from engine.risk.account_snapshot import WorkspaceRiskAccountSnapshot
 
 from core.algorithm_workspace import (
     WORKSPACE_CONTROL_MODE_SEMI,
@@ -55,7 +57,11 @@ from core.workspace_parameter_adapter import (
 from core.workspace_parameters import WorkspaceAlgorithmParameters
 from core.workspace_profit_guard import WorkspaceProfitProtectionDecision
 from core.workspace_replay_settings import WorkspaceReplaySettings
-from core.workspace_runtime import WorkspaceRuntime, WorkspaceRuntimeError
+from core.workspace_runtime import (
+    WORKSPACE_STARTUP_PHASE_WAIT_BROKER,
+    WorkspaceRuntime,
+    WorkspaceRuntimeError,
+)
 
 
 class WorkspaceLayoutLockedError(RuntimeError):
@@ -93,6 +99,8 @@ class AlgorithmWorkspaceController:
     ) -> WorkspaceMarketEvent | None:
         """Poll one changed Live Read-only event for the selected WSP."""
         runtime = self.ensure_workspace_runtime(workspace_uid)
+        if runtime.risk_account_snapshot is None:
+            self.sync_workspace_risk_account_snapshot(workspace_uid)
         return runtime.advance_broker_market()
 
     def restore_workspaces(self) -> list[AlgorithmWorkspace]:
@@ -156,7 +164,80 @@ class AlgorithmWorkspaceController:
     ) -> WorkspaceRuntime:
         runtime = self.ensure_workspace_runtime(workspace_uid)
         runtime.complete_start()
+        self.sync_workspace_risk_account_snapshot(workspace_uid)
         return runtime
+
+    def sync_workspace_risk_account_snapshot(
+        self,
+        workspace_uid: str,
+    ) -> WorkspaceRiskAccountSnapshot | None:
+        """Прокинути exact-binding cached BROKER account state у WSP risk."""
+        runtime = self.ensure_workspace_runtime(workspace_uid)
+        if runtime.context.data_mode != WORKSPACE_DATA_MODE_BROKER:
+            return runtime.risk_account_snapshot
+        if runtime.context.startup_phase == WORKSPACE_STARTUP_PHASE_WAIT_BROKER:
+            runtime.clear_risk_account_snapshot(
+                "broker connection is unavailable",
+            )
+            return None
+        account_state = self._cached_workspace_account_state(
+            runtime.context.broker,
+        )
+        if account_state is None:
+            runtime.clear_risk_account_snapshot(
+                "cached broker account state is unavailable",
+            )
+            return None
+        state_broker = str(
+            getattr(account_state, "broker_name", "") or ""
+        ).strip().upper()
+        state_account_id = str(
+            getattr(account_state, "account_id", "") or ""
+        ).strip()
+        bound_account_id = str(runtime.context.account_id or "").strip()
+        if (
+            state_broker != runtime.context.broker
+            or state_account_id != bound_account_id
+        ):
+            runtime.clear_risk_account_snapshot(
+                "cached broker account binding does not match workspace",
+            )
+            return None
+        return runtime.set_risk_account_snapshot(
+            WorkspaceRiskAccountSnapshot(
+                snapshot_utc=(
+                    str(getattr(account_state, "snapshot_utc", "") or "").strip()
+                    or datetime.now(UTC)
+                ),
+                workspace_uid=runtime.context.workspace_uid,
+                broker=runtime.context.broker,
+                account_id=runtime.context.account_id,
+                source_mode=runtime.context.data_mode,
+                equity=getattr(account_state, "equity", None),
+                daily_realized_pnl=None,
+                open_positions_count=None,
+                currency=getattr(account_state, "currency", None),
+                binding_verified=True,
+                synthetic=False,
+            )
+        )
+
+    def _cached_workspace_account_state(self, broker: str) -> object | None:
+        """Прочитати broker cache без refresh або прямого adapter call."""
+        runtime_engine = self._runtime_engine
+        if runtime_engine is None:
+            return None
+        normalized_broker = str(broker or "").strip().upper()
+        if normalized_broker == "IB":
+            service = getattr(runtime_engine, "ib_runtime_service", None)
+        elif normalized_broker == "CTRADER":
+            service = getattr(runtime_engine, "ctrader_runtime_service", None)
+        else:
+            return None
+        getter = getattr(service, "get_account_state", None)
+        if not callable(getter):
+            return None
+        return getter()
 
     def begin_workspace_runtime_stop(
         self,

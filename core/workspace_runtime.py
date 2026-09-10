@@ -1,5 +1,3 @@
-# core/workspace_runtime.py — per-WSP runtime, lifecycle та журнал подій
-# -*- coding: utf-8 -*-
 """workspace_runtime.py — канонічний per-WSP runtime та журнал подій.
 
 WorkspaceRuntime ізолює стан WSP, керує Replay/Live Read-only startup,
@@ -531,6 +529,7 @@ class WorkspaceRuntime:
         equity: float | None = None,
         daily_realized_pnl: float | None = None,
         open_positions_count: int | None = None,
+        currency: str | None = None,
         snapshot_utc: datetime | None = None,
     ) -> WorkspaceRiskAccountSnapshot:
         """Set volatile account facts used by signal risk evaluation."""
@@ -541,6 +540,7 @@ class WorkspaceRuntime:
                     equity,
                     daily_realized_pnl,
                     open_positions_count,
+                    currency,
                     snapshot_utc,
                 )
             ):
@@ -568,6 +568,7 @@ class WorkspaceRuntime:
                     if open_positions_count is None
                     else open_positions_count
                 ),
+                currency=currency,
                 binding_verified=True,
                 synthetic=self.context.data_mode == WORKSPACE_DATA_MODE_REPLAY,
             )
@@ -594,6 +595,7 @@ class WorkspaceRuntime:
             equity=effective_snapshot.equity,
             daily_realized_pnl=effective_snapshot.daily_realized_pnl,
             open_positions_count=effective_snapshot.open_positions_count,
+            currency=effective_snapshot.currency,
             binding_verified=effective_snapshot.binding_verified,
             synthetic=effective_snapshot.synthetic,
         )
