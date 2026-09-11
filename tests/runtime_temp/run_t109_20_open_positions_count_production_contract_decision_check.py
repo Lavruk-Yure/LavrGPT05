@@ -72,9 +72,7 @@ PRODUCTION_RECOMMENDATION = (
     "ACCEPT_WORKSPACE_ONLY_BROKER_CONFIRMED_CONTRACT_"
     "BUT_DO_NOT_WIRE_UNTIL_WORKSPACE_IDENTITY_IS_PRESERVED"
 )
-FIRST_UNRESOLVED_BOUNDARY = (
-    "WORKSPACE_EXECUTION_IDENTITY_TO_BROKER_POSITION_OWNERSHIP"
-)
+FIRST_UNRESOLVED_BOUNDARY = "WORKSPACE_EXECUTION_IDENTITY_TO_BROKER_POSITION_OWNERSHIP"
 BOUNDARY_CONTRACT = (
     "WORKSPACE_ONLY_BROKER_CONFIRMED_COUNT_REQUIRES_WORKSPACE_IDENTITY_"
     "PRESERVED_THROUGH_EXECUTION_AND_BROKER_RECONCILIATION"
@@ -118,9 +116,9 @@ def _source_section(
 def _production_hashes() -> dict[str, str]:
     """Зафіксувати scoped production sources до і після TEST_ONLY run."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -155,9 +153,7 @@ def main() -> None:
     replay = _source_text("core/workspace_replay_execution.py")
     runtime_engine = _source_text("engine/runtime_engine.py")
     ib_service = _source_text("engine/services/ib_runtime_service.py")
-    ctrader_service = _source_text(
-        "engine/services/ctrader_runtime_service.py"
-    )
+    ctrader_service = _source_text("engine/services/ctrader_runtime_service.py")
     ib_positions = _source_section(
         "engine/ib_adapter.py",
         "    def get_positions(",
@@ -215,16 +211,19 @@ def main() -> None:
         )
     )
 
-    ib_source_present = all(
-        token in ib_positions
-        for token in (
-            "self._wrapper.positions.clear()",
-            "self._client.reqPositions()",
-            "self._wrapper.position_event.wait(",
-            "self._client.cancelPositions()",
-            "return self._build_positions(",
+    ib_source_present = (
+        all(
+            token in ib_positions
+            for token in (
+                "self._wrapper.positions.clear()",
+                "self._client.reqPositions()",
+                "self._wrapper.position_event.wait(",
+                "self._client.cancelPositions()",
+                "return self._build_positions(",
+            )
         )
-    ) and "return adapter.get_positions()" in ib_service
+        and "return adapter.get_positions()" in ib_service
+    )
     ib_non_zero_exposure_only = all(
         token in ib_build
         for token in (
@@ -236,17 +235,20 @@ def main() -> None:
     ib_new_request_required = "self._client.reqPositions()" in ib_positions
     ib_freshness_known = "snapshot_utc" in broker_position_fields
 
-    ctrader_source_present = all(
-        token in ctrader_positions
-        for token in (
-            "self._positions_payload = []",
-            "request = ProtoOAReconcileReq()",
-            "request.ctidTraderAccountId = self.config.ctid_trader_account_id",
-            "deferred = self.client.send(request)",
-            "self._positions_event.wait(",
-            "return self._build_positions()",
+    ctrader_source_present = (
+        all(
+            token in ctrader_positions
+            for token in (
+                "self._positions_payload = []",
+                "request = ProtoOAReconcileReq()",
+                "request.ctidTraderAccountId = self.config.ctid_trader_account_id",
+                "deferred = self.client.send(request)",
+                "self._positions_event.wait(",
+                "return self._build_positions()",
+            )
         )
-    ) and "return adapter.get_positions()" in ctrader_service
+        and "return adapter.get_positions()" in ctrader_service
+    )
     ctrader_exposure_present = all(
         token in ctrader_build
         for token in (
@@ -319,9 +321,7 @@ def main() -> None:
     alternative_a_contract_fit = False
     alternative_b_workspace_only_feasible = workspace_only_count_currently_derivable
     alternative_b_contract_fit = True
-    alternative_c_workspace_symbol_feasible = (
-        workspace_only_count_currently_derivable
-    )
+    alternative_c_workspace_symbol_feasible = workspace_only_count_currently_derivable
     alternative_c_contract_fit = "PARTIAL_REDUNDANT_FOR_SINGLE_SYMBOL_WORKSPACE"
     reverse_invariant_compatible = True
     broker_neutral_open_positions_contract_resolved = True
@@ -372,14 +372,8 @@ def main() -> None:
     print(f"candidate_position_scope={CANDIDATE_POSITION_SCOPE}")
     print(f"candidate_lifecycle_scope={CANDIDATE_LIFECYCLE_SCOPE}")
     print(f"candidate_close_requested_semantics={CANDIDATE_CLOSE_SEMANTICS}")
-    print(
-        "candidate_partial_fill_semantics="
-        f"{CANDIDATE_PARTIAL_FILL_SEMANTICS}"
-    )
-    print(
-        "candidate_partial_close_semantics="
-        f"{CANDIDATE_PARTIAL_CLOSE_SEMANTICS}"
-    )
+    print("candidate_partial_fill_semantics=" f"{CANDIDATE_PARTIAL_FILL_SEMANTICS}")
+    print("candidate_partial_close_semantics=" f"{CANDIDATE_PARTIAL_CLOSE_SEMANTICS}")
     print(
         "maximum_open_positions_setting_scope="
         f"{maximum_open_positions_setting_scope}"
@@ -411,13 +405,8 @@ def main() -> None:
         "RuntimeEngine.get_active_broker_positions"
     )
     print("ctrader_positions_account_scope=CONFIGURED_CTRADER_ACCOUNT")
-    print(
-        "ctrader_workspace_identity_present="
-        f"{broker_workspace_identity_present}"
-    )
-    print(
-        "ctrader_partial_fill_behavior=NON_ZERO_RECONCILED_EXPOSURE_COUNTS_AS_OPEN"
-    )
+    print("ctrader_workspace_identity_present=" f"{broker_workspace_identity_present}")
+    print("ctrader_partial_fill_behavior=NON_ZERO_RECONCILED_EXPOSURE_COUNTS_AS_OPEN")
     print(
         "ctrader_close_requested_behavior=COUNTED_WHILE_RECONCILE_RETURNS_"
         "NON_ZERO_POSITION;REQUEST_STATE_NOT_IN_POSITION_DTO"
@@ -439,8 +428,7 @@ def main() -> None:
         f"{workspace_only_count_currently_derivable}"
     )
     print(
-        "alternative_A_account_wide_feasible="
-        f"{alternative_a_account_wide_feasible}"
+        "alternative_A_account_wide_feasible=" f"{alternative_a_account_wide_feasible}"
     )
     print(f"alternative_A_contract_fit={alternative_a_contract_fit}")
     print(

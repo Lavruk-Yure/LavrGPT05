@@ -6112,9 +6112,7 @@ class AlgorithmWorkspaceArea(QWidget):
         """Зберегти Qt cascade offsets і вмістити normalized frames у viewport."""
         mdi = self.ui.mdiWorkspaces
         subwindows = [
-            subwindow
-            for subwindow in mdi.subWindowList()
-            if subwindow.isVisible()
+            subwindow for subwindow in mdi.subWindowList() if subwindow.isVisible()
         ]
         if not subwindows:
             return
@@ -6127,19 +6125,15 @@ class AlgorithmWorkspaceArea(QWidget):
             mdi.cascadeSubWindows()
             viewport_rect = mdi.viewport().rect()
             max_x_offset = max(
-                subwindow.geometry().x() - viewport_rect.x()
-                for subwindow in subwindows
+                subwindow.geometry().x() - viewport_rect.x() for subwindow in subwindows
             )
             max_y_offset = max(
-                subwindow.geometry().y() - viewport_rect.y()
-                for subwindow in subwindows
+                subwindow.geometry().y() - viewport_rect.y() for subwindow in subwindows
             )
             maximum_width = max(1, viewport_rect.width() - max_x_offset)
             maximum_height = max(1, viewport_rect.height() - max_y_offset)
             minimum_width = max(subwindow.minimumWidth() for subwindow in subwindows)
-            minimum_height = max(
-                subwindow.minimumHeight() for subwindow in subwindows
-            )
+            minimum_height = max(subwindow.minimumHeight() for subwindow in subwindows)
             workspace_count = len(subwindows)
             frame_width = self._cascade_preferred_extent(
                 maximum_width,

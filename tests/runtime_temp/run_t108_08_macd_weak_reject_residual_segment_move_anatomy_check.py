@@ -58,7 +58,9 @@ from run_t108_07_macd_weak_prominence_missed_strong_segments_anatomy_check impor
     _missed_strong_segments,
 )
 
-from core.workspace_algorithm import create_registered_workspace_algorithm  # noqa: E402, E501
+from core.workspace_algorithm import (
+    create_registered_workspace_algorithm,
+)  # noqa: E402, E501
 from core.workspace_alligator import (  # noqa: E402
     WorkspaceMacdAlligatorReplayAlgorithm,
 )
@@ -118,18 +120,14 @@ def _residual_move_r(
     )
     assert stop_distance > 0.0
 
-    future_timestamps = timestamps[signal_index + 1:]
+    future_timestamps = timestamps[signal_index + 1 :]
     future_events = tuple(events[timestamp] for timestamp in future_timestamps)
     if not future_events:
         favorable = 0.0
     elif segment.side == "BUY":
-        favorable = (
-            max(item.high for item in future_events) - signal_event.close
-        )
+        favorable = max(item.high for item in future_events) - signal_event.close
     else:
-        favorable = (
-            signal_event.close - min(item.low for item in future_events)
-        )
+        favorable = signal_event.close - min(item.low for item in future_events)
     move_r = max(favorable, 0.0) / stop_distance
     return signal_index + 1, len(future_events), move_r
 
@@ -211,9 +209,7 @@ def _run_period(spec) -> PeriodResult:
     diagnostic_keys = Counter(
         (item.timestamp, item.direction) for item in weak_diagnostics
     )
-    record_keys = Counter(
-        (item.timestamp, item.direction) for item in rejected_records
-    )
+    record_keys = Counter((item.timestamp, item.direction) for item in rejected_records)
     assert diagnostic_keys == record_keys
 
     missed_segments = _missed_strong_segments(runtime, algorithm)
@@ -244,14 +240,9 @@ def _print_period(period: str, result: PeriodResult) -> None:
 
     rows = result.rows
     reached = tuple(row for row in rows if row.reached_residual_label)
-    reached_segments = {
-        (row.segment_start, row.direction)
-        for row in reached
-    }
+    reached_segments = {(row.segment_start, row.direction) for row in reached}
     segment_coverage = (
-        100.0
-        * len(reached_segments)
-        / len(result.missed_strong_segments)
+        100.0 * len(reached_segments) / len(result.missed_strong_segments)
     )
     event_rate = 100.0 * len(reached) / len(rows)
 
@@ -260,9 +251,7 @@ def _print_period(period: str, result: PeriodResult) -> None:
     print(f"  missed_strong_segments={len(result.missed_strong_segments)}")
     print(f"  weak_reject_events_in_missed_strong_segments={len(rows)}")
     bar_number_median = median(row.segment_bar_number for row in rows)
-    remaining_bars_median = median(
-        row.remaining_completed_bars for row in rows
-    )
+    remaining_bars_median = median(row.remaining_completed_bars for row in rows)
     residual_move_median = median(row.residual_move_r for row in rows)
     residual_move_max = max(row.residual_move_r for row in rows)
     print(f"  weak_reject_segment_bar_number_median={bar_number_median:.2f}")

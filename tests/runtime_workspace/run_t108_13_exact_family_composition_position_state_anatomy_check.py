@@ -32,10 +32,7 @@ for import_path in (PROJECT_ROOT, TEST_ROOT):
         sys.path.insert(0, str(import_path))
 
 TEST_ID = "T108-13"
-MODE = (
-    "RM108_T108_13_EXACT_FAMILY_COMPOSITION_POSITION_STATE_"
-    "ANATOMY_TEST_ONLY"
-)
+MODE = "RM108_T108_13_EXACT_FAMILY_COMPOSITION_POSITION_STATE_" "ANATOMY_TEST_ONLY"
 COMPOSITION_SCRIPT = "run_t108_12_signed_family_combination_anatomy_check.py"
 PERSISTENCES = (1, 2, 3, 4, 5)
 PERIOD_CODES = ("2025", "2026")
@@ -182,9 +179,7 @@ def _position_labels(replay: Any, runtime: Any) -> dict[datetime, PositionLabel]
             and trade.entry_timestamp == decision_at
         )
         exits = tuple(
-            trade
-            for trade in active
-            if trade.close_timestamp < next_decision_at
+            trade for trade in active if trade.close_timestamp < next_decision_at
         )
         remains = bool(
             active_trade is not None
@@ -251,8 +246,7 @@ def _events(
     """Створити factual one-bar outcome labels без execution semantics."""
 
     return tuple(
-        DirectionalOutcomeEvent(item.row.timestamp, direction)
-        for item in rows
+        DirectionalOutcomeEvent(item.row.timestamp, direction) for item in rows
     )
 
 
@@ -281,13 +275,9 @@ def _reason_counts(
     """Сформувати deterministic factual close-reason distribution."""
 
     counts = Counter(
-        trade.close_reason
-        for item in rows
-        for trade in item.position.exits_before_next
+        trade.close_reason for item in rows for trade in item.position.exits_before_next
     )
-    return "|".join(
-        f"close_{reason}={counts[reason]}" for reason in close_reasons
-    )
+    return "|".join(f"close_{reason}={counts[reason]}" for reason in close_reasons)
 
 
 def _entry_count(rows: tuple[ClassifiedRow, ...], direction: str) -> int:
@@ -337,9 +327,7 @@ def _print_compositions(
         for persistence in PERSISTENCES:
             analysis = results[period][persistence]
             for class_name in SAME_CLASSES:
-                direction = (
-                    "BUY" if class_name.endswith("_BUY") else "SELL"
-                )
+                direction = "BUY" if class_name.endswith("_BUY") else "SELL"
                 for state in POSITION_STATES:
                     rows = analysis.cells[class_name][state]
                     metric = _metrics(replay, rows, direction)
@@ -385,9 +373,7 @@ def _print_entry_labels(
         for persistence in PERSISTENCES:
             analysis = results[period][persistence]
             for class_name in SAME_CLASSES:
-                direction = (
-                    "BUY" if class_name.endswith("_BUY") else "SELL"
-                )
+                direction = "BUY" if class_name.endswith("_BUY") else "SELL"
                 rows = analysis.cells[class_name]["FLAT"]
                 entry_count = _entry_count(rows, direction)
                 print(
@@ -423,9 +409,7 @@ def _print_exit_labels(
         for persistence in PERSISTENCES:
             analysis = results[period][persistence]
             for class_name in SAME_CLASSES:
-                direction = (
-                    "BUY" if class_name.endswith("_BUY") else "SELL"
-                )
+                direction = "BUY" if class_name.endswith("_BUY") else "SELL"
                 for state in ("LONG", "SHORT"):
                     if not _is_opposite(state, direction):
                         continue
@@ -451,9 +435,7 @@ def _print_support_labels(
         for persistence in PERSISTENCES:
             analysis = results[period][persistence]
             for class_name in SAME_CLASSES:
-                direction = (
-                    "BUY" if class_name.endswith("_BUY") else "SELL"
-                )
+                direction = "BUY" if class_name.endswith("_BUY") else "SELL"
                 for state in ("LONG", "SHORT"):
                     if not _is_support(state, direction):
                         continue
@@ -480,9 +462,7 @@ def _print_opposite_before_exit(
         for persistence in PERSISTENCES:
             analysis = results[period][persistence]
             for class_name in SAME_CLASSES:
-                direction = (
-                    "BUY" if class_name.endswith("_BUY") else "SELL"
-                )
+                direction = "BUY" if class_name.endswith("_BUY") else "SELL"
                 for state in ("LONG", "SHORT"):
                     if not _is_opposite(state, direction):
                         continue
@@ -640,8 +620,7 @@ def main() -> int:
     print("production_threshold_changed=False")
     print("md7_changed=False")
     print(
-        "broker_requests="
-        f"{sum(item.broker_requests for item in replays.values())}"
+        "broker_requests=" f"{sum(item.broker_requests for item in replays.values())}"
     )
     print(
         "broker_execution_attempted="

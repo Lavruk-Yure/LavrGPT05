@@ -120,9 +120,9 @@ def schema_columns(schema: str, table: str) -> tuple[str, ...]:
 def production_hashes() -> dict[str, str]:
     """Зафіксувати production sources до і після TEST_ONLY harness."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -153,10 +153,10 @@ def signal_record(
         reason="T109-10 contract case",
         risk_decision=risk_decision,
         risk_reason_code=(
-            "RISK_ALLOWED" if risk_decision == "ALLOW" else "RISK_BLOCKED"
-        )
-        if risk_decision is not None
-        else None,
+            ("RISK_ALLOWED" if risk_decision == "ALLOW" else "RISK_BLOCKED")
+            if risk_decision is not None
+            else None
+        ),
         requested_volume=1000.0,
         approved_volume=approved_volume,
         risk_execution_attempted=False,
@@ -245,9 +245,7 @@ def main() -> None:
         "    @staticmethod\n    def _get_position_symbol_text(",
     )
 
-    plan_fields = tuple(
-        field.name for field in fields(TestOnlyWorkspaceExecutionPlan)
-    )
+    plan_fields = tuple(field.name for field in fields(TestOnlyWorkspaceExecutionPlan))
     identity_fields = (
         "workspace_uid",
         "signal_uid",
@@ -269,14 +267,17 @@ def main() -> None:
         token not in risk_model
         for token in ("volume_unit", "BASE_UNITS", "LOTS", "BROKER_NATIVE")
     )
-    risk_default_is_1000 = all(
-        token in risk_constants
-        for token in (
-            "DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME = 1000.0",
-            "WORKSPACE_RISK_SETTING_MAXIMUM_POSITION_VOLUME = "
-            '"maximum_position_volume"',
+    risk_default_is_1000 = (
+        all(
+            token in risk_constants
+            for token in (
+                "DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME = 1000.0",
+                "WORKSPACE_RISK_SETTING_MAXIMUM_POSITION_VOLUME = "
+                '"maximum_position_volume"',
+            )
         )
-    ) and DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME == 1000.0
+        and DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME == 1000.0
+    )
     approved_copies_requested = (
         "approved_volume = request.requested_volume" in risk_model
     )
@@ -288,13 +289,17 @@ def main() -> None:
             "lots_float = float(lots)",
         )
     )
-    ib_converts_lots_to_base_units = all(
-        token in ib_conversion
-        for token in (
-            "1.00 lot = 100000 units",
-            "return round(lots_float * 100000.0, 2)",
+    ib_converts_lots_to_base_units = (
+        all(
+            token in ib_conversion
+            for token in (
+                "1.00 lot = 100000 units",
+                "return round(lots_float * 100000.0, 2)",
+            )
         )
-    ) and "quantity_float = self._ib_lots_to_fx_quantity(lots_float)" in runtime_engine
+        and "quantity_float = self._ib_lots_to_fx_quantity(lots_float)"
+        in runtime_engine
+    )
     ctrader_converts_lots_to_api_volume = all(
         token in ctrader_lot
         for token in (

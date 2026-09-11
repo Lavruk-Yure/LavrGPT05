@@ -251,9 +251,7 @@ def _probe_mode(control_mode: str) -> ModeProbeResult:
         risk_allowed=record.risk_decision == "ALLOW",
         risk_execution_attempted=record.risk_execution_attempted,
         actual_broker_requests=provider.actual_broker_requests,
-        actual_broker_execution_attempted=(
-            provider.actual_broker_execution_attempted
-        ),
+        actual_broker_execution_attempted=(provider.actual_broker_execution_attempted),
     )
     runtime.stop("T107-14 probe completed")
     return result
@@ -354,9 +352,7 @@ def _risk_gate_support() -> dict[str, bool]:
         ),
     }
     return {
-        name: (
-            evaluator.evaluate(blocked_request).reason_code == expected_reason
-        )
+        name: (evaluator.evaluate(blocked_request).reason_code == expected_reason)
         for name, (blocked_request, expected_reason) in cases.items()
     }
 
@@ -370,18 +366,16 @@ def _production_contract() -> dict[str, bool]:
     )
     proposal_sources = "\n".join(
         (
-            (PROJECT_ROOT / "core" / "workspace_macd.py").read_text(
-                encoding="utf-8"
-            ),
+            (PROJECT_ROOT / "core" / "workspace_macd.py").read_text(encoding="utf-8"),
             (PROJECT_ROOT / "core" / "workspace_alligator.py").read_text(
                 encoding="utf-8"
             ),
         )
     )
     runtime_source = inspect.getsource(WorkspaceRuntime)
-    area_source = (
-        PROJECT_ROOT / "core" / "algorithm_workspace_area.py"
-    ).read_text(encoding="utf-8")
+    area_source = (PROJECT_ROOT / "core" / "algorithm_workspace_area.py").read_text(
+        encoding="utf-8"
+    )
     candidate_f_trade_intent_created = bool(
         "WorkspaceTradeIntent(" in proposal_sources
         or "trade_intent=" in proposal_sources
@@ -438,8 +432,7 @@ def main() -> None:
         and generic_trade_intent_reaches_risk_gate
     )
     order_plan_created = bool(
-        candidate_f_reaches_execution_gate
-        and production["runtime_execution_endpoint"]
+        candidate_f_reaches_execution_gate and production["runtime_execution_endpoint"]
     )
     broker_request_would_be_sent = bool(
         order_plan_created and production["runtime_constructor_execution_seam"]

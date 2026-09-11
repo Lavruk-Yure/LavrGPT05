@@ -20,7 +20,7 @@ from pathlib import Path
 
 from core.app_paths import BASE_DIR
 
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 
 
 RUNTIME_TABLES_SQL = """
@@ -67,7 +67,12 @@ CREATE TABLE IF NOT EXISTS trades (
     volume REAL NOT NULL,
     created_utc TEXT NOT NULL,
     source TEXT NOT NULL,
-    comment TEXT NOT NULL DEFAULT ''
+    comment TEXT NOT NULL DEFAULT '',
+    workspace_uid TEXT,
+    signal_uid TEXT,
+    execution_origin TEXT,
+    control_mode TEXT,
+    execution_state TEXT
 );
 
 CREATE TABLE IF NOT EXISTS order_plans (
@@ -316,12 +321,48 @@ def _ensure_runtime_column(
 def migrate_runtime_schema(
     connection: sqlite3.Connection,
 ) -> None:
-    """Apply additive Runtime schema migrations through schema v8."""
+    """Apply additive Runtime schema migrations through schema v9."""
     _ensure_runtime_column(
         connection,
         "trades",
         "comment",
         "TEXT NOT NULL DEFAULT ''",
+    )
+    _ensure_runtime_column(
+        connection,
+        "trades",
+        "workspace_uid",
+        "TEXT",
+    )
+    _ensure_runtime_column(
+        connection,
+        "trades",
+        "signal_uid",
+        "TEXT",
+    )
+    _ensure_runtime_column(
+        connection,
+        "trades",
+        "execution_origin",
+        "TEXT",
+    )
+    _ensure_runtime_column(
+        connection,
+        "trades",
+        "control_mode",
+        "TEXT",
+    )
+    _ensure_runtime_column(
+        connection,
+        "trades",
+        "execution_state",
+        "TEXT",
+    )
+    connection.execute(
+        """
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_trades_workspace_signal_unique
+        ON trades (workspace_uid, signal_uid)
+        """
     )
     _ensure_runtime_column(
         connection,

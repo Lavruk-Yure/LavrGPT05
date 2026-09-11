@@ -102,9 +102,9 @@ def _source_text(relative_path: str) -> str:
 def _production_hashes() -> dict[str, str]:
     """Повернути exact SHA-256 кожного scoped production source."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -147,7 +147,8 @@ def main() -> None:
         "approved_volume",
     )
     contract_is_explicit = bool(
-        WORKSPACE_CANONICAL_VOLUME_UNIT == WORKSPACE_VOLUME_UNIT_BASE_UNITS
+        WORKSPACE_CANONICAL_VOLUME_UNIT
+        == WORKSPACE_VOLUME_UNIT_BASE_UNITS
         == "BASE_UNITS"
         and WORKSPACE_CANONICAL_VOLUME_SCOPE
         == WORKSPACE_VOLUME_SCOPE_FX_POSITION_SIZE_ONLY
@@ -279,9 +280,7 @@ def main() -> None:
             "exchange_rate",
         )
     )
-    fx_scope_explicit = bool(
-        contract_is_explicit and constants_document_fx_base_units
-    )
+    fx_scope_explicit = bool(contract_is_explicit and constants_document_fx_base_units)
     non_fx_generalization_added = False
     production_contract_changed = True
     production_trading_logic_changed = False
@@ -347,13 +346,9 @@ def main() -> None:
     print(f"first_unresolved_boundary={FIRST_UNRESOLVED_BOUNDARY}")
     print(f"boundary_contract={BOUNDARY_CONTRACT}")
     print(f"production_contract_changed={production_contract_changed}")
+    print("production_trading_logic_changed=" f"{production_trading_logic_changed}")
     print(
-        "production_trading_logic_changed="
-        f"{production_trading_logic_changed}"
-    )
-    print(
-        "production_execution_wiring_changed="
-        f"{production_execution_wiring_changed}"
+        "production_execution_wiring_changed=" f"{production_execution_wiring_changed}"
     )
     print(f"production_hashes_before={combined_before}")
     print(f"production_hashes_after={combined_after}")

@@ -312,8 +312,7 @@ def main() -> None:
     print(f"second_cascade_changes_geometry={second_cascade_changes_geometry}")
     print(f"second_cascade_required={second_cascade_required}")
     print(
-        "first_cascade_final_geometry_stable="
-        f"{first_cascade_final_geometry_stable}"
+        "first_cascade_final_geometry_stable=" f"{first_cascade_final_geometry_stable}"
     )
     print(
         "first_cascade_preferred_size_reasonable="

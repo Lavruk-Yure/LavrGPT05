@@ -249,7 +249,8 @@ def _completed_bar_boundary() -> bool:
     return bool(
         partial is None
         and completed is not None
-        and completed.timestamp == event[0]["timestamp"].replace(
+        and completed.timestamp
+        == event[0]["timestamp"].replace(
             minute=0,
             second=0,
             microsecond=0,
@@ -325,9 +326,9 @@ def _runtime_route_contract() -> tuple[bool, bool, bool]:
             "submit_order(",
         )
     )
-    runtime_engine_source = (
-        PROJECT_ROOT / "engine" / "runtime_engine.py"
-    ).read_text(encoding="utf-8")
+    runtime_engine_source = (PROJECT_ROOT / "engine" / "runtime_engine.py").read_text(
+        encoding="utf-8"
+    )
     manual_order_boundary_present = bool(
         "def place_manual_market_order(" in runtime_engine_source
         and "service.place_market_order(" in runtime_engine_source

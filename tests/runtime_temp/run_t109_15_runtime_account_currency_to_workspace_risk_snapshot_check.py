@@ -111,9 +111,9 @@ class CachedRuntimeEngine:
 def _production_hashes() -> dict[str, str]:
     """Повернути exact SHA-256 реально змінених production files."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -258,8 +258,7 @@ def main() -> None:
         currency="EUR",
     )
     wrong_account_currency_rejected = bool(
-        foreign_snapshot is None
-        and foreign_runtime.risk_account_snapshot is None
+        foreign_snapshot is None and foreign_runtime.risk_account_snapshot is None
     )
     missing_runtime, missing_snapshot, missing_requests = _route_snapshot(
         workspace_account_id="T10915-MISSING",
@@ -281,8 +280,7 @@ def main() -> None:
         open_positions_count=0,
     )
     risk_numeric_semantics_changed = not bool(
-        missing_daily_decision.reason_code
-        == RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
+        missing_daily_decision.reason_code == RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
         and complete_decision.decision == RISK_DECISION_ALLOW
         and complete_decision.calculated_risk_percent == 0.1
         and complete_decision.approved_volume == 1000.0
@@ -319,7 +317,7 @@ def main() -> None:
             "sync_workspace_risk_account_snapshot",
             "get_account_state",
             "state_account_id != bound_account_id",
-            "currency=getattr(account_state, \"currency\", None)",
+            'currency=getattr(account_state, "currency", None)',
         )
     )
     production_files_changed = (
@@ -360,10 +358,7 @@ def main() -> None:
     print(f"workspace_risk_snapshot_currency={snapshot.currency}")
     print(f"workspace_snapshot_broker={snapshot.broker}")
     print(f"workspace_snapshot_account_id={snapshot.account_id}")
-    print(
-        "workspace_snapshot_binding_matches_runtime_account="
-        f"{binding_matches}"
-    )
+    print("workspace_snapshot_binding_matches_runtime_account=" f"{binding_matches}")
     print(
         "workspace_runtime_currency_available="
         f"{workspace_runtime_currency_available}"

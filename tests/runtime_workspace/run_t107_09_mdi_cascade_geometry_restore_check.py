@@ -244,9 +244,7 @@ def main() -> None:
         post_minimize_cascade_sizes_normalized = _sizes_normalized(
             post_minimize_geometries
         )
-        post_minimize_cascade_offsets_valid = _offsets_valid(
-            post_minimize_geometries
-        )
+        post_minimize_cascade_offsets_valid = _offsets_valid(post_minimize_geometries)
         post_minimize_cascade_within_viewport = _within_viewport(
             post_minimize_geometries,
             viewport,
@@ -333,17 +331,13 @@ def main() -> None:
         "post_minimize_cascade_geometries="
         f"{_geometry_text(post_minimize_geometries)}"
     )
-    print(
-        "post_minimize_cascade_offsets="
-        f"{_offset_text(post_minimize_geometries)}"
-    )
+    print("post_minimize_cascade_offsets=" f"{_offset_text(post_minimize_geometries)}")
     print(
         "post_minimize_cascade_sizes_normalized="
         f"{post_minimize_cascade_sizes_normalized}"
     )
     print(
-        "post_minimize_cascade_offsets_valid="
-        f"{post_minimize_cascade_offsets_valid}"
+        "post_minimize_cascade_offsets_valid=" f"{post_minimize_cascade_offsets_valid}"
     )
     print(
         "post_minimize_cascade_within_viewport="

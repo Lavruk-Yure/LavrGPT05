@@ -52,12 +52,9 @@ MODE = "RM108_T108_19_DOMINANT_REJECT_CONDITIONAL_EVIDENCE_ANATOMY_TEST_ONLY"
 MINIMUM_GROUP_SIZE = 20
 EPSILON = 1e-12
 T108_08_FILE = (
-    TEST_ROOT
-    / "run_t108_08_macd_weak_reject_residual_segment_move_anatomy_check.py"
+    TEST_ROOT / "run_t108_08_macd_weak_reject_residual_segment_move_anatomy_check.py"
 )
-T108_10_FILE = (
-    TEST_ROOT / "run_t108_10_directional_signal_persistence_anatomy_check.py"
-)
+T108_10_FILE = TEST_ROOT / "run_t108_10_directional_signal_persistence_anatomy_check.py"
 
 
 def _load_module(path: Path, name: str) -> ModuleType:
@@ -203,9 +200,7 @@ def _conditional_rows(
     strategy_events = tuple(
         runtime.strategy_events[key] for key in sorted(runtime.strategy_events)
     )
-    expansion_events, projection_events = VIEW_ALLIGATOR_FAMILIES(
-        strategy_events
-    )
+    expansion_events, projection_events = VIEW_ALLIGATOR_FAMILIES(strategy_events)
     expansion_map = _direction_map(tuple(expansion_events))
     projection_map = _direction_map(tuple(projection_events))
     record_reasons: dict[tuple[datetime, str], set[str]] = {}
@@ -226,9 +221,7 @@ def _conditional_rows(
                 timestamp=source.signal_timestamp,
                 direction=source.direction,
                 residual_move_r=source.residual_move_r,
-                alligator_aligned=(
-                    _alligator_side(observation) == source.direction
-                ),
+                alligator_aligned=(_alligator_side(observation) == source.direction),
                 opening_expansion_aligned=(
                     source.direction
                     in expansion_map.get(source.signal_timestamp, frozenset())
@@ -291,16 +284,9 @@ def _channel_decision(
         rows = rows_by_period[period]
         if any(getattr(row, attribute) is None for row in rows):
             return "UNAVAILABLE"
-        present = _stats(
-            tuple(row for row in rows if getattr(row, attribute) is True)
-        )
-        absent = _stats(
-            tuple(row for row in rows if getattr(row, attribute) is False)
-        )
-        if (
-            present.count < MINIMUM_GROUP_SIZE
-            or absent.count < MINIMUM_GROUP_SIZE
-        ):
+        present = _stats(tuple(row for row in rows if getattr(row, attribute) is True))
+        absent = _stats(tuple(row for row in rows if getattr(row, attribute) is False))
+        if present.count < MINIMUM_GROUP_SIZE or absent.count < MINIMUM_GROUP_SIZE:
             return "SMALL_SAMPLE_ONLY"
         assert present.median_move_r is not None
         assert absent.median_move_r is not None
@@ -332,12 +318,8 @@ def _print_channel(
     print(f"{channel.upper()}_PAIRED_PRESENT_ABSENT")
     for period in ("2025", "2026"):
         rows = rows_by_period[period]
-        present_rows = tuple(
-            row for row in rows if getattr(row, attribute) is True
-        )
-        absent_rows = tuple(
-            row for row in rows if getattr(row, attribute) is False
-        )
+        present_rows = tuple(row for row in rows if getattr(row, attribute) is True)
+        absent_rows = tuple(row for row in rows if getattr(row, attribute) is False)
         unavailable = sum(getattr(row, attribute) is None for row in rows)
         present = _stats(present_rows)
         absent = _stats(absent_rows)
@@ -378,9 +360,7 @@ def main() -> None:
         rows = _conditional_rows(spec.code, result, runtime)
         rows_by_period[spec.code] = rows
         broker_requests += result.broker_requests
-        execution_attempted = (
-            execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
-        )
+        execution_attempted = execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
         print(f"period={spec.code}")
         print(f"  production_baseline={result.baseline}")
         print(f"  factual_reject_events={len(rows)}")

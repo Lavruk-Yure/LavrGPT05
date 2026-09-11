@@ -313,9 +313,7 @@ def _period_rows(spec: Any) -> tuple[Any, Any, tuple[TradeTimingRow, ...]]:
     session = runtime.replay_session
     assert session is not None and session.completed and session.multi_resolution
     execution_events = tuple(
-        event
-        for window in session.execution_windows
-        for event in window
+        event for window in session.execution_windows for event in window
     )
     assert execution_events
     assert all(

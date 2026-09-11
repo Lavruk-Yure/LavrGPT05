@@ -7400,5 +7400,16 @@
     "en": "Downloading: {percent}% · requests {requests} · bars {bars} · earliest bar {covered_start} UTC",
     "uk": "Завантаження: {percent}% · запитів {requests} · барів {bars} · найраніший бар {covered_start} UTC",
     "pl": "Pobieranie: {percent}% · zapytań {requests} · barów {bars} · najwcześniejszy bar {covered_start} UTC"
+  },
+  "AlgorithmWorkspaceHistoricalSummaryDialog.breakEven": {
+    "en": "Break-even:",
+    "uk": "Беззбиткові:",
+    "pl": "Break-even:",
+    "de": "Break-even:",
+    "fr": "À l’équilibre :"
+  },
+  "AlgorithmWorkspaceParametersDialog.logicLegacy": {
+    "en": "Legacy",
+    "uk": "Legacy"
   }
 }

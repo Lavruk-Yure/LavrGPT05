@@ -137,9 +137,7 @@ def _analyze(replay: Any, persistence: int) -> CombinationResult:
 
     rows, _, _ = DECISION_ROWS(replay, persistence)
     same_lists: dict[str, list[Any]] = {name: [] for name in SAME_CLASSES}
-    conflict_lists: dict[str, list[Any]] = {
-        name: [] for name in CONFLICT_CLASSES
-    }
+    conflict_lists: dict[str, list[Any]] = {name: [] for name in CONFLICT_CLASSES}
     neutral_count = 0
     unclassified: Counter[tuple[int, int, int]] = Counter()
     for row in rows:
@@ -154,9 +152,7 @@ def _analyze(replay: Any, persistence: int) -> CombinationResult:
             unclassified[state] += 1
 
     same_rows = {name: tuple(items) for name, items in same_lists.items()}
-    conflict_rows = {
-        name: tuple(items) for name, items in conflict_lists.items()
-    }
+    conflict_rows = {name: tuple(items) for name, items in conflict_lists.items()}
     same_metrics = {
         name: OUTCOME_METRICS(
             replay.events,
@@ -242,12 +238,9 @@ def _print_coverage(results: dict[str, dict[int, CombinationResult]]) -> None:
     for period in PERIOD_CODES:
         for persistence in PERSISTENCES:
             result = results[period][persistence]
-            fields = [
-                f"{name}={len(result.same_rows[name])}" for name in SAME_CLASSES
-            ]
+            fields = [f"{name}={len(result.same_rows[name])}" for name in SAME_CLASSES]
             fields.extend(
-                f"{name}={len(result.conflict_rows[name])}"
-                for name in CONFLICT_CLASSES
+                f"{name}={len(result.conflict_rows[name])}" for name in CONFLICT_CLASSES
             )
             fields.extend(
                 (
@@ -256,10 +249,7 @@ def _print_coverage(results: dict[str, dict[int, CombinationResult]]) -> None:
                     f"total_decision_bars={result.total_rows}",
                 )
             )
-            print(
-                f"period={period}|persistence=P{persistence}|"
-                + "|".join(fields)
-            )
+            print(f"period={period}|persistence=P{persistence}|" + "|".join(fields))
 
 
 def _print_same(results: dict[str, dict[int, CombinationResult]]) -> None:
@@ -481,8 +471,7 @@ def main() -> int:
         replay = RUN_PERIOD(spec)
         replays[spec.code] = replay
         results[spec.code] = {
-            persistence: _analyze(replay, persistence)
-            for persistence in PERSISTENCES
+            persistence: _analyze(replay, persistence) for persistence in PERSISTENCES
         }
     assert tuple(results) == PERIOD_CODES
     assert PRODUCTION_HASHES() == before_hashes

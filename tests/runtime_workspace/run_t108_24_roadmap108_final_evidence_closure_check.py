@@ -28,47 +28,29 @@ MODE = "RM108_T108_24_FINAL_EVIDENCE_CLOSURE_TEST_ONLY"
 SOURCE_IDS = tuple(f"T108-{number:02d}" for number in range(6, 24))
 
 SOURCE_FILES = {
-    "T108-06": (
-        "run_t108_06_production_reject_anatomy_strong_trend_segments_check.py"
-    ),
+    "T108-06": ("run_t108_06_production_reject_anatomy_strong_trend_segments_check.py"),
     "T108-07": (
-        "run_t108_07_macd_weak_prominence_missed_strong_segments_"
-        "anatomy_check.py"
+        "run_t108_07_macd_weak_prominence_missed_strong_segments_" "anatomy_check.py"
     ),
-    "T108-08": (
-        "run_t108_08_macd_weak_reject_residual_segment_move_anatomy_check.py"
-    ),
+    "T108-08": ("run_t108_08_macd_weak_reject_residual_segment_move_anatomy_check.py"),
     "T108-09": "run_t108_09_research_evidence_md7_coverage_audit_check.py",
     "T108-10": "run_t108_10_directional_signal_persistence_anatomy_check.py",
     "T108-11": "run_t108_11_unweighted_family_vote_anatomy_check.py",
     "T108-12": "run_t108_12_signed_family_combination_anatomy_check.py",
-    "T108-13": (
-        "run_t108_13_exact_family_composition_position_state_anatomy_check.py"
-    ),
-    "T108-14": (
-        "run_t108_14_intra_trade_m1_opposite_evidence_timing_anatomy_check.py"
-    ),
+    "T108-13": ("run_t108_13_exact_family_composition_position_state_anatomy_check.py"),
+    "T108-14": ("run_t108_14_intra_trade_m1_opposite_evidence_timing_anatomy_check.py"),
     "T108-15": (
         "run_t108_15_opportunity_normalized_opposite_evidence_anatomy_check.py"
     ),
     "T108-16": "run_t108_16_ms_buy_flat_counterfactual_entry_replay_check.py",
-    "T108-17": (
-        "run_t108_17_ms_buy_counterfactual_excursion_payoff_anatomy_check.py"
-    ),
+    "T108-17": ("run_t108_17_ms_buy_counterfactual_excursion_payoff_anatomy_check.py"),
     "T108-18": "run_t108_18_roadmap108_evidence_synthesis_check.py",
-    "T108-19": (
-        "run_t108_19_dominant_reject_conditional_evidence_anatomy_check.py"
-    ),
+    "T108-19": ("run_t108_19_dominant_reject_conditional_evidence_anatomy_check.py"),
     "T108-20": (
-        "run_t108_20_macd_weak_reject_internal_temporal_geometry_"
-        "anatomy_check.py"
+        "run_t108_20_macd_weak_reject_internal_temporal_geometry_" "anatomy_check.py"
     ),
-    "T108-21": (
-        "run_t108_21_first_weak_reject_counterfactual_entry_replay_check.py"
-    ),
-    "T108-22": (
-        "run_t108_22_causal_weak_reject_population_rebuild_anatomy_check.py"
-    ),
+    "T108-21": ("run_t108_21_first_weak_reject_counterfactual_entry_replay_check.py"),
+    "T108-22": ("run_t108_22_causal_weak_reject_population_rebuild_anatomy_check.py"),
     "T108-23": (
         "run_t108_23_weak_prominence_existing_distance_gate_"
         "counterfactual_entry_check.py"
@@ -245,9 +227,7 @@ def _literal_assignment(text: str, path: Path, name: str) -> Any:
         value = node.value
         assert value.end_lineno is not None
         assert value.end_col_offset is not None
-        selected = source_lines[
-            value.lineno - 1 : value.end_lineno  # noqa: E203
-        ]
+        selected = source_lines[value.lineno - 1 : value.end_lineno]  # noqa: E203
         selected[0] = selected[0][value.col_offset :]  # noqa: E203
         selected[-1] = selected[-1][: value.end_col_offset]
         return ast.literal_eval("\n".join(selected))
@@ -337,10 +317,7 @@ def main() -> int:
     for key, value in BRANCH_CONCLUSIONS:
         print(f"{key}={value}")
     print("normalized_distance_role=SAME_GEOMETRY_NOT_INDEPENDENT_SIGNAL")
-    print(
-        "supertrend_interpretation="
-        "NOT_USELESS_ONLY_REJECTED_STANDALONE_VOTE"
-    )
+    print("supertrend_interpretation=" "NOT_USELESS_ONLY_REJECTED_STANDALONE_VOTE")
     _print_t108_23_results()
 
     print("ROADMAP108_FINAL_DECISIONS")

@@ -52,9 +52,13 @@ ALLIGATOR_SOURCES = (
 )
 STOCHASTIC_SOURCE = "STOCHASTIC_KD_CROSS_14_1_3"
 SUPERTREND_SOURCE = "SUPERTREND_DIRECTION_SWITCH_10_3"
-ALL_SOURCES = MACD_SOURCES + ALLIGATOR_SOURCES + (
-    STOCHASTIC_SOURCE,
-    SUPERTREND_SOURCE,
+ALL_SOURCES = (
+    MACD_SOURCES
+    + ALLIGATOR_SOURCES
+    + (
+        STOCHASTIC_SOURCE,
+        SUPERTREND_SOURCE,
+    )
 )
 
 
@@ -145,8 +149,7 @@ def _event_indexes(replay: Any) -> dict[str, dict[int, int]]:
     """Перетворити factual timestamps T108-10 на source/index/direction map."""
 
     timestamp_indexes = {
-        event.timestamp: index
-        for index, event in enumerate(replay.events)
+        event.timestamp: index for index, event in enumerate(replay.events)
     }
     result: dict[str, dict[int, int]] = {}
     for source in ALL_SOURCES:
@@ -189,10 +192,7 @@ def _decision_rows(
     """Побудувати causal Pn family states без читання наступного bar."""
 
     indexed = _event_indexes(replay)
-    states: dict[str, tuple[int, int] | None] = {
-        source: None
-        for source in ALL_SOURCES
-    }
+    states: dict[str, tuple[int, int] | None] = {source: None for source in ALL_SOURCES}
     rows: list[DecisionRow] = []
     coverage_counter: Counter[str] = Counter()
     conflict_counter: Counter[str] = Counter()
@@ -393,10 +393,7 @@ def _metric_line(score: int, metric: Any) -> str:
 def _non_decreasing(values: list[float]) -> bool:
     """Перевірити лише factual adjacent magnitudes без tuning."""
 
-    return all(
-        right + EPSILON >= left
-        for left, right in zip(values, values[1:])
-    )
+    return all(right + EPSILON >= left for left, right in zip(values, values[1:]))
 
 
 def _monotonicity(metrics: dict[int, Any]) -> tuple[bool, bool]:
@@ -412,8 +409,7 @@ def _distribution(metrics: dict[int, Any]) -> str:
     """Стиснути absolute-score populations в один deterministic рядок."""
 
     return ",".join(
-        f"A{magnitude}:{metrics[magnitude].events}"
-        for magnitude in sorted(metrics)
+        f"A{magnitude}:{metrics[magnitude].events}" for magnitude in sorted(metrics)
     )
 
 

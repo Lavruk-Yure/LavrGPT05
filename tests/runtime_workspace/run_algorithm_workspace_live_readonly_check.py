@@ -544,9 +544,7 @@ def main() -> None:
     validated_before_reconnect = len(reconnect_engine.validated)
     reconnect_engine.set_connected("CTRADER", True)
     assert reconnect_ctrader.advance_broker_market() is not None
-    assert (
-        reconnect_ctrader.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING
-    )
+    assert reconnect_ctrader.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING
     assert len(reconnect_engine.validated) == validated_before_reconnect + 1
     assert reconnect_ctrader.context.runtime_state == WORKSPACE_STATE_RUNNING
     assert reconnect_ctrader.context.startup_phase == WORKSPACE_STARTUP_PHASE_RUNNING

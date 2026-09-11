@@ -23,8 +23,10 @@ from engine.ctrader_history import CTraderHistoryProgressCallback
 from engine.ib_history import IBHistoryProgressCallback
 from engine.runtime_constants import WORKSPACE_REPLAY_SOURCE_CSV
 from engine.risk.account_snapshot import WorkspaceRiskAccountSnapshot
+from engine.risk.constants import RISK_DECISION_ALLOW
 
 from core.algorithm_workspace import (
+    WORKSPACE_CONTROL_MODE_AUTO,
     WORKSPACE_CONTROL_MODE_SEMI,
     WORKSPACE_DATA_MODE_BROKER,
     WORKSPACE_STATE_RESTORED,
@@ -46,6 +48,7 @@ from core.workspace_history_export import (
     WorkspaceHistoryCsvWriter,
 )
 from core.workspace_market_event import WorkspaceMarketEvent
+from core.workspace_signal import WorkspaceSignalRecord
 from core.workspace_ownership import (
     WorkspaceOrderSnapshot,
     WorkspaceOwnedSnapshot,
@@ -146,9 +149,67 @@ class AlgorithmWorkspaceController:
             workspace,
             algorithm_factory=self._algorithm_factory,
             broker_market_provider=self._broker_market_provider,
+            signal_record_observer=self._persist_workspace_trade_after_risk_allow,
         )
         runtime.complete_restore()
         return runtime
+
+    def _persist_workspace_trade_after_risk_allow(
+        self,
+        record: WorkspaceSignalRecord,
+    ) -> None:
+        """Persist one causal Workspace trade after BROKER risk ALLOW."""
+        if (
+            not record.accepted
+            or record.source_mode != WORKSPACE_DATA_MODE_BROKER
+            or record.risk_decision != RISK_DECISION_ALLOW
+        ):
+            return
+
+        runtime = self._runtimes.get(record.workspace_uid)
+        if runtime is None:
+            raise RuntimeError(
+                "Workspace runtime is unavailable for post-risk persistence"
+            )
+        control_mode = runtime.context.control_mode
+        if control_mode == WORKSPACE_CONTROL_MODE_AUTO:
+            execution_state = "READY_FOR_SUBMISSION"
+        elif control_mode == WORKSPACE_CONTROL_MODE_SEMI:
+            execution_state = "PENDING_CONFIRMATION"
+        else:
+            return
+
+        runtime_engine = self._runtime_engine
+        repository = getattr(runtime_engine, "repository", None)
+        create_trade = getattr(repository, "create_trade", None)
+        if not callable(create_trade):
+            raise RuntimeError(
+                "Runtime trade repository is unavailable for Workspace execution"
+            )
+        account_id = str(record.account_id or "").strip()
+        if not account_id:
+            raise RuntimeError(
+                "Workspace BROKER trade persistence requires account_id"
+            )
+        approved_volume = record.approved_volume
+        if approved_volume is None or approved_volume <= 0.0:
+            raise RuntimeError(
+                "Workspace BROKER trade persistence requires approved_volume"
+            )
+
+        create_trade(
+            broker=record.broker,
+            account_id=account_id,
+            symbol=record.symbol,
+            side=record.direction,
+            volume=approved_volume,
+            source="WORKSPACE",
+            workspace_uid=record.workspace_uid,
+            signal_uid=record.signal_uid,
+            execution_origin="WORKSPACE",
+            control_mode=control_mode,
+            execution_state=execution_state,
+        )
 
     def begin_workspace_runtime_start(
         self,

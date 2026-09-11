@@ -201,9 +201,7 @@ def main() -> None:
             window for window in windows if isinstance(window, AlgorithmWorkspaceWindow)
         )
 
-        minimum_width = max(
-            subwindow.minimumWidth() for subwindow in typed_subwindows
-        )
+        minimum_width = max(subwindow.minimumWidth() for subwindow in typed_subwindows)
         minimum_height = max(
             subwindow.minimumHeight() for subwindow in typed_subwindows
         )
@@ -257,21 +255,16 @@ def main() -> None:
             cascade_geometries,
             viewport,
         )
-        all_contents_visible = all(
-            _content_visible(window) for window in typed_windows
-        )
+        all_contents_visible = all(_content_visible(window) for window in typed_windows)
         cascade_offsets_valid = _offsets_valid(cascade_geometries)
         preferred_size_matches_formula = bool(
-            preferred_width == expected_width
-            and preferred_height == expected_height
+            preferred_width == expected_width and preferred_height == expected_height
         )
         preferred_size_above_minimum = bool(
-            preferred_width >= minimum_width
-            and preferred_height >= minimum_height
+            preferred_width >= minimum_width and preferred_height >= minimum_height
         )
         preferred_size_reduced_from_max_fit = bool(
-            preferred_width < maximum_width
-            and preferred_height < maximum_height
+            preferred_width < maximum_width and preferred_height < maximum_height
         )
 
         area.cascade_windows()
@@ -279,9 +272,7 @@ def main() -> None:
         second_cascade_geometries = tuple(
             QRect(subwindow.geometry()) for subwindow in typed_subwindows
         )
-        second_cascade_geometry_stable = (
-            second_cascade_geometries == cascade_geometries
-        )
+        second_cascade_geometry_stable = second_cascade_geometries == cascade_geometries
 
         minimized_subwindows = typed_subwindows[:2]
         for subwindow in minimized_subwindows:
@@ -372,17 +363,13 @@ def main() -> None:
     print(f"preferred_size_matches_formula={preferred_size_matches_formula}")
     print(f"preferred_size_above_minimum={preferred_size_above_minimum}")
     print(
-        "preferred_size_reduced_from_max_fit="
-        f"{preferred_size_reduced_from_max_fit}"
+        "preferred_size_reduced_from_max_fit=" f"{preferred_size_reduced_from_max_fit}"
     )
     print(f"second_cascade_geometry_stable={second_cascade_geometry_stable}")
     print(f"minimized_before_cascade={minimized_before_cascade}")
     print(f"minimized_workspaces_restored={minimized_workspaces_restored}")
     print(f"tile_regression_green={tile_regression_green}")
-    print(
-        "preferred_size_contract_satisfied="
-        f"{preferred_size_contract_satisfied}"
-    )
+    print("preferred_size_contract_satisfied=" f"{preferred_size_contract_satisfied}")
     print("broker_requests=0")
     print("broker_execution_attempted=False")
     print("production_logic_changed=False")

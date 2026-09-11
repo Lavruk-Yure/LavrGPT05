@@ -889,8 +889,7 @@ def _print_roadmap108() -> None:
         "coverage_percent=17.99"
     )
     print(
-        "T108-06|2026|strong_segments=80|traded=14|missed=66|"
-        "coverage_percent=17.50"
+        "T108-06|2026|strong_segments=80|traded=14|missed=66|" "coverage_percent=17.50"
     )
     print("T108-06|dominant_missed_reject_reason=MACD_EXTREMUM_TOO_WEAK")
     print(

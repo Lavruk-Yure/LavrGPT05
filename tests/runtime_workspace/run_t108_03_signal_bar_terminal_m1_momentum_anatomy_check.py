@@ -74,9 +74,7 @@ MOMENTUM_EQUAL = "EQUAL"
 LOSS_LT_WIN = "LOSS_LT_WIN"
 LOSS_GE_WIN = "LOSS_GE_WIN"
 SIGNAL_TERMINAL_WEAKNESS_PRESENT = "SIGNAL_TERMINAL_WEAKNESS_PRESENT"
-SIGNAL_TERMINAL_WEAKNESS_NOT_STABLE = (
-    "SIGNAL_TERMINAL_WEAKNESS_NOT_STABLE_CROSS_PERIOD"
-)
+SIGNAL_TERMINAL_WEAKNESS_NOT_STABLE = "SIGNAL_TERMINAL_WEAKNESS_NOT_STABLE_CROSS_PERIOD"
 
 
 @dataclass(frozen=True, slots=True)
@@ -155,11 +153,7 @@ def _signed_return_r(
     """Нормувати directional price move factual stop distance одного trade."""
 
     assert trade.stop_loss_distance > 0.0
-    return (
-        (end_price - start_price)
-        * _direction(trade)
-        / trade.stop_loss_distance
-    )
+    return (end_price - start_price) * _direction(trade) / trade.stop_loss_distance
 
 
 def _constituent_m1(
@@ -221,8 +215,7 @@ def _aligned_count(
     """Порахувати M1 closes, спрямовані у бік майбутнього trade."""
 
     return sum(
-        _signed_return_r(trade, event.open, event.close) > EPSILON
-        for event in events
+        _signed_return_r(trade, event.open, event.close) > EPSILON for event in events
     )
 
 
@@ -247,17 +240,12 @@ def _build_row(
     _assert_signal_matches_constituents(signal, events)
     signal_return = _signed_return_r(trade, signal.open, signal.close)
     terminal_values = {
-        count: _terminal_net_r(trade, events, count)
-        for count in TERMINAL_WINDOWS
+        count: _terminal_net_r(trade, events, count) for count in TERMINAL_WINDOWS
     }
     terminal_three = terminal_values[3]
     earlier = _signed_return_r(trade, events[0].open, events[-4].close)
     difference = terminal_three - earlier
-    ratio = (
-        terminal_three / earlier
-        if abs(earlier) > EPSILON
-        else None
-    )
+    ratio = terminal_three / earlier if abs(earlier) > EPSILON else None
     signal_range = signal.high - signal.low
     assert signal_range > 0.0
     close_location = (signal.close - signal.low) / signal_range

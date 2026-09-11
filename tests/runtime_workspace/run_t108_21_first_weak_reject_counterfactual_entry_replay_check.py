@@ -44,14 +44,8 @@ PERIOD_CODES = ("2025", "2026")
 EXPECTED_WEAK_COUNTS = {"2025": 136, "2026": 96}
 EXPECTED_FIRST_COUNTS = {"2025": 74, "2026": 50}
 EXPECTED_BASELINE_PREFIXES = {
-    "2025": (
-        "trades:42,wins:30,losses:11,break_even:1,"
-        "net:+4.03,pf:1.5424,dd:3.58"
-    ),
-    "2026": (
-        "trades:18,wins:15,losses:2,break_even:1,"
-        "net:+3.68,pf:3.7669,dd:1.20"
-    ),
+    "2025": ("trades:42,wins:30,losses:11,break_even:1," "net:+4.03,pf:1.5424,dd:3.58"),
+    "2026": ("trades:18,wins:15,losses:2,break_even:1," "net:+3.68,pf:3.7669,dd:1.20"),
 }
 
 
@@ -99,8 +93,7 @@ def _causal_precondition() -> dict[str, bool]:
     ordinal_source = inspect.getsource(causal_cluster_values)
 
     full_segment_observations_used = (
-        "segment.observations" in strong_source
-        and "segment_events" in strong_source
+        "segment.observations" in strong_source and "segment_events" in strong_source
     )
     future_price_used = (
         "max(item.high for item in segment_events)" in strong_source
@@ -136,12 +129,8 @@ def _causal_precondition() -> dict[str, bool]:
     )
     assert not membership_causal
     return {
-        "strong_trend_segment_membership_causal_at_decision_time": (
-            membership_causal
-        ),
-        "first_weak_reject_ordinal_prior_current_only": (
-            ordinal_prior_current_only
-        ),
+        "strong_trend_segment_membership_causal_at_decision_time": (membership_causal),
+        "first_weak_reject_ordinal_prior_current_only": (ordinal_prior_current_only),
         "eventual_segment_observations_used_by_population": (
             full_segment_observations_used
         ),
@@ -198,18 +187,12 @@ def main() -> int:
         result, runtime = RUN_WITH_RUNTIME(spec)
         rows = BUILD_ROWS(spec.code, result, runtime)
         weak_count = len(rows)
-        first_count = sum(
-            int(row.values["reject_ordinal"]) == 1 for row in rows
-        )
+        first_count = sum(int(row.values["reject_ordinal"]) == 1 for row in rows)
         assert weak_count == EXPECTED_WEAK_COUNTS[spec.code]
         assert first_count == EXPECTED_FIRST_COUNTS[spec.code]
-        assert result.baseline.startswith(
-            EXPECTED_BASELINE_PREFIXES[spec.code]
-        )
+        assert result.baseline.startswith(EXPECTED_BASELINE_PREFIXES[spec.code])
         broker_requests += result.broker_requests
-        execution_attempted = (
-            execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
-        )
+        execution_attempted = execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
         print(
             f"period={spec.code}|factual_weak_reject_events={weak_count}|"
             f"expected={EXPECTED_WEAK_COUNTS[spec.code]}|reconciled=True"
@@ -228,8 +211,7 @@ def main() -> int:
 
     print("DECISION")
     print(
-        "FIRST_WEAK_REJECT_ENTRY_HYPOTHESIS="
-        "CAUSAL_ENTRY_HYPOTHESIS_NOT_EXECUTABLE"
+        "FIRST_WEAK_REJECT_ENTRY_HYPOTHESIS=" "CAUSAL_ENTRY_HYPOTHESIS_NOT_EXECUTABLE"
     )
     print("production_approval=False")
     print("substitute_logic_created=False")

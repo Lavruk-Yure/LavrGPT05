@@ -71,9 +71,7 @@ from engine.services.ib_runtime_service import IBRuntimeService  # noqa: E402
 TEST_ID = "T109-04"
 MODE = "BROKER_RISK_ACCOUNT_SNAPSHOT_BINDING_PATH_ANATOMY_TEST_ONLY"
 FACTUAL_VERDICT = "A. SNAPSHOT_NOT_CREATED"
-FIRST_BROKEN_BOUNDARY = (
-    "RUNTIME_ACCOUNT_STATE_TO_WORKSPACE_RISK_ACCOUNT_SNAPSHOT"
-)
+FIRST_BROKEN_BOUNDARY = "RUNTIME_ACCOUNT_STATE_TO_WORKSPACE_RISK_ACCOUNT_SNAPSHOT"
 BOUNDARY_CONTRACT = (
     "BROKER_ACCOUNT_STATE_REQUIRES_EXPLICIT_WORKSPACE_RISK_SNAPSHOT_ROUTE"
 )
@@ -246,15 +244,12 @@ def _run_mode(
             (
                 record
                 for record in reversed(runtime.signal_records())
-                if record.risk_reason_code
-                == RISK_REASON_ACCOUNT_BINDING_MISMATCH
+                if record.risk_reason_code == RISK_REASON_ACCOUNT_BINDING_MISMATCH
             ),
             None,
         )
     if matching_record is None:
-        raise AssertionError(
-            f"{control_mode} ACCOUNT_BINDING_MISMATCH record missing"
-        )
+        raise AssertionError(f"{control_mode} ACCOUNT_BINDING_MISMATCH record missing")
     result = ModeSnapshotFact(
         control_mode=control_mode,
         snapshot_present_after_start=snapshot_present_after_start,
@@ -274,9 +269,7 @@ def _run_mode(
 def main() -> None:
     """Виконати static/executable anatomy та надрукувати factual verdict."""
     hashes_before = _production_hashes()
-    constructor_calls = _call_sites(
-        function_name="WorkspaceRiskAccountSnapshot"
-    )
+    constructor_calls = _call_sites(function_name="WorkspaceRiskAccountSnapshot")
     replay_factory_calls = _call_sites(
         function_name="",
         attribute_name="from_replay_settings",
@@ -293,12 +286,8 @@ def main() -> None:
         runtime, _rejects, requests = run_canonical_period(spec)
         baselines[spec.code] = runtime
         broker_requests += requests
-    canonical_2025_exact_match = (
-        _baseline_key(baselines["2025"]) == EXPECTED_2025
-    )
-    canonical_2026_exact_match = (
-        _baseline_key(baselines["2026"]) == EXPECTED_2026
-    )
+    canonical_2025_exact_match = _baseline_key(baselines["2025"]) == EXPECTED_2025
+    canonical_2026_exact_match = _baseline_key(baselines["2026"]) == EXPECTED_2026
     replay_session = baselines["2025"].replay_session
     if replay_session is None or not replay_session.completed:
         raise AssertionError("canonical completed Replay input missing")
@@ -307,15 +296,11 @@ def main() -> None:
     semi = _run_mode(WORKSPACE_CONTROL_MODE_SEMI, events)
     facts = (auto, semi)
     broker_requests += sum(fact.broker_requests for fact in facts)
-    broker_execution_attempted = any(
-        fact.broker_execution_attempted for fact in facts
-    )
+    broker_execution_attempted = any(fact.broker_execution_attempted for fact in facts)
     hashes_after = _production_hashes()
 
     definition_line = inspect.getsourcelines(WorkspaceRiskAccountSnapshot)[1]
-    setter_line = inspect.getsourcelines(
-        WorkspaceRuntime.set_risk_account_snapshot
-    )[1]
+    setter_line = inspect.getsourcelines(WorkspaceRuntime.set_risk_account_snapshot)[1]
     binding_inputs = "workspace_uid,broker,account_id,source_mode"
 
     assert constructor_calls == ("core/workspace_runtime.py:552",)
@@ -332,8 +317,7 @@ def main() -> None:
     assert all(not fact.snapshot_present_after_start for fact in facts)
     assert all(not fact.snapshot_present_at_risk for fact in facts)
     assert all(
-        fact.risk_reason == RISK_REASON_ACCOUNT_BINDING_MISMATCH
-        for fact in facts
+        fact.risk_reason == RISK_REASON_ACCOUNT_BINDING_MISMATCH for fact in facts
     )
     assert hashes_before == hashes_after
     assert broker_requests == 0

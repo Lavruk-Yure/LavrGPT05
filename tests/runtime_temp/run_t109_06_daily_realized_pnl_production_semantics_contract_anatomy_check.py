@@ -66,9 +66,9 @@ PRODUCTION_FILES = (
 def production_hashes() -> dict[str, str]:
     """Зафіксувати scoped production sources до і після TEST_ONLY anatomy."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -82,9 +82,7 @@ def definition_line(relative_path: str, exact_fragment: str) -> int:
     """Знайти exact production call-site без виклику protected API."""
     lines = source_text(relative_path).splitlines()
     matches = [
-        number
-        for number, line in enumerate(lines, start=1)
-        if exact_fragment in line
+        number for number, line in enumerate(lines, start=1) if exact_fragment in line
     ]
     if len(matches) != 1:
         raise AssertionError(
@@ -115,33 +113,25 @@ def main() -> None:
     ib_source = source_text("engine/ib_adapter.py")
     ib_service_source = source_text("engine/services/ib_runtime_service.py")
     ctrader_source = source_text("engine/ctrader_adapter.py")
-    ctrader_service_source = source_text(
-        "engine/services/ctrader_runtime_service.py"
-    )
+    ctrader_service_source = source_text("engine/services/ctrader_runtime_service.py")
     replay_source = source_text("core/workspace_replay_execution.py")
     workspace_runtime_source = source_text("core/workspace_runtime.py")
 
-    request_fields = tuple(
-        field.name for field in fields(WorkspaceRiskRequest)
-    )
+    request_fields = tuple(field.name for field in fields(WorkspaceRiskRequest))
     snapshot_fields = tuple(
         field.name for field in fields(WorkspaceRiskAccountSnapshot)
     )
-    runtime_state_fields = tuple(
-        field.name for field in fields(RuntimeAccountState)
-    )
+    runtime_state_fields = tuple(field.name for field in fields(RuntimeAccountState))
 
     risk_sign_formula_defined = (
-        "max(0.0, -request.daily_realized_pnl) / request.equity * 100.0"
-        in risk_source
+        "max(0.0, -request.daily_realized_pnl) / request.equity * 100.0" in risk_source
     )
     risk_missing_value_guard_defined = (
         "if request.daily_realized_pnl is None:" in risk_source
         and "RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING" in risk_source
     )
     risk_limit_guard_defined = (
-        "daily_loss_percent >= self.policy.max_daily_loss_percent"
-        in risk_source
+        "daily_loss_percent >= self.policy.max_daily_loss_percent" in risk_source
     )
     risk_scope_defined = any(
         token in snapshot_source or token in risk_source
@@ -196,8 +186,7 @@ def main() -> None:
         "def pnl(" in ib_source or "self._client.reqPnL(" in ib_source
     )
     ib_runtime_daily_cache_defined = (
-        "daily_realized_pnl" in ib_service_source
-        or "daily_pnl" in ib_service_source
+        "daily_realized_pnl" in ib_service_source or "daily_pnl" in ib_service_source
     )
 
     ctrader_unrealized_facts_defined = all(
@@ -250,8 +239,7 @@ def main() -> None:
         )
     )
     replay_fees_applied = any(
-        token in replay_source
-        for token in ("commission", "swap", "fee")
+        token in replay_source for token in ("commission", "swap", "fee")
     )
 
     assert "daily_realized_pnl" in request_fields
@@ -282,12 +270,8 @@ def main() -> None:
         runtime, _rejects, requests = run_canonical_period(spec)
         baselines[spec.code] = runtime
         broker_requests += requests
-    canonical_2025_exact_match = (
-        baseline_key(baselines["2025"]) == EXPECTED_2025
-    )
-    canonical_2026_exact_match = (
-        baseline_key(baselines["2026"]) == EXPECTED_2026
-    )
+    canonical_2025_exact_match = baseline_key(baselines["2025"]) == EXPECTED_2025
+    canonical_2026_exact_match = baseline_key(baselines["2026"]) == EXPECTED_2026
     broker_execution_attempted = False
     broker_neutral_contract_defined = False
     hashes_after = production_hashes()
@@ -388,15 +372,11 @@ def main() -> None:
         "reset to 0 on engine initialization/reset; no calendar/broker-day reset"
     )
     print("replay_semantics_transferable_to_broker=False")
-    print(
-        f"broker_neutral_contract_defined={broker_neutral_contract_defined}"
-    )
+    print(f"broker_neutral_contract_defined={broker_neutral_contract_defined}")
     print(f"first_unresolved_boundary={FIRST_UNRESOLVED_BOUNDARY}")
     print(f"boundary_contract={BOUNDARY_CONTRACT}")
     print(f"factual_verdict={FACTUAL_VERDICT}")
-    print(
-        "unresolved_fields=scope,content,day_boundary,reset_semantics"
-    )
+    print("unresolved_fields=scope,content,day_boundary,reset_semantics")
     print(
         "exact_call_sites="
         f"risk_formula=engine/risk/risk_model.py:{risk_formula_line}; "

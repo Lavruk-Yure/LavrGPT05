@@ -1123,8 +1123,7 @@ class WorkspaceRuntime:
                 spread=self.context.current_spread,
                 state_before=trace_state_before,
                 state_after=(
-                    f"{self.context.runtime_state}/"
-                    f"{self.context.startup_phase}"
+                    f"{self.context.runtime_state}/" f"{self.context.startup_phase}"
                 ),
                 latest_bar_timestamp=(
                     current_event.timestamp if current_event is not None else None
@@ -1139,9 +1138,7 @@ class WorkspaceRuntime:
             incoming_event_timestamp=event.timestamp,
             spread=event.spread,
             state_before=trace_state_before,
-            state_after=(
-                f"{self.context.runtime_state}/{self.context.startup_phase}"
-            ),
+            state_after=(f"{self.context.runtime_state}/{self.context.startup_phase}"),
             latest_bar_timestamp=(
                 current_event.timestamp if current_event is not None else None
             ),

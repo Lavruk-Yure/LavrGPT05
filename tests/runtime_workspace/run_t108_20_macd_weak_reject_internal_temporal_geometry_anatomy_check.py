@@ -237,12 +237,8 @@ def _rows(period: str, result: Any, runtime: Any) -> tuple[AnatomyRow, ...]:
                 diagnostic.crossover_steepness_per_minute
             ),
             "macd_slope_per_minute": float(diagnostic.macd_slope_per_minute),
-            "signal_slope_per_minute": float(
-                diagnostic.signal_slope_per_minute
-            ),
-            "effective_angle_degrees": float(
-                diagnostic.effective_angle_degrees
-            ),
+            "signal_slope_per_minute": float(diagnostic.signal_slope_per_minute),
+            "effective_angle_degrees": float(diagnostic.effective_angle_degrees),
             "reject_ordinal": float(ordinal),
             "prior_weak_rejects": float(prior),
             "elapsed_bars_from_first_weak_reject": float(elapsed),
@@ -352,9 +348,7 @@ def _print_distributions(rows_by_period: dict[str, tuple[AnatomyRow, ...]]) -> N
         for feature in FEATURES:
             for group in OUTCOME_GROUPS:
                 rows = tuple(
-                    row
-                    for row in rows_by_period[period]
-                    if row.outcome_group == group
+                    row for row in rows_by_period[period] if row.outcome_group == group
                 )
                 stats = _distribution(rows, feature)
                 print(
@@ -419,9 +413,7 @@ def _print_ordinal_bins(rows_by_period: dict[str, tuple[AnatomyRow, ...]]) -> No
     for period in PERIOD_CODES:
         for bin_name in ORDINAL_BINS:
             rows = tuple(
-                row
-                for row in rows_by_period[period]
-                if _ordinal_bin(row) == bin_name
+                row for row in rows_by_period[period] if _ordinal_bin(row) == bin_name
             )
             moves = tuple(row.residual_move_r for row in rows)
             reached_1r = sum(row.reached_1r for row in rows)
@@ -445,9 +437,7 @@ def _period_separation(rows: tuple[AnatomyRow, ...], feature: str) -> int:
         )
         for group in OUTCOME_GROUPS
     }
-    if any(
-        item.count < MINIMUM_OUTCOME_GROUP_SIZE for item in groups.values()
-    ):
+    if any(item.count < MINIMUM_OUTCOME_GROUP_SIZE for item in groups.values()):
         return 0
     win = groups["REACHED_2R"]
     middle = groups["REACHED_1R_ONLY"]
@@ -562,9 +552,7 @@ def main() -> int:
         rows_by_period[spec.code] = rows
         thresholds[spec.code] = _thresholds(runtime)
         broker_requests += result.broker_requests
-        execution_attempted = (
-            execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
-        )
+        execution_attempted = execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
         print(
             f"period={spec.code}|factual_weak_reject_events={len(rows)}|"
             f"expected={EXPECTED_COUNTS[spec.code]}|reconciled=True"
@@ -579,8 +567,7 @@ def main() -> int:
     _print_iqr_overlap(rows_by_period)
     _print_ordinal_bins(rows_by_period)
     feature_decisions = {
-        feature: _feature_decision(rows_by_period, feature)
-        for feature in FEATURES
+        feature: _feature_decision(rows_by_period, feature) for feature in FEATURES
     }
     print("FEATURE_SEPARATION_DECISIONS")
     for feature, decision in feature_decisions.items():
@@ -590,8 +577,7 @@ def main() -> int:
     for name, decision in decisions.items():
         print(f"{name}={decision}")
     promising = any(
-        value == "CROSS_PERIOD_SEPARATION_CANDIDATE"
-        for value in decisions.values()
+        value == "CROSS_PERIOD_SEPARATION_CANDIDATE" for value in decisions.values()
     )
     print(
         "NEXT_STEP="

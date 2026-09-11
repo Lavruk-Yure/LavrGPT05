@@ -145,9 +145,9 @@ def _proto_fields(message_type: Any) -> tuple[str, ...]:
 def _production_hashes() -> dict[str, str]:
     """Зафіксувати scoped production sources до і після TEST_ONLY run."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -301,8 +301,13 @@ def main() -> None:
     )
     local_ids_linked = all(
         "trade_uid" in columns
-        for columns in (trade_columns, plan_columns, broker_order_columns,
-                        position_columns, ib_leg_columns)
+        for columns in (
+            trade_columns,
+            plan_columns,
+            broker_order_columns,
+            position_columns,
+            ib_leg_columns,
+        )
     )
 
     trade_created_before_submission = all(
@@ -320,7 +325,8 @@ def main() -> None:
     )
     trade_to_order_one_to_many = bool(
         "trade_uid TEXT NOT NULL" in schema
-        and "trade_uid TEXT NOT NULL UNIQUE" not in re.search(
+        and "trade_uid TEXT NOT NULL UNIQUE"
+        not in re.search(
             r"CREATE TABLE IF NOT EXISTS order_plans \((.*?)\n\);",
             schema,
             re.DOTALL,
@@ -337,27 +343,23 @@ def main() -> None:
     )
     runtime_positions_allow_many_per_trade = bool(
         "trade_uid" in position_columns
-        and "trade_uid TEXT NOT NULL UNIQUE" not in re.search(
+        and "trade_uid TEXT NOT NULL UNIQUE"
+        not in re.search(
             r"CREATE TABLE IF NOT EXISTS positions \((.*?)\n\);",
             schema,
             re.DOTALL,
         ).group(1)
     )
-    ib_virtual_leg_one_per_trade = (
-        "trade_uid TEXT NOT NULL UNIQUE" in re.search(
-            r"CREATE TABLE IF NOT EXISTS ib_virtual_position_legs "
-            r"\((.*?)\n\);",
-            schema,
-            re.DOTALL,
-        ).group(1)
-    )
+    ib_virtual_leg_one_per_trade = "trade_uid TEXT NOT NULL UNIQUE" in re.search(
+        r"CREATE TABLE IF NOT EXISTS ib_virtual_position_legs " r"\((.*?)\n\);",
+        schema,
+        re.DOTALL,
+    ).group(1)
 
     ctrader_new_order_fields = _proto_fields(
         getattr(ctrader_api_messages, "ProtoOANewOrderReq")
     )
-    ctrader_deal_fields = _proto_fields(
-        getattr(ctrader_model_messages, "ProtoOADeal")
-    )
+    ctrader_deal_fields = _proto_fields(getattr(ctrader_model_messages, "ProtoOADeal"))
     ctrader_hint_available = all(
         field_name in ctrader_new_order_fields
         for field_name in ("clientOrderId", "label", "comment")
@@ -596,8 +598,7 @@ def main() -> None:
         f"{workspace_execution_source_marker_required}"
     )
     print(
-        "reverse_identity_contract_supported="
-        f"{reverse_identity_contract_supported}"
+        "reverse_identity_contract_supported=" f"{reverse_identity_contract_supported}"
     )
     print(
         "open_positions_ownership_bridge_supported="

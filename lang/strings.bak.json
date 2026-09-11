@@ -2,53 +2,8 @@
   "lang_active": {
     "code": "uk"
   },
-  "AlgorithmWorkspaceWindow.colClosedAt": {
-    "en": "Closed",
-    "uk": "Закрито"
-  },
   "AlgorithmWorkspaceWindow.signalGoJournalHint": {
     "en": "Open journal records for the selected signal timestamp."
-  },
-  "AlgorithmWorkspaceWindow.chartDrawSegmentHint": {
-    "en": "Slanted segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: finish. Left click while drawing: finish this segment and continue a polyline from the same point.",
-    "uk": "Похилий відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші. ПКМ — завершити лінію. ЛКМ під час побудови — завершити поточний відрізок і продовжити ламану з цієї ж точки."
-  },
-  "AlgorithmWorkspaceWindow.chartDrawHorizontalHint": {
-    "en": "Horizontal segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: second point.",
-    "uk": "Горизонтальний відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші, ПКМ — друга точка."
-  },
-  "AlgorithmWorkspaceWindow.chartDrawVerticalHint": {
-    "en": "Vertical segment. Click to enable or disable. Right click: first point. Move the mouse. Right click: second point.",
-    "uk": "Вертикальний відрізок. Натисни кнопку, щоб увімкнути; натисни ще раз, щоб вимкнути. ПКМ — перша точка, далі рух миші, ПКМ — друга точка."
-  },
-  "AlgorithmWorkspaceWindow.chartDrawClearHint": {
-    "en": "Clear all temporary manual lines from the current chart.",
-    "uk": "Очистити всі тимчасові ручні лінії на поточній діаграмі."
-  },
-  "AlgorithmWorkspaceWindow.chartDrawingStartLabel": {
-    "en": "Start",
-    "uk": "Початок"
-  },
-  "AlgorithmWorkspaceWindow.chartDrawingEndLabel": {
-    "en": "End",
-    "uk": "Кінець"
-  },
-  "AlgorithmWorkspaceWindow.chartDrawingLineLabel": {
-    "en": "Line",
-    "uk": "Лінія"
-  },
-  "AlgorithmWorkspaceWindow.chartDrawingTimeLabel": {
-    "en": "Time UTC",
-    "uk": "Час UTC"
-  },
-  "AlgorithmWorkspaceWindow.chartDrawingValueLabel": {
-    "en": "Value",
-    "uk": "Значення"
-  },
-  "AlgorithmWorkspaceHistoryDownloadDialog.statusProgress": {
-    "en": "Downloading: {percent}% · requests {requests} · bars {bars} · earliest bar {covered_start} UTC",
-    "uk": "Завантаження: {percent}% · запитів {requests} · барів {bars} · найраніший бар {covered_start} UTC",
-    "pl": "Pobieranie: {percent}% · zapytań {requests} · barów {bars} · najwcześniejszy bar {covered_start} UTC"
   },
   "WorkspaceParameterGroup.dataReplay.title": {
     "en": "Data and Replay",
@@ -72,11 +27,11 @@
   },
   "WorkspaceParameterGroup.signals.description": {
     "en": "Independent signal sources added one by one during testing.",
-    "uk": "Незалежні джерела сигналів додаються по одному під час тестування."
+    "uk": "Незалежні джерела сигналів додавалися по одному під час тестування."
   },
   "WorkspaceParameterGroup.riskManagement.description": {
     "en": "Limits applied before any broker execution is permitted.",
-    "uk": "Обмеження застосовуються до того, як буде дозволено будь-яке виконання брокерських операцій."
+    "uk": "Обмеження застосовуються до того, як брокеру буде дозволено виконати операцію."
   },
   "WorkspaceParameterGroup.execution.title": {
     "en": "Execution",
@@ -112,7 +67,7 @@
   },
   "WorkspaceParameter.maximumPositionVolume.description": {
     "en": "Hard upper limit for the volume requested by one WSP signal.",
-    "uk": "Жорстка верхня межа обсягу, що запитується одним сигналом WSP."
+    "uk": "Жорстка верхня межа обсягу, запитуваного одним сигналом WSP."
   },
   "WorkspaceParameter.maximumOpenPositions.title": {
     "en": "Maximum open positions",
@@ -136,7 +91,7 @@
   },
   "WorkspaceParameter.requireStopLoss.description": {
     "en": "Reject every trade intent that has no Stop Loss.",
-    "uk": "Відхиляйте кожну спробу укладення угоди, яка не має стоп-лосса."
+    "uk": "Відхиляйте кожну спробу укладення угоди, яка не має стоп-лосу."
   },
   "WorkspaceParameter.profitDrawdownClosePercent.title": {
     "en": "Profit drawdown close, %",
@@ -145,5 +100,16 @@
   "WorkspaceParameter.profitDrawdownClosePercent.description": {
     "en": "Local close decision after the configured profit drawdown.",
     "uk": "Рішення про закриття позиції на місцевому рівні після налаштованого відкату прибутку."
+  },
+  "AlgorithmWorkspaceHistoricalSummaryDialog.breakEven": {
+    "en": "Break-even:",
+    "uk": "Беззбиткові:",
+    "pl": "Break-even:",
+    "de": "Break-even:",
+    "fr": "À l’équilibre :"
+  },
+  "AlgorithmWorkspaceParametersDialog.logicLegacy": {
+    "en": "Legacy",
+    "uk": "Legacy"
   }
 }

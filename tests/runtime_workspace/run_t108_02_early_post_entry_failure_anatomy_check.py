@@ -79,9 +79,7 @@ ABOVE_ENTRY = "ABOVE_ENTRY"
 BELOW_ENTRY = "BELOW_ENTRY"
 FLAT = "FLAT"
 EARLY_FAILURE_PATTERN_PRESENT = "EARLY_FAILURE_PATTERN_PRESENT"
-EARLY_FAILURE_PATTERN_NOT_STABLE = (
-    "EARLY_FAILURE_PATTERN_NOT_STABLE_CROSS_PERIOD"
-)
+EARLY_FAILURE_PATTERN_NOT_STABLE = "EARLY_FAILURE_PATTERN_NOT_STABLE_CROSS_PERIOD"
 
 
 @dataclass(frozen=True, slots=True)
@@ -228,9 +226,11 @@ def _build_row(
 
     selected = _trade_events(trade, events, timestamps)
     snapshots = tuple(
-        _available_horizon(trade, selected, horizon)
-        if len(selected) >= horizon
-        else _closed_horizon(horizon)
+        (
+            _available_horizon(trade, selected, horizon)
+            if len(selected) >= horizon
+            else _closed_horizon(horizon)
+        )
         for horizon in HORIZONS
     )
 
@@ -339,15 +339,9 @@ def _print_required_summary(
         for horizon in HORIZONS:
             below, available, closed = _below_entry_counts(population, horizon)
             suffix = "bar" if horizon == 1 else "bars"
-            print(
-                f"{period}_{label}_below_entry_after_{horizon}_{suffix}={below}"
-            )
-            print(
-                f"{period}_{label}_available_after_{horizon}_{suffix}={available}"
-            )
-            print(
-                f"{period}_{label}_closed_before_{horizon}_{suffix}={closed}"
-            )
+            print(f"{period}_{label}_below_entry_after_{horizon}_{suffix}={below}")
+            print(f"{period}_{label}_available_after_{horizon}_{suffix}={available}")
+            print(f"{period}_{label}_closed_before_{horizon}_{suffix}={closed}")
         for horizon in VERDICT_HORIZONS:
             median = statistics.median(_available_values(population, horizon))
             suffix = "bar" if horizon == 1 else "bars"
@@ -503,13 +497,11 @@ def _period_pattern(rows: tuple[EarlyFailureRow, ...]) -> bool:
         win_values = _available_values(wins, horizon)
         loss_below, loss_available, _ = _below_entry_counts(losses, horizon)
         win_below, win_available, _ = _below_entry_counts(wins, horizon)
-        median_separated = (
-            statistics.median(loss_values) + EPSILON
-            < statistics.median(win_values)
+        median_separated = statistics.median(loss_values) + EPSILON < statistics.median(
+            win_values
         )
         rate_separated = (
-            loss_below / loss_available
-            > win_below / win_available + EPSILON
+            loss_below / loss_available > win_below / win_available + EPSILON
         )
         if not median_separated or not rate_separated:
             return False
@@ -536,8 +528,7 @@ def main() -> None:
         _print_outcome_comparison(period, rows)
 
     period_patterns = {
-        period: _period_pattern(rows_by_period[period])
-        for period in ("2025", "2026")
+        period: _period_pattern(rows_by_period[period]) for period in ("2025", "2026")
     }
     pattern_stable = all(period_patterns.values())
     verdict = (

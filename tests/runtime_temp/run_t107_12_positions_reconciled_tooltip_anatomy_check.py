@@ -65,12 +65,7 @@ def _column_index(translation_key: str) -> int:
 
 def _single_line(text: str) -> str:
     """Зберегти повний tooltip в одному machine-readable output рядку."""
-    return (
-        str(text)
-        .replace("—", "\\u2014")
-        .replace("\r", "\\r")
-        .replace("\n", "\\n")
-    )
+    return str(text).replace("—", "\\u2014").replace("\r", "\\r").replace("\n", "\\n")
 
 
 def main() -> None:
@@ -143,16 +138,12 @@ def main() -> None:
         current_status_cell_text = status_item.text()
         current_status_cell_tooltip = status_item.toolTip()
         underlying_reconciliation_state = position.reconciliation_status
-        underlying_state_is_reconciled = (
-            underlying_reconciliation_state == RECONCILED
-        )
+        underlying_state_is_reconciled = underlying_reconciliation_state == RECONCILED
         tooltip_contains_reconciled = RECONCILED in status_cell_tooltip
         current_status_tooltip_contains_reconciled = (
             RECONCILED in current_status_cell_tooltip
         )
-        legacy_column_is_closed_at = (
-            LEGACY_ASSERTION_COLUMN == closed_at_column
-        )
+        legacy_column_is_closed_at = LEGACY_ASSERTION_COLUMN == closed_at_column
         ui_matches_current_production_state = bool(
             position.active
             and underlying_state_is_reconciled
@@ -188,10 +179,7 @@ def main() -> None:
     print(f"status_cell_text={_single_line(status_cell_text)}")
     print(f"status_cell_tooltip={_single_line(status_cell_tooltip)}")
     print(f"current_status_cell_text={_single_line(current_status_cell_text)}")
-    print(
-        "current_status_cell_tooltip="
-        f"{_single_line(current_status_cell_tooltip)}"
-    )
+    print("current_status_cell_tooltip=" f"{_single_line(current_status_cell_tooltip)}")
     print(f"underlying_reconciliation_state={underlying_reconciliation_state}")
     print(f"underlying_position_active={position.active}")
     print(f"underlying_state_is_reconciled={underlying_state_is_reconciled}")
@@ -201,13 +189,9 @@ def main() -> None:
         f"{current_status_tooltip_contains_reconciled}"
     )
     print(
-        "ui_matches_current_production_state="
-        f"{ui_matches_current_production_state}"
+        "ui_matches_current_production_state=" f"{ui_matches_current_production_state}"
     )
-    print(
-        "old_area_assertion_currently_valid="
-        f"{old_area_assertion_currently_valid}"
-    )
+    print("old_area_assertion_currently_valid=" f"{old_area_assertion_currently_valid}")
     print(f"failure_classification={failure_classification}")
     print("broker_requests=0")
     print("broker_execution_attempted=False")

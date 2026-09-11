@@ -54,7 +54,9 @@ from run_t108_06_production_reject_anatomy_strong_trend_segments_check import ( 
     _strong_move_r,
 )
 
-from core.workspace_algorithm import create_registered_workspace_algorithm  # noqa: E402, E501
+from core.workspace_algorithm import (
+    create_registered_workspace_algorithm,
+)  # noqa: E402, E501
 from core.workspace_alligator import (  # noqa: E402
     WorkspaceMacdAlligatorReplayAlgorithm,
 )
@@ -97,8 +99,7 @@ def _missed_strong_segments(
     missed: list[TrendSegment] = []
     for segment in _segments(tuple(signal_filter.observations)):
         assert all(
-            item.timestamp in runtime.strategy_events
-            for item in segment.observations
+            item.timestamp in runtime.strategy_events for item in segment.observations
         )
         if _strong_move_r(segment, runtime.strategy_events) < STRONG_MOVE_R:
             continue
@@ -123,9 +124,7 @@ def _diagnostics_in_segments(
         for item in segment.observations
     }
     return tuple(
-        item
-        for item in diagnostics
-        if (item.timestamp, item.direction) in segment_keys
+        item for item in diagnostics if (item.timestamp, item.direction) in segment_keys
     )
 
 
@@ -167,12 +166,8 @@ def _run_period(spec) -> PeriodAnatomy:
         for record in runtime.historical_signal_records
         if record.filter_reason_code == MACD_QUALITY_REASON_EXTREMUM_TOO_WEAK
     )
-    diagnostic_keys = Counter(
-        (item.timestamp, item.direction) for item in all_weak
-    )
-    record_keys = Counter(
-        (item.timestamp, item.direction) for item in rejected_records
-    )
+    diagnostic_keys = Counter((item.timestamp, item.direction) for item in all_weak)
+    record_keys = Counter((item.timestamp, item.direction) for item in rejected_records)
     assert diagnostic_keys == record_keys
     assert all(item.extremum_prominence is not None for item in all_weak)
     assert all(not item.criterion_prominence_pass for item in all_weak)
@@ -231,15 +226,9 @@ def _print_period(period: str, anatomy: PeriodAnatomy) -> None:
     }
     print(f"period={period}")
     print(f"  production_baseline={anatomy.baseline}")
-    print(
-        "  production_extremum_min_prominence="
-        f"{anatomy.minimum_prominence:.10f}"
-    )
+    print("  production_extremum_min_prominence=" f"{anatomy.minimum_prominence:.10f}")
     print(f"  missed_strong_segments={len(anatomy.missed_strong_segments)}")
-    print(
-        "  missed_strong_segments_with_weak_reject="
-        f"{len(segments_with_weak)}"
-    )
+    print("  missed_strong_segments_with_weak_reject=" f"{len(segments_with_weak)}")
     _print_population(
         "all_production_weak_reject",
         anatomy.all_weak,

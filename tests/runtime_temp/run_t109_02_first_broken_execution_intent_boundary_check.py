@@ -131,9 +131,7 @@ def _intent_call_sites() -> IntentCallSiteInventory:
                     continue
                 if not any(item.arg == "trade_intent" for item in node.keywords):
                     continue
-                target = (
-                    production_assignments if is_production else test_assignments
-                )
+                target = production_assignments if is_production else test_assignments
                 target.append(_site(path, node.lineno))
     return IntentCallSiteInventory(
         production_constructors=tuple(sorted(production_constructors)),
@@ -265,9 +263,7 @@ def main() -> None:
     auto = _run_mode(WORKSPACE_CONTROL_MODE_AUTO, broker_events)
     semi = _run_mode(WORKSPACE_CONTROL_MODE_SEMI, broker_events)
     inventory = _intent_call_sites()
-    guard_present, risk_call_present, post_record_creator = (
-        _record_signal_contract()
-    )
+    guard_present, risk_call_present, post_record_creator = _record_signal_contract()
     hashes_after = _production_hashes()
 
     facts = (auto, semi)
@@ -334,10 +330,7 @@ def main() -> None:
         "trade_intent_production_creators="
         f"{_joined(inventory.production_constructors)}"
     )
-    print(
-        "trade_intent_test_only_creators="
-        f"{_joined(inventory.test_constructors)}"
-    )
+    print("trade_intent_test_only_creators=" f"{_joined(inventory.test_constructors)}")
     print(
         "trade_intent_production_proposal_assignments="
         f"{_joined(inventory.production_proposal_assignments)}"

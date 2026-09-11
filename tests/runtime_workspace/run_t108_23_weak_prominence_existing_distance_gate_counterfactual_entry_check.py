@@ -49,12 +49,8 @@ MODE = (
     "RM108_T108_23_WEAK_PROMINENCE_EXISTING_DISTANCE_GATE_"
     "COUNTERFACTUAL_ENTRY_TEST_ONLY"
 )
-SOURCE_SCRIPT = (
-    "run_t108_22_causal_weak_reject_population_rebuild_anatomy_check.py"
-)
-EXECUTION_SCRIPT = (
-    "run_t108_16_ms_buy_flat_counterfactual_entry_replay_check.py"
-)
+SOURCE_SCRIPT = "run_t108_22_causal_weak_reject_population_rebuild_anatomy_check.py"
+EXECUTION_SCRIPT = "run_t108_16_ms_buy_flat_counterfactual_entry_replay_check.py"
 PERIOD_CODES = ("2025", "2026")
 EXPECTED_POPULATIONS = {"2025": 1679, "2026": 1209}
 EXPECTED_THRESHOLD = 0.00005
@@ -132,9 +128,7 @@ class CounterfactualResult:
     broker_requests: int
 
 
-class DistanceGateCounterfactualAlgorithm(
-    WorkspaceMacdAlligatorReplayAlgorithm
-):
+class DistanceGateCounterfactualAlgorithm(WorkspaceMacdAlligatorReplayAlgorithm):
     """Емітувати лише causal distance-pass proposals заданого напрямку."""
 
     def __init__(
@@ -219,12 +213,10 @@ def _position_blocked(row: Any, trades: tuple[Any, ...]) -> bool:
 
     decision_at = row.timestamp + M15_DELTA
     active = any(
-        trade.entry_timestamp < decision_at <= trade.close_timestamp
-        for trade in trades
+        trade.entry_timestamp < decision_at <= trade.close_timestamp for trade in trades
     )
     simultaneous_entry = any(
-        trade.signal_timestamp == row.timestamp
-        and trade.entry_timestamp == decision_at
+        trade.signal_timestamp == row.timestamp and trade.entry_timestamp == decision_at
         for trade in trades
     )
     return active or simultaneous_entry
@@ -324,18 +316,13 @@ def _run_counterfactual(
     execution = runtime.replay_execution
     assert execution is not None
     assert execution.policy.maximum_open_positions == 1
-    created = sum(
-        entry.event == "VIRTUAL_ORDER_CREATED" for entry in runtime.journal
-    )
-    blocked = sum(
-        entry.event == "VIRTUAL_ORDER_BLOCKED" for entry in runtime.journal
-    )
+    created = sum(entry.event == "VIRTUAL_ORDER_CREATED" for entry in runtime.journal)
+    blocked = sum(entry.event == "VIRTUAL_ORDER_BLOCKED" for entry in runtime.journal)
     added_blocked, pending_blocked = _capacity_blocking(audit, runtime)
     assert blocked == added_blocked + pending_blocked
     assert created + blocked == len(audit.executable)
     cancelled = sum(
-        order.status == "CANCELLED_SESSION_END"
-        for order in execution.snapshot().orders
+        order.status == "CANCELLED_SESSION_END" for order in execution.snapshot().orders
     )
     assert len(_trades(runtime)) + cancelled == created
     assert broker_probe.requests == 0
@@ -486,8 +473,7 @@ def main() -> int:
         baseline[spec.code] = (runtime, anatomy, audit)
         broker_requests += baseline_result.broker_requests
         baseline_execution_attempted = (
-            baseline_execution_attempted
-            or BROKER_EXECUTION_ATTEMPTED(runtime)
+            baseline_execution_attempted or BROKER_EXECUTION_ATTEMPTED(runtime)
         )
         print(
             f"period={spec.code}|production_minimum_distance="

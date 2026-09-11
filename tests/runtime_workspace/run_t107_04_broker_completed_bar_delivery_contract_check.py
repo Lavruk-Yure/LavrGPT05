@@ -262,8 +262,7 @@ def main() -> None:
     production_algorithm.on_market_event(completed_broker_event)
     production_components_received_one_completed_bar = bool(
         len(production_macd.observations) == production_macd_before + 1
-        and len(production_alligator.observations)
-        == production_alligator_before + 1
+        and len(production_alligator.observations) == production_alligator_before + 1
     )
     production_algorithm.stop()
 
@@ -316,14 +315,8 @@ def main() -> None:
     print(f"test_id={TEST_ID}")
     print(f"mode={MODE}")
     print(f"same_bucket_updates={same_bucket_updates}")
-    print(
-        "same_timestamp_events_dispatched="
-        f"{same_timestamp_events_dispatched}"
-    )
-    print(
-        "partial_bucket_reached_algorithm="
-        f"{partial_bucket_reached_algorithm}"
-    )
+    print("same_timestamp_events_dispatched=" f"{same_timestamp_events_dispatched}")
+    print("partial_bucket_reached_algorithm=" f"{partial_bucket_reached_algorithm}")
     print(
         "previous_bucket_dispatched_once_on_rollover="
         f"{previous_bucket_dispatched_once_on_rollover}"
@@ -332,10 +325,7 @@ def main() -> None:
         "completed_timestamps_strictly_increasing="
         f"{completed_timestamps_strictly_increasing}"
     )
-    print(
-        "macd_accepts_broker_completed_bar="
-        f"{macd_accepts_broker_completed_bar}"
-    )
+    print("macd_accepts_broker_completed_bar=" f"{macd_accepts_broker_completed_bar}")
     print(
         "production_components_received_one_completed_bar="
         f"{production_components_received_one_completed_bar}"

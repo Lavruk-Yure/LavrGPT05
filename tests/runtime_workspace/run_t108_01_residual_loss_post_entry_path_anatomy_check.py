@@ -105,11 +105,7 @@ def _execution_events(
 
     session = runtime.replay_session
     assert session is not None and session.completed and session.multi_resolution
-    events = tuple(
-        event
-        for window in session.execution_windows
-        for event in window
-    )
+    events = tuple(event for window in session.execution_windows for event in window)
     assert events
     assert all(event.timeframe == session.source_timeframe == "M1" for event in events)
     assert all(
@@ -359,17 +355,13 @@ def main() -> None:
         print(f"{period}_loss_mfe_ge_1_00r={full}")
 
     for period in ("2025", "2026"):
-        profit_then_loss = sum(
-            row.profit_then_loss for row in rows_by_period[period]
-        )
+        profit_then_loss = sum(row.profit_then_loss for row in rows_by_period[period])
         print(f"{period}_loss_profit_then_loss={profit_then_loss}")
     print(
-        "loss_close_reason_counts_2025="
-        f"{_close_reason_text(rows_by_period['2025'])}"
+        "loss_close_reason_counts_2025=" f"{_close_reason_text(rows_by_period['2025'])}"
     )
     print(
-        "loss_close_reason_counts_2026="
-        f"{_close_reason_text(rows_by_period['2026'])}"
+        "loss_close_reason_counts_2026=" f"{_close_reason_text(rows_by_period['2026'])}"
     )
     print(f"local_structure_metric={LOCAL_STRUCTURE_METRIC}")
     print("bar_numbers=ONE_BASED_FROM_ENTRY;ZERO_MEANS_NO_NONZERO_EXCURSION")

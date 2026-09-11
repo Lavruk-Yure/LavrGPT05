@@ -163,7 +163,7 @@ def _previous_window(
     """Вибрати count completed M15 строго перед signal bar."""
 
     assert count in WINDOWS and signal_index >= count
-    selected = events[signal_index - count:signal_index]
+    selected = events[signal_index - count : signal_index]
     assert len(selected) == count
     return selected
 
@@ -255,15 +255,13 @@ def _build_row(
     assert trade.entry_timestamp == expected_entry
     assert signal_index >= max(WINDOWS) + 1
     windows = {
-        count: _previous_window(events, signal_index, count)
-        for count in WINDOWS
+        count: _previous_window(events, signal_index, count) for count in WINDOWS
     }
     direction_windows = {
-        count: events[signal_index - count - 1:signal_index]
-        for count in WINDOWS
+        count: events[signal_index - count - 1 : signal_index] for count in WINDOWS
     }
     assert all(len(direction_windows[count]) == count + 1 for count in WINDOWS)
-    causal_events = events[:signal_index + 1]
+    causal_events = events[: signal_index + 1]
     assert all(
         event.timestamp + timedelta(minutes=M15_MINUTES) <= trade.entry_timestamp
         for event in causal_events
@@ -303,9 +301,7 @@ def _build_row(
         previous_10_m15_body_to_range_median=_body_to_range_median(windows[10]),
         previous_3_m15_net_move_to_sum_range=_net_move_to_sum_range(windows[3]),
         previous_5_m15_net_move_to_sum_range=_net_move_to_sum_range(windows[5]),
-        previous_10_m15_net_move_to_sum_range=_net_move_to_sum_range(
-            windows[10]
-        ),
+        previous_10_m15_net_move_to_sum_range=_net_move_to_sum_range(windows[10]),
         overlap_ratio_prev_3=_overlap_ratio(windows[3]),
         overlap_ratio_prev_5=_overlap_ratio(windows[5]),
     )

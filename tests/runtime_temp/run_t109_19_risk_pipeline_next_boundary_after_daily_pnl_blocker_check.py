@@ -133,9 +133,9 @@ class ModeProbeFact:
 def _production_hashes() -> dict[str, str]:
     """Зафіксувати scoped production modules до і після TEST_ONLY probe."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -292,10 +292,7 @@ def _assert_surrogate(fact: ModeProbeFact) -> None:
     assert fact.snapshot.daily_realized_pnl == DAILY_PNL_SURROGATE
     assert fact.snapshot.open_positions_count is None
     assert fact.record.risk_decision == "BLOCK"
-    assert (
-        fact.record.risk_reason_code
-        == RISK_REASON_OPEN_POSITIONS_SNAPSHOT_MISSING
-    )
+    assert fact.record.risk_reason_code == RISK_REASON_OPEN_POSITIONS_SNAPSHOT_MISSING
     assert not fact.record.risk_execution_attempted
 
 
@@ -347,8 +344,7 @@ def main() -> None:
         for fact in facts
     )
     production_missing_daily_pnl_still_blocks = all(
-        fact.record.risk_reason_code
-        == RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
+        fact.record.risk_reason_code == RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
         for fact in (production_auto, production_semi)
     )
     auto_signal_accepted = (
@@ -360,12 +356,10 @@ def main() -> None:
     auto_risk_entered = auto.record.risk_decision is not None
     semi_risk_entered = semi.record.risk_decision is not None
     auto_daily_pnl_guard_passed = (
-        auto.record.risk_reason_code
-        != RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
+        auto.record.risk_reason_code != RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
     )
     semi_daily_pnl_guard_passed = (
-        semi.record.risk_reason_code
-        != RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
+        semi.record.risk_reason_code != RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING
     )
     auto_risk_allowed = auto.record.risk_decision == RISK_DECISION_ALLOW
     semi_risk_allowed = semi.record.risk_decision == RISK_DECISION_ALLOW

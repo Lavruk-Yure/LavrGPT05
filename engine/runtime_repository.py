@@ -134,15 +134,51 @@ class RuntimeRepository:
         volume: float,
         source: str = "MANUAL",
         comment: str = "",
+        *,
+        workspace_uid: str | None = None,
+        signal_uid: str | None = None,
+        execution_origin: str | None = None,
+        control_mode: str | None = None,
+        execution_state: str | None = None,
     ) -> str:
         """
         Створити Trade до відправлення order брокеру.
 
-        Повертає trade_uid.
+        Для Workspace execution пара ``workspace_uid`` + ``signal_uid`` є
+        ідемпотентним causal key: повторний виклик повертає той самий trade_uid.
+        Manual/legacy виклики залишають Workspace identity порожньою.
         """
-        trade_uid = str(uuid4())
+        broker_clean = str(broker).strip().upper()
+        account_clean = str(account_id).strip()
+        symbol_clean = str(symbol).strip().upper()
+        side_clean = str(side).strip().upper()
+        source_clean = str(source).strip().upper()
+        comment_clean = str(comment or "").strip()
+        workspace_clean = str(workspace_uid or "").strip() or None
+        signal_clean = str(signal_uid or "").strip() or None
+        execution_origin_clean = str(execution_origin or "").strip().upper() or None
+        control_mode_clean = str(control_mode or "").strip().upper() or None
+        execution_state_clean = str(execution_state or "").strip().upper() or None
 
-        self._connection.execute(
+        if (workspace_clean is None) != (signal_clean is None):
+            raise ValueError("workspace_uid and signal_uid must be provided together")
+
+        workspace_identity_present = workspace_clean is not None
+        if workspace_identity_present and any(
+            value is None
+            for value in (
+                execution_origin_clean,
+                control_mode_clean,
+                execution_state_clean,
+            )
+        ):
+            raise ValueError(
+                "Workspace trade requires execution_origin, control_mode "
+                "and execution_state"
+            )
+
+        trade_uid = str(uuid4())
+        cursor = self._connection.execute(
             """
             INSERT INTO trades (
                 trade_uid,
@@ -153,26 +189,75 @@ class RuntimeRepository:
                 volume,
                 created_utc,
                 source,
-                comment
+                comment,
+                workspace_uid,
+                signal_uid,
+                execution_origin,
+                control_mode,
+                execution_state
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(workspace_uid, signal_uid) DO NOTHING
             """,
             (
                 trade_uid,
-                str(broker).strip().upper(),
-                str(account_id).strip(),
-                str(symbol).strip().upper(),
-                str(side).strip().upper(),
+                broker_clean,
+                account_clean,
+                symbol_clean,
+                side_clean,
                 float(volume),
                 utc_now_iso(),
-                str(source).strip().upper(),
-                str(comment or "").strip(),
+                source_clean,
+                comment_clean,
+                workspace_clean,
+                signal_clean,
+                execution_origin_clean,
+                control_mode_clean,
+                execution_state_clean,
             ),
         )
 
-        self._connection.commit()
+        if cursor.rowcount == 1 or not workspace_identity_present:
+            self._connection.commit()
+            return trade_uid
 
-        return trade_uid
+        existing = self._connection.execute(
+            """
+            SELECT *
+            FROM trades
+            WHERE workspace_uid = ?
+              AND signal_uid = ?
+            """,
+            (workspace_clean, signal_clean),
+        ).fetchone()
+        if existing is None:
+            self._connection.rollback()
+            raise RuntimeError("Workspace trade idempotency lookup failed")
+
+        expected = {
+            "broker": broker_clean,
+            "account_id": account_clean,
+            "symbol": symbol_clean,
+            "side": side_clean,
+            "volume": float(volume),
+            "source": source_clean,
+            "execution_origin": execution_origin_clean,
+            "control_mode": control_mode_clean,
+        }
+        mismatches = [
+            field
+            for field, expected_value in expected.items()
+            if existing[field] != expected_value
+        ]
+        if mismatches:
+            self._connection.rollback()
+            raise ValueError(
+                "Workspace trade causal key conflicts with persisted trade: "
+                + ", ".join(mismatches)
+            )
+
+        self._connection.commit()
+        return str(existing["trade_uid"])
 
     def create_order_plan(
         self,

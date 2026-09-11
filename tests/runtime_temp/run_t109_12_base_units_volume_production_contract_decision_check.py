@@ -65,9 +65,7 @@ CANDIDATE_SCOPE = (
 STANDARD_FX_BASE_UNITS_PER_LOT = 100_000.0
 EXPECTED_2025 = "42/30/11/1/+4.03/1.5424/3.58"
 EXPECTED_2026 = "18/15/2/1/+3.68/3.7669/1.20"
-FACTUAL_VERDICT = (
-    "C. BASE_UNITS_ARITHMETIC_OK_BUT_CURRENCY_NORMALIZATION_UNRESOLVED"
-)
+FACTUAL_VERDICT = "C. BASE_UNITS_ARITHMETIC_OK_BUT_CURRENCY_NORMALIZATION_UNRESOLVED"
 FIRST_UNRESOLVED_BOUNDARY = (
     "FX_QUOTE_CURRENCY_ESTIMATED_LOSS_TO_ACCOUNT_CURRENCY_RISK_NORMALIZATION"
 )
@@ -119,9 +117,9 @@ def _source_section(relative_path: str, start: str, end: str) -> str:
 def _production_hashes() -> dict[str, str]:
     """Зафіксувати production sources до і після TEST_ONLY harness."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -202,8 +200,7 @@ def main() -> None:
 
     default_is_1000 = bool(
         DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME == 1000.0
-        and "DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME = 1000.0"
-        in risk_constants
+        and "DEFAULT_WORKSPACE_MAXIMUM_POSITION_VOLUME = 1000.0" in risk_constants
     )
     persisted_3000_exists = all(
         token in risk_settings_test
@@ -219,23 +216,29 @@ def main() -> None:
             "result[volume_key] = self.maximum_position_volume",
         )
     )
-    ui_has_no_unit = all(
-        token in parameter_catalog
-        for token in (
-            'title="Maximum position volume"',
-            '"Hard upper limit for the volume requested by one WSP signal."',
+    ui_has_no_unit = (
+        all(
+            token in parameter_catalog
+            for token in (
+                'title="Maximum position volume"',
+                '"Hard upper limit for the volume requested by one WSP signal."',
+            )
         )
-    ) and "base units" not in parameter_catalog.lower()
+        and "base units" not in parameter_catalog.lower()
+    )
 
-    requested_chain_unchanged = all(
-        token in intent_section
-        for token in (
-            "fixed_volume=self.risk_policy.maximum_position_volume",
-            "requested_volume = policy.fixed_volume",
-            "requested_volume=requested_volume",
-            "estimated_loss_at_stop=protection_distance * requested_volume",
+    requested_chain_unchanged = (
+        all(
+            token in intent_section
+            for token in (
+                "fixed_volume=self.risk_policy.maximum_position_volume",
+                "requested_volume = policy.fixed_volume",
+                "requested_volume=requested_volume",
+                "estimated_loss_at_stop=protection_distance * requested_volume",
+            )
         )
-    ) and "requested_volume: float" in workspace_signal
+        and "requested_volume: float" in workspace_signal
+    )
     approved_chain_unchanged = all(
         token in risk_model
         for token in (
@@ -244,21 +247,27 @@ def main() -> None:
         )
     )
 
-    workspace_feed_is_forex = all(
-        token in workspace_feed
-        for token in (
-            '"get_workspace_forex_quote_snapshot"',
-            "RuntimeEngine does not provide Forex quote snapshots",
+    workspace_feed_is_forex = (
+        all(
+            token in workspace_feed
+            for token in (
+                '"get_workspace_forex_quote_snapshot"',
+                "RuntimeEngine does not provide Forex quote snapshots",
+            )
         )
-    ) and "get_workspace_forex_quote_snapshot" in runtime_engine
-    ctrader_scope_is_current_forex = all(
-        token in ctrader_symbols
-        for token in (
-            "CTRADER_FOREX_SYMBOLS",
-            "symbolCategoryId == 1 (Forex)",
-            "get_enabled_symbol_id",
+        and "get_workspace_forex_quote_snapshot" in runtime_engine
+    )
+    ctrader_scope_is_current_forex = (
+        all(
+            token in ctrader_symbols
+            for token in (
+                "CTRADER_FOREX_SYMBOLS",
+                "symbolCategoryId == 1 (Forex)",
+                "get_enabled_symbol_id",
+            )
         )
-    ) and "ctr_symbols.get_enabled_symbol_id(symbol_name)" in ctrader_adapter
+        and "ctr_symbols.get_enabled_symbol_id(symbol_name)" in ctrader_adapter
+    )
     ib_scope_is_forex = all(
         token in ib_order_section
         for token in (
@@ -289,7 +298,7 @@ def main() -> None:
         )
     )
     snapshot_has_no_currency = "currency:" not in account_snapshot
-    runtime_account_has_currency = "currency: str = \"\"" in runtime_account
+    runtime_account_has_currency = 'currency: str = ""' in runtime_account
     risk_currency_conversion_present = any(
         token in risk_model + account_snapshot
         for token in (
@@ -338,8 +347,7 @@ def main() -> None:
         and "1.00 lot = 10_000_000 api-volume" in ctrader_lot
     )
     ctrader_symbol_step_present = any(
-        token in ctrader_lot
-        for token in ("VOLUME_STEP", "volume_step", "step_volume")
+        token in ctrader_lot for token in ("VOLUME_STEP", "volume_step", "step_volume")
     )
 
     units_1000_lots = _base_units_to_lots(1000.0)

@@ -88,9 +88,9 @@ def _source_text(relative_path: str) -> str:
 def _production_hashes() -> dict[str, str]:
     """Повернути exact SHA-256 scoped production sources."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -154,15 +154,13 @@ def main() -> None:
     ib_adapter_source = _source_text("engine/ib_adapter.py")
     ib_service_source = _source_text("engine/services/ib_runtime_service.py")
     ctrader_adapter_source = _source_text("engine/ctrader_adapter.py")
-    ctrader_service_source = _source_text(
-        "engine/services/ctrader_runtime_service.py"
-    )
+    ctrader_service_source = _source_text("engine/services/ctrader_runtime_service.py")
     ctrader_symbols_source = _source_text("core/ctrader_symbols.py")
 
     snapshot_fields = tuple(
         field.name for field in fields(WorkspaceRiskAccountSnapshot)
     )
-    runtime_account_currency_present = "currency: str = \"\"" in account_state_source
+    runtime_account_currency_present = 'currency: str = ""' in account_state_source
     workspace_risk_snapshot_currency_present = "currency" in snapshot_fields
     workspace_runtime_account_currency_available = any(
         token in workspace_runtime_source
@@ -172,7 +170,7 @@ def main() -> None:
         token in ib_adapter_source + ib_service_source
         for token in (
             "reqAccountSummary",
-            'self._account_state.currency = account.currency',
+            "self._account_state.currency = account.currency",
             'net_liquidation.get("currency")',
         )
     )
@@ -206,10 +204,10 @@ def main() -> None:
     )
     eur_base, eur_quote = _split_six_char_fx_symbol("EURUSD")
     usd_base, usd_quote = _split_six_char_fx_symbol("USDJPY")
-    symbol_scenarios_exact = (
-        (eur_base, eur_quote) == ("EUR", "USD")
-        and (usd_base, usd_quote) == ("USD", "JPY")
-    )
+    symbol_scenarios_exact = (eur_base, eur_quote) == ("EUR", "USD") and (
+        usd_base,
+        usd_quote,
+    ) == ("USD", "JPY")
     symbol_currency_contract_reliable = bool(
         ib_symbol_contract
         and ctrader_symbol_contract
@@ -383,8 +381,7 @@ def main() -> None:
     )
     print("base_equals_account_source_complete=False")
     print(
-        "cross_required_formula=loss_quote*QUOTEACCOUNT or "
-        "loss_quote/ACCOUNTQUOTE"
+        "cross_required_formula=loss_quote*QUOTEACCOUNT or " "loss_quote/ACCOUNTQUOTE"
     )
     print(
         "cross_rate_source=RuntimeEngine broker Forex quote snapshot for an "

@@ -89,9 +89,9 @@ def _source(relative_path: str) -> str:
 def _production_hashes() -> dict[str, str]:
     """Зафіксувати SHA-256 усіх production sources у перевіреному scope."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -121,18 +121,14 @@ def main() -> None:
     ib_source = _source("engine/ib_adapter.py")
     ib_service_source = _source("engine/services/ib_runtime_service.py")
     ctrader_source = _source("engine/ctrader_adapter.py")
-    ctrader_service_source = _source(
-        "engine/services/ctrader_runtime_service.py"
-    )
+    ctrader_service_source = _source("engine/services/ctrader_runtime_service.py")
     db_source = _source("engine/db/runtime_db.py")
     repository_source = _source("engine/runtime_repository.py")
     replay_source = _source("core/workspace_replay_execution.py")
     runtime_source = _source("core/workspace_runtime.py")
     risk_source = _source("engine/risk/risk_model.py")
 
-    account_state_fields = tuple(
-        field.name for field in fields(RuntimeAccountState)
-    )
+    account_state_fields = tuple(field.name for field in fields(RuntimeAccountState))
     snapshot_fields = tuple(
         field.name for field in fields(WorkspaceRiskAccountSnapshot)
     )
@@ -154,8 +150,7 @@ def main() -> None:
     ib_commission_report = "def commissionReport(" in ib_source
     ib_swap_source = "swap" in ib_source.lower()
     ib_runtime_daily_cache = any(
-        token in ib_service_source
-        for token in ("daily_realized_pnl", "daily_pnl")
+        token in ib_service_source for token in ("daily_realized_pnl", "daily_pnl")
     )
     ib_day_metadata = any(
         token in ib_source
@@ -183,8 +178,7 @@ def main() -> None:
         )
     )
     ctrader_runtime_daily_cache = any(
-        token in ctrader_service_source
-        for token in ("daily_realized_pnl", "daily_pnl")
+        token in ctrader_service_source for token in ("daily_realized_pnl", "daily_pnl")
     )
     ctrader_day_metadata = any(
         token in ctrader_source
@@ -215,8 +209,7 @@ def main() -> None:
         )
     )
     local_account_wide_query = all(
-        token in repository_source
-        for token in ("daily_realized_pnl", "account_wide")
+        token in repository_source for token in ("daily_realized_pnl", "account_wide")
     )
 
     replay_accumulator = all(
@@ -239,8 +232,7 @@ def main() -> None:
         for token in ("broker_session_day", "daily_reset", "day_boundary")
     )
     replay_costs = any(
-        token in replay_source.lower()
-        for token in ("commission", "swap", "fee")
+        token in replay_source.lower() for token in ("commission", "swap", "fee")
     )
 
     assert "account_id" in account_state_fields
@@ -275,12 +267,8 @@ def main() -> None:
         runtime, _rejects, requests = run_canonical_period(spec)
         baselines[spec.code] = runtime
         broker_requests += requests
-    canonical_2025_exact_match = (
-        _baseline_key(baselines["2025"]) == EXPECTED_2025
-    )
-    canonical_2026_exact_match = (
-        _baseline_key(baselines["2026"]) == EXPECTED_2026
-    )
+    canonical_2025_exact_match = _baseline_key(baselines["2025"]) == EXPECTED_2025
+    canonical_2026_exact_match = _baseline_key(baselines["2026"]) == EXPECTED_2026
 
     ib_contract_complete = False
     ctrader_contract_complete = False
@@ -320,9 +308,7 @@ def main() -> None:
     print("ib_day_boundary_source=UNDEFINED_IN_PRODUCTION_CONTRACT")
     print("ib_new_broker_request_required=True")
     print(f"ib_contract_complete={ib_contract_complete}")
-    print(
-        "ctrader_realized_pnl_source=ABSENT_OPEN_POSITION_UNREALIZED_ONLY"
-    )
+    print("ctrader_realized_pnl_source=ABSENT_OPEN_POSITION_UNREALIZED_ONLY")
     print("ctrader_scope=OPEN_POSITION_LEVEL_UNREALIZED_ONLY")
     print("ctrader_currency=ACCOUNT_CURRENCY_FOR_UNREALIZED_POSITION_PNL")
     print("ctrader_commission_source=ABSENT_NO_DEAL_HISTORY_ROUTE")
@@ -345,8 +331,7 @@ def main() -> None:
     print(f"swap_source_complete={swap_source_complete}")
     print(f"net_realized_pnl_derivable={net_realized_pnl_derivable}")
     print(
-        "replay_realized_pnl_source=WorkspaceReplayExecutionEngine."
-        "realized_profit"
+        "replay_realized_pnl_source=WorkspaceReplayExecutionEngine." "realized_profit"
     )
     print("replay_realized_pnl_scope=WORKSPACE_REPLAY_EXECUTION_SESSION")
     print(

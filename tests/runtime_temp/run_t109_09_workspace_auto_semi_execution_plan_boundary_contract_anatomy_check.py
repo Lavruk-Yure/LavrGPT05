@@ -90,9 +90,9 @@ def schema_columns(schema: str, table: str) -> tuple[str, ...]:
 def production_hashes() -> dict[str, str]:
     """Зафіксувати scoped production sources до і після anatomy run."""
     return {
-        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
+        path.relative_to(PROJECT_ROOT)
+        .as_posix(): hashlib.sha256(path.read_bytes())
+        .hexdigest()
         for path in PRODUCTION_FILES
     }
 
@@ -261,8 +261,7 @@ def main() -> None:
         "    @property\n    def workspace_uid(",
     )
     workspace_runtime_has_engine = any(
-        token in workspace_runtime_init
-        for token in ("runtime_engine", "RuntimeEngine")
+        token in workspace_runtime_init for token in ("runtime_engine", "RuntimeEngine")
     )
     controller_has_engine = all(
         token in controller_init + controller_engine_setter
@@ -303,7 +302,8 @@ def main() -> None:
     )
 
     repository_create_trade_has_identity = all(
-        token in source_section(
+        token
+        in source_section(
             "engine/runtime_repository.py",
             "    def create_trade(",
             "    def create_order_plan(",
@@ -311,7 +311,8 @@ def main() -> None:
         for token in ("workspace_uid", "signal_uid")
     )
     repository_create_plan_has_identity = all(
-        token in source_section(
+        token
+        in source_section(
             "engine/runtime_repository.py",
             "    def create_order_plan(",
             "    def create_broker_order(",

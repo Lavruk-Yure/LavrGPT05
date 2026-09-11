@@ -299,17 +299,14 @@ def _family_fields(
 
     eligible_count = sum(row.trade_has_any_eligible_opportunity for row in rows)
     with_evidence = tuple(
-        row
-        for row in rows
-        if row.family[family].opposite_evidence_opportunities > 0
+        row for row in rows if row.family[family].opposite_evidence_opportunities > 0
     )
     opposite_count = sum(
         row.family[family].opposite_evidence_opportunities for row in rows
     )
     total_opportunities = sum(row.eligible_m15_opportunities for row in rows)
     first_indexes = (
-        row.family[family].first_opposite_opportunity_index
-        for row in with_evidence
+        row.family[family].first_opposite_opportunity_index for row in with_evidence
     )
     return (
         f"family={family}|trades_with_opposite_evidence={len(with_evidence)}|"
@@ -396,8 +393,7 @@ def _stochastic_coverage(rows: tuple[OpportunityTradeRow, ...]) -> float | None:
     """Порахувати trade-level Stochastic opposite coverage у зрізі."""
 
     found = sum(
-        row.family["STOCHASTIC"].opposite_evidence_opportunities > 0
-        for row in rows
+        row.family["STOCHASTIC"].opposite_evidence_opportunities > 0 for row in rows
     )
     return _percent(found, len(rows))
 
