@@ -34,10 +34,6 @@ from engine.db.runtime_db import (
     insert_runtime_event,
     insert_session,
 )
-from engine.ib_history import (
-    IBHistoryDownloadResult,
-    IBHistoryProgressCallback,
-)
 from engine.ib_fx_external_exposure import (
     IB_FX_EXTERNAL_EXPOSURE_CONFIRMED,
     IB_FX_GUARD_EVIDENCE_UNAVAILABLE,
@@ -47,6 +43,10 @@ from engine.ib_fx_external_exposure import (
     IBFxExternalExposureExecutionBlockedError,
     IBFxExternalExposureGuardDecision,
     evaluate_ib_fx_external_exposure_guard,
+)
+from engine.ib_history import (
+    IBHistoryDownloadResult,
+    IBHistoryProgressCallback,
 )
 from engine.ib_order_errors import (
     IBManualOpenConfirmationPendingError,
@@ -778,7 +778,7 @@ class RuntimeEngine:
             ):
                 external_signed_volume = group.display_signed_volume
 
-            if abs(external_signed_volume) <= (IB_POSITION_QUANTITY_ABS_TOLERANCE):
+            if abs(external_signed_volume) <= IB_POSITION_QUANTITY_ABS_TOLERANCE:
                 continue
 
             current_exposure = IBFxExternalExposure(
@@ -3357,7 +3357,7 @@ class RuntimeEngine:
         reconnect_task = RuntimeReconnectTask(
             runtime_service=service,
             reconnect_cooldown_seconds=CTRADER_RECONNECT_COOLDOWN_SECONDS,
-            failure_backoff_seconds=(CTRADER_RECONNECT_FAILURE_BACKOFF_SECONDS),
+            failure_backoff_seconds=CTRADER_RECONNECT_FAILURE_BACKOFF_SECONDS,
         )
 
         self._ctrader_reconnect_task = reconnect_task
@@ -4612,6 +4612,150 @@ class RuntimeEngine:
             "control_mode": control_mode_norm,
             "display_comment": display_comment,
             "broker_comment": broker_comment,
+        }
+
+    def submit_workspace_execution_plan(
+        self,
+        trade_uid: str,
+        order_plan_uid: str,
+        *,
+        reverse_required: bool = False,
+        confirmed_flat: bool = False,
+    ) -> dict:
+        """Відправити вже persisted Workspace execution plan брокеру.
+
+        Метод не створює повторно Trade або OrderPlan. Він приймає тільки
+        Workspace chain у стані READY_FOR_SUBMISSION, перевіряє exact
+        broker/account binding, конвертує broker-specific volume та після
+        успішної відправки persist-ить BrokerOrder. Position створюється
+        окремо після broker confirmation/reconciliation.
+        """
+        trade_uid_clean = str(trade_uid or "").strip()
+        order_plan_uid_clean = str(order_plan_uid or "").strip()
+        if not trade_uid_clean or not order_plan_uid_clean:
+            raise ValueError("Workspace trade_uid and order_plan_uid are required")
+
+        chain = self.repository.get_trade_chain(trade_uid_clean)
+        trade = chain.get("trade")
+        if trade is None:
+            raise RuntimeError("Workspace persisted trade is unavailable")
+        if str(trade.get("source") or "").strip().upper() != "WORKSPACE":
+            raise RuntimeError("Workspace submission requires WORKSPACE trade")
+
+        plans = [
+            plan
+            for plan in chain.get("order_plans", [])
+            if str(plan.get("order_plan_uid") or "").strip() == order_plan_uid_clean
+        ]
+        if len(plans) != 1:
+            raise RuntimeError("Workspace persisted execution plan is unavailable")
+        plan = plans[0]
+        if str(plan.get("source") or "").strip().upper() != "WORKSPACE":
+            raise RuntimeError("Workspace submission requires WORKSPACE order plan")
+
+        existing_orders = [
+            row
+            for row in chain.get("broker_orders", [])
+            if str(row.get("order_plan_uid") or "").strip() == order_plan_uid_clean
+        ]
+        if existing_orders:
+            existing = existing_orders[-1]
+            return {
+                "trade_uid": trade_uid_clean,
+                "order_plan_uid": order_plan_uid_clean,
+                "broker_order_uid": str(existing.get("broker_order_uid") or ""),
+                "broker_order_id": existing.get("broker_order_id"),
+                "execution_status": str(existing.get("execution_status") or ""),
+                "already_submitted": True,
+            }
+
+        control_mode = str(trade.get("control_mode") or "").strip().upper()
+        if control_mode not in {"AUTO", "SEMI"}:
+            raise RuntimeError("Workspace submission requires AUTO or SEMI mode")
+        execution_state = str(trade.get("execution_state") or "").strip().upper()
+        if execution_state != "READY_FOR_SUBMISSION":
+            raise RuntimeError(
+                "Workspace execution plan is not ready for broker submission"
+            )
+        if reverse_required and not confirmed_flat:
+            raise RuntimeError(
+                "Workspace reverse submission requires confirmed flat exposure"
+            )
+
+        broker = str(trade.get("broker") or "").strip().upper()
+        account_id = str(trade.get("account_id") or "").strip()
+        self.validate_workspace_broker_binding(broker, account_id)
+
+        symbol = str(trade.get("symbol") or "").strip().upper()
+        side = str(plan.get("side") or "").strip().upper()
+        base_units = float(plan.get("volume") or 0.0)
+        stop_loss_raw = plan.get("stop_loss")
+        stop_loss = float(stop_loss_raw) if stop_loss_raw is not None else None
+        if base_units <= 0.0:
+            raise RuntimeError("Workspace execution plan volume must be positive")
+
+        trade_volume = float(trade.get("volume") or 0.0)
+        if not math.isclose(trade_volume, base_units, rel_tol=0.0, abs_tol=1e-9):
+            raise RuntimeError("Workspace trade and order-plan volumes differ")
+
+        trade_hint = trade_uid_clean.replace("-", "")[:12]
+        broker_comment = build_broker_order_comment(
+            f"WSP:{trade_hint}",
+            control_mode,
+        )
+
+        if broker == "IB":
+            service = self.ib_runtime_service
+            if service is None:
+                raise RuntimeError("IB runtime service is not set")
+            broker_result = service.place_market_order(
+                symbol_name=symbol,
+                side=side,
+                quantity=base_units,
+                stop_loss=stop_loss,
+                take_profit=None,
+                comment=broker_comment,
+            )
+        elif broker == "CTRADER":
+            service = self.ctrader_runtime_service
+            if service is None:
+                raise RuntimeError("cTrader runtime service is not set")
+            lots = base_units / 100000.0
+            broker_result = service.place_market_order(
+                symbol_name=symbol,
+                side=side,
+                lots=lots,
+                stop_loss=stop_loss,
+                take_profit=None,
+                comment=broker_comment,
+            )
+        else:
+            raise RuntimeError(f"Unsupported Workspace broker: {broker}")
+
+        broker_order_id = self._extract_broker_order_id(broker_result)
+        execution_status = "SUBMITTED"
+        if isinstance(broker_result, dict):
+            execution_status = (
+                str(broker_result.get("status") or execution_status).strip().upper()
+            )
+        broker_order_uid = self.repository.create_broker_order(
+            trade_uid=trade_uid_clean,
+            order_plan_uid=order_plan_uid_clean,
+            broker=broker,
+            broker_order_id=broker_order_id,
+            execution_status=execution_status,
+            broker_timestamp=None,
+            source="WORKSPACE",
+            broker_comment=broker_comment,
+        )
+        return {
+            "trade_uid": trade_uid_clean,
+            "order_plan_uid": order_plan_uid_clean,
+            "broker_order_uid": broker_order_uid,
+            "broker_order_id": broker_order_id,
+            "execution_status": execution_status,
+            "already_submitted": False,
+            "broker_result": broker_result,
         }
 
     def place_manual_market_order(

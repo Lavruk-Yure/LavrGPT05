@@ -31,6 +31,7 @@ from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Any, cast
 
+from core import workspace_broker_live_trace as broker_live_trace
 from core.algorithm_workspace import (
     WORKSPACE_CONTROL_MODE_AUTO,
     WORKSPACE_CONTROL_MODE_SEMI,
@@ -44,7 +45,6 @@ from core.algorithm_workspace import (
     WORKSPACE_STATE_STOPPING,
     AlgorithmWorkspace,
 )
-from core import workspace_broker_live_trace as broker_live_trace
 from core.workspace_algorithm import (
     WorkspaceAlgorithm,
     WorkspaceAlgorithmError,
@@ -1138,7 +1138,7 @@ class WorkspaceRuntime:
             incoming_event_timestamp=event.timestamp,
             spread=event.spread,
             state_before=trace_state_before,
-            state_after=(f"{self.context.runtime_state}/{self.context.startup_phase}"),
+            state_after=f"{self.context.runtime_state}/{self.context.startup_phase}",
             latest_bar_timestamp=(
                 current_event.timestamp if current_event is not None else None
             ),
@@ -2378,6 +2378,11 @@ class WorkspaceRuntime:
             ),
             approved_volume=(
                 risk_decision.approved_volume if risk_decision is not None else None
+            ),
+            stop_loss=(
+                proposal.trade_intent.stop_loss
+                if proposal.trade_intent is not None
+                else None
             ),
             risk_execution_attempted=(
                 risk_decision.execution_attempted

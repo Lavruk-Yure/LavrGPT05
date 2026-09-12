@@ -14,16 +14,10 @@ binding у WorkspaceRiskAccountSnapshot без refresh або нового broke
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Iterable
 from dataclasses import replace
 from datetime import UTC, datetime
-from typing import Any
-
-from engine.ctrader_history import CTraderHistoryProgressCallback
-from engine.ib_history import IBHistoryProgressCallback
-from engine.runtime_constants import WORKSPACE_REPLAY_SOURCE_CSV
-from engine.risk.account_snapshot import WorkspaceRiskAccountSnapshot
-from engine.risk.constants import RISK_DECISION_ALLOW
+from typing import Any, Callable, Mapping, cast
 
 from core.algorithm_workspace import (
     WORKSPACE_CONTROL_MODE_AUTO,
@@ -35,20 +29,19 @@ from core.algorithm_workspace import (
 )
 from core.session_repository import SessionRepository
 from core.workspace_algorithm import WorkspaceAlgorithm
+from core.workspace_broker_market import (
+    RuntimeEngineWorkspaceMarketProvider,
+)
 from core.workspace_chart import WorkspaceChartSnapshot
 from core.workspace_close_guard import WorkspaceCloseGuardResult
 from core.workspace_history_download_settings import (
     WorkspaceHistoryDownloadSettings,
-)
-from core.workspace_broker_market import (
-    RuntimeEngineWorkspaceMarketProvider,
 )
 from core.workspace_history_export import (
     WorkspaceHistoryCsvExportResult,
     WorkspaceHistoryCsvWriter,
 )
 from core.workspace_market_event import WorkspaceMarketEvent
-from core.workspace_signal import WorkspaceSignalRecord
 from core.workspace_ownership import (
     WorkspaceOrderSnapshot,
     WorkspaceOwnedSnapshot,
@@ -65,6 +58,12 @@ from core.workspace_runtime import (
     WorkspaceRuntime,
     WorkspaceRuntimeError,
 )
+from core.workspace_signal import WorkspaceSignalRecord
+from engine.ctrader_history import CTraderHistoryProgressCallback
+from engine.ib_history import IBHistoryProgressCallback
+from engine.risk.account_snapshot import WorkspaceRiskAccountSnapshot
+from engine.risk.constants import RISK_DECISION_ALLOW
+from engine.runtime_constants import WORKSPACE_REPLAY_SOURCE_CSV
 
 
 class WorkspaceLayoutLockedError(RuntimeError):
@@ -188,16 +187,14 @@ class AlgorithmWorkspaceController:
             )
         account_id = str(record.account_id or "").strip()
         if not account_id:
-            raise RuntimeError(
-                "Workspace BROKER trade persistence requires account_id"
-            )
+            raise RuntimeError("Workspace BROKER trade persistence requires account_id")
         approved_volume = record.approved_volume
         if approved_volume is None or approved_volume <= 0.0:
             raise RuntimeError(
                 "Workspace BROKER trade persistence requires approved_volume"
             )
 
-        create_trade(
+        trade_uid = create_trade(
             broker=record.broker,
             account_id=account_id,
             symbol=record.symbol,
@@ -209,6 +206,50 @@ class AlgorithmWorkspaceController:
             execution_origin="WORKSPACE",
             control_mode=control_mode,
             execution_state=execution_state,
+        )
+        get_trade_chain = getattr(repository, "get_trade_chain", None)
+        create_order_plan = getattr(repository, "create_order_plan", None)
+        if not callable(get_trade_chain) or not callable(create_order_plan):
+            raise RuntimeError(
+                "Runtime order-plan repository is unavailable for Workspace execution"
+            )
+        trade_chain_value: object = get_trade_chain(trade_uid)
+        trade_chain = cast(Mapping[str, Any], trade_chain_value)
+        workspace_plans = [
+            plan
+            for plan in trade_chain.get("order_plans", [])
+            if str(plan.get("source") or "").strip().upper() == "WORKSPACE"
+        ]
+        if len(workspace_plans) > 1:
+            raise RuntimeError(
+                "Workspace trade has duplicate persisted execution plans"
+            )
+        if workspace_plans:
+            plan = workspace_plans[0]
+            expected = {
+                "order_type": "MARKET",
+                "side": record.direction,
+                "volume": float(approved_volume),
+                "stop_loss": record.stop_loss,
+            }
+            mismatches = [
+                field
+                for field, expected_value in expected.items()
+                if plan.get(field) != expected_value
+            ]
+            if mismatches:
+                raise RuntimeError(
+                    "Workspace execution plan conflicts with persisted plan: "
+                    + ", ".join(mismatches)
+                )
+            return
+        create_order_plan(
+            trade_uid=trade_uid,
+            order_type="MARKET",
+            side=record.direction,
+            volume=approved_volume,
+            source="WORKSPACE",
+            stop_loss=record.stop_loss,
         )
 
     def begin_workspace_runtime_start(
@@ -249,12 +290,10 @@ class AlgorithmWorkspaceController:
                 "cached broker account state is unavailable",
             )
             return None
-        state_broker = str(
-            getattr(account_state, "broker_name", "") or ""
-        ).strip().upper()
-        state_account_id = str(
-            getattr(account_state, "account_id", "") or ""
-        ).strip()
+        state_broker = (
+            str(getattr(account_state, "broker_name", "") or "").strip().upper()
+        )
+        state_account_id = str(getattr(account_state, "account_id", "") or "").strip()
         bound_account_id = str(runtime.context.account_id or "").strip()
         if (
             state_broker != runtime.context.broker

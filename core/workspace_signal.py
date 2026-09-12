@@ -322,6 +322,7 @@ class WorkspaceSignalRecord:
     risk_reason_code: str | None = None
     requested_volume: float | None = None
     approved_volume: float | None = None
+    stop_loss: float | None = None
     risk_execution_attempted: bool = False
     filter_decision: str = WORKSPACE_SIGNAL_FILTER_ALLOW
     filter_reason_code: str | None = None
@@ -423,6 +424,10 @@ class WorkspaceSignalRecord:
             self.approved_volume,
             "approved_volume",
         )
+        stop_loss = _optional_positive_float(
+            self.stop_loss,
+            "stop_loss",
+        )
         filter_decision = _required_upper(
             self.filter_decision,
             "filter_decision",
@@ -442,6 +447,7 @@ class WorkspaceSignalRecord:
         object.__setattr__(self, "risk_reason_code", risk_reason_code)
         object.__setattr__(self, "requested_volume", requested_volume)
         object.__setattr__(self, "approved_volume", approved_volume)
+        object.__setattr__(self, "stop_loss", stop_loss)
         object.__setattr__(self, "filter_decision", filter_decision)
         object.__setattr__(
             self,

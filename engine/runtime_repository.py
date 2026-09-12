@@ -266,6 +266,7 @@ class RuntimeRepository:
         side: str,
         volume: float,
         source: str = "MANUAL",
+        stop_loss: float | None = None,
     ) -> str:
         """
         Створити OrderPlan для існуючого Trade.
@@ -282,10 +283,11 @@ class RuntimeRepository:
                 order_type,
                 side,
                 volume,
+                stop_loss,
                 created_utc,
                 source
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 order_plan_uid,
@@ -293,6 +295,7 @@ class RuntimeRepository:
                 str(order_type).strip().upper(),
                 str(side).strip().upper(),
                 float(volume),
+                float(stop_loss) if stop_loss is not None else None,
                 utc_now_iso(),
                 str(source).strip().upper(),
             ),

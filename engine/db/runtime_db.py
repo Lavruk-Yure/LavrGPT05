@@ -20,7 +20,7 @@ from pathlib import Path
 
 from core.app_paths import BASE_DIR
 
-SCHEMA_VERSION = 9
+SCHEMA_VERSION = 10
 
 
 RUNTIME_TABLES_SQL = """
@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS order_plans (
     order_type TEXT NOT NULL,
     side TEXT NOT NULL,
     volume REAL NOT NULL,
+    stop_loss REAL,
     created_utc TEXT NOT NULL,
     source TEXT NOT NULL,
     FOREIGN KEY (trade_uid) REFERENCES trades (trade_uid)
@@ -321,7 +322,7 @@ def _ensure_runtime_column(
 def migrate_runtime_schema(
     connection: sqlite3.Connection,
 ) -> None:
-    """Apply additive Runtime schema migrations through schema v9."""
+    """Apply additive Runtime schema migrations through schema v10."""
     _ensure_runtime_column(
         connection,
         "trades",
@@ -363,6 +364,12 @@ def migrate_runtime_schema(
         CREATE UNIQUE INDEX IF NOT EXISTS idx_trades_workspace_signal_unique
         ON trades (workspace_uid, signal_uid)
         """
+    )
+    _ensure_runtime_column(
+        connection,
+        "order_plans",
+        "stop_loss",
+        "REAL",
     )
     _ensure_runtime_column(
         connection,
