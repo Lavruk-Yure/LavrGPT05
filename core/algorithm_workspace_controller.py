@@ -83,6 +83,10 @@ class AlgorithmWorkspaceController:
         self._runtime_engine: Any | None = None
         self._broker_market_provider: RuntimeEngineWorkspaceMarketProvider | None = None
         self._runtimes: dict[str, WorkspaceRuntime] = {}
+        self._workspace_submission_identities: dict[
+            tuple[str, str],
+            tuple[str, str],
+        ] = {}
 
     def set_runtime_engine(self, runtime_engine: Any | None) -> None:
         """Attach the shared engine used by read-only broker WSP feeds."""
@@ -194,7 +198,7 @@ class AlgorithmWorkspaceController:
                 "Workspace BROKER trade persistence requires approved_volume"
             )
 
-        trade_uid = create_trade(
+        trade_uid_value = create_trade(
             broker=record.broker,
             account_id=account_id,
             symbol=record.symbol,
@@ -207,6 +211,7 @@ class AlgorithmWorkspaceController:
             control_mode=control_mode,
             execution_state=execution_state,
         )
+        trade_uid = str(trade_uid_value).strip()
         get_trade_chain = getattr(repository, "get_trade_chain", None)
         create_order_plan = getattr(repository, "create_order_plan", None)
         if not callable(get_trade_chain) or not callable(create_order_plan):
@@ -242,8 +247,15 @@ class AlgorithmWorkspaceController:
                     "Workspace execution plan conflicts with persisted plan: "
                     + ", ".join(mismatches)
                 )
+            order_plan_uid = str(plan.get("order_plan_uid") or "").strip()
+            self._remember_workspace_submission_identity(
+                record.workspace_uid,
+                record.signal_uid,
+                trade_uid,
+                order_plan_uid,
+            )
             return
-        create_order_plan(
+        order_plan_uid_value = create_order_plan(
             trade_uid=trade_uid,
             order_type="MARKET",
             side=record.direction,
@@ -251,6 +263,52 @@ class AlgorithmWorkspaceController:
             source="WORKSPACE",
             stop_loss=record.stop_loss,
         )
+        order_plan_uid = str(order_plan_uid_value).strip()
+        self._remember_workspace_submission_identity(
+            record.workspace_uid,
+            record.signal_uid,
+            trade_uid,
+            order_plan_uid,
+        )
+
+    def _remember_workspace_submission_identity(
+        self,
+        workspace_uid: str,
+        signal_uid: str,
+        trade_uid: str,
+        order_plan_uid: str,
+    ) -> None:
+        """Утримати exact persisted Trade/OrderPlan identity для WSP signal."""
+        key = (
+            str(workspace_uid or "").strip(),
+            str(signal_uid or "").strip(),
+        )
+        identity = (
+            str(trade_uid or "").strip(),
+            str(order_plan_uid or "").strip(),
+        )
+        if not all(key) or not all(identity):
+            raise RuntimeError(
+                "Workspace submission identity requires causal and persisted UIDs"
+            )
+        existing = self._workspace_submission_identities.get(key)
+        if existing is not None and existing != identity:
+            raise RuntimeError(
+                "Workspace signal conflicts with retained submission identity"
+            )
+        self._workspace_submission_identities[key] = identity
+
+    def _workspace_submission_identity_for_signal(
+        self,
+        workspace_uid: str,
+        signal_uid: str,
+    ) -> tuple[str, str] | None:
+        """Повернути retained trade_uid/order_plan_uid без broker submission."""
+        key = (
+            str(workspace_uid or "").strip(),
+            str(signal_uid or "").strip(),
+        )
+        return self._workspace_submission_identities.get(key)
 
     def begin_workspace_runtime_start(
         self,

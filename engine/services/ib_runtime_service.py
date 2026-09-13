@@ -19,6 +19,7 @@ from collections import deque
 from datetime import UTC, datetime
 from typing import Optional, Protocol
 
+from engine.broker_position import BrokerPositionSnapshot
 from engine.ib_adapter import IBAdapter
 from engine.ib_history import (
     IBHistoryDownloadResult,
@@ -344,6 +345,20 @@ class IBRuntimeService:
             return []
 
         return adapter.get_positions()
+
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Повернути broker-neutral terminal snapshot IB positions."""
+        adapter = self.get_active_adapter()
+        account_id = str(self._account_state.account_id or "").strip()
+
+        if adapter is None:
+            return BrokerPositionSnapshot.failure_result(
+                broker="IB",
+                account_id=account_id,
+                failure_reason="IB active adapter is unavailable.",
+            )
+
+        return adapter.get_positions_snapshot()
 
     def place_market_order(
         self,

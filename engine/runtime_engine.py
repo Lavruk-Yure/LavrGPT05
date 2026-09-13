@@ -23,7 +23,7 @@ from engine.broker_order_identity import (
     normalize_order_control_mode,
     strip_broker_order_identity,
 )
-from engine.broker_position import BrokerPosition
+from engine.broker_position import BrokerPosition, BrokerPositionSnapshot
 from engine.ctrader_history import (
     CTraderHistoryDownloadResult,
     CTraderHistoryProgressCallback,
@@ -184,6 +184,10 @@ class CTraderRuntimeServiceProtocol(Protocol):
         """
         ...
 
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Повернути broker-neutral terminal position snapshot."""
+        ...
+
     def get_broker_health(self) -> RuntimeBrokerHealth:
         """
         Повернути broker health.
@@ -282,6 +286,10 @@ class IBRuntimeServiceProtocol(Protocol):
         """
         Повернути відкриті IB broker positions.
         """
+        ...
+
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Повернути broker-neutral terminal position snapshot."""
         ...
 
     def get_forex_quote_snapshot(
@@ -2768,6 +2776,30 @@ class RuntimeEngine:
             )
 
         raise RuntimeError(f"Positions are not supported for broker: {broker}")
+
+    def get_active_broker_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Повернути terminal snapshot positions для активного broker."""
+        broker = self.get_active_broker()
+
+        if broker == "CTRADER":
+            service = self.ctrader_runtime_service
+
+            if service is None:
+                raise RuntimeError("cTrader runtime service is not set")
+
+            return service.get_positions_snapshot()
+
+        if broker == "IB":
+            service = self.ib_runtime_service
+
+            if service is None:
+                raise RuntimeError("IB runtime service is not set")
+
+            return service.get_positions_snapshot()
+
+        raise RuntimeError(
+            f"Position snapshot is not supported for broker: {broker}"
+        )
 
     def _enrich_ib_positions_from_runtime_repository(
         self,

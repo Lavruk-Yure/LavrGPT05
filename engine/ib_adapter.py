@@ -40,6 +40,7 @@ from engine.broker_position import (
     POSITION_SIDE_BUY,
     POSITION_SIDE_SELL,
     BrokerPosition,
+    BrokerPositionSnapshot,
 )
 from engine.ib_history import (
     IBHistoricalBar,
@@ -3259,24 +3260,31 @@ class IBAdapter(BrokerInterface):
         return value.astimezone(UTC)
 
     def get_positions(self) -> list[BrokerPosition]:
-        """
-        Отримати відкриті IB positions у canonical форматі.
-        """
+        """Отримати відкриті IB positions у canonical форматі."""
+
+        return list(self.get_positions_snapshot().positions)
+
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Отримати terminal snapshot IB positions request."""
+
+        account_id = self._get_primary_account_id()
+
         if not self._connected:
             self._logger.warning("IB get_positions called while disconnected.")
-            return []
+            return BrokerPositionSnapshot.failure_result(
+                broker="IB",
+                account_id=account_id,
+                failure_reason="IB adapter is disconnected.",
+            )
 
         with self._positions_lock:
             self._wrapper.position_event.clear()
             self._wrapper.positions.clear()
-
             self._logger.info("Requesting IB positions...")
-
             finished = False
 
             try:
                 self._client.reqPositions()
-
                 finished = self._wrapper.position_event.wait(
                     timeout=IB_POSITIONS_TIMEOUT_SECONDS,
                 )
@@ -3291,34 +3299,34 @@ class IBAdapter(BrokerInterface):
 
             if not finished:
                 self._logger.error("IB positions timeout.")
-                return []
+                return BrokerPositionSnapshot.failure_result(
+                    broker="IB",
+                    account_id=account_id,
+                    failure_reason="IB positions timeout.",
+                )
 
             position_rows = [
                 dict(position_row) for position_row in self._wrapper.positions
             ]
 
-        portfolio_by_id = self._request_portfolio_by_position_id(
-            position_rows,
-        )
-
-        pnl_by_id = self._request_pnl_by_position_id(
-            position_rows,
-        )
-
-        sl_tp_by_id = self._request_open_orders_by_position_id(
-            position_rows,
-        )
-
+        portfolio_by_id = self._request_portfolio_by_position_id(position_rows)
+        pnl_by_id = self._request_pnl_by_position_id(position_rows)
+        sl_tp_by_id = self._request_open_orders_by_position_id(position_rows)
         execution_time_by_id = self._request_execution_times_by_position_id(
             position_rows,
         )
-
-        return self._build_positions(
+        positions = self._build_positions(
             position_rows=position_rows,
             portfolio_by_id=portfolio_by_id,
             pnl_by_id=pnl_by_id,
             sl_tp_by_id=sl_tp_by_id,
             execution_time_by_id=execution_time_by_id,
+        )
+
+        return BrokerPositionSnapshot.success_result(
+            broker="IB",
+            account_id=account_id,
+            positions=positions,
         )
 
     def place_market_order(

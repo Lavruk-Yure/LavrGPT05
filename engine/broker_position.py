@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +71,108 @@ class BrokerPosition:
             "raw_payload": self.raw_payload or {},
         }
 
+
+@dataclass(frozen=True, slots=True)
+class BrokerPositionSnapshot:
+    """Broker-neutral snapshot результату position request."""
+
+    broker: str
+    account_id: str
+    success: bool
+    observed_at_utc: datetime
+    positions: tuple[BrokerPosition, ...]
+    failure_reason: str = ""
+
+    @classmethod
+    def success_result(
+        cls,
+        broker: str,
+        account_id: str,
+        positions: list[BrokerPosition],
+    ) -> "BrokerPositionSnapshot":
+        """Побудувати успішний snapshot у момент terminal outcome."""
+
+        return cls(
+            broker=str(broker).strip().upper(),
+            account_id=str(account_id).strip(),
+            success=True,
+            observed_at_utc=datetime.now(UTC),
+            positions=tuple(positions),
+        )
+
+    @classmethod
+    def failure_result(
+        cls,
+        broker: str,
+        account_id: str,
+        failure_reason: str,
+    ) -> "BrokerPositionSnapshot":
+        """Побудувати failure snapshot у момент terminal outcome."""
+
+        return cls(
+            broker=str(broker).strip().upper(),
+            account_id=str(account_id).strip(),
+            success=False,
+            observed_at_utc=datetime.now(UTC),
+            positions=(),
+            failure_reason=str(failure_reason).strip(),
+        )
+
+
+
+def _normalize_position_symbol(value: str) -> str:
+    """Нормалізувати symbol для broker-neutral position scope."""
+
+    return str(value or "").strip().upper().replace("/", "").replace(".", "")
+
+
+def broker_position_snapshot_confirms_flat(
+    snapshot: BrokerPositionSnapshot,
+    *,
+    broker: str,
+    account_id: str,
+    symbol: str,
+    now_utc: datetime,
+    max_age: timedelta,
+) -> bool:
+    """Перевірити broker-confirmed flat exposure для exact account/symbol.
+
+    Функція fail-closed: failure, stale/future snapshot, scope mismatch,
+    naive timestamps або matching open exposure повертають False. Freshness
+    policy передається параметром і не є універсальною production-константою.
+    """
+
+    if not snapshot.success or max_age <= timedelta(0):
+        return False
+    if snapshot.observed_at_utc.tzinfo is None or now_utc.tzinfo is None:
+        return False
+
+    broker_norm = str(broker or "").strip().upper()
+    account_norm = str(account_id or "").strip().upper()
+    symbol_norm = _normalize_position_symbol(symbol)
+    if not broker_norm or not account_norm or not symbol_norm:
+        return False
+
+    if snapshot.broker.strip().upper() != broker_norm:
+        return False
+    if snapshot.account_id.strip().upper() != account_norm:
+        return False
+
+    age = now_utc.astimezone(UTC) - snapshot.observed_at_utc.astimezone(UTC)
+    if age < timedelta(0) or age > max_age:
+        return False
+
+    for position in snapshot.positions:
+        if str(position.broker).strip().upper() != broker_norm:
+            continue
+        if str(position.account_id).strip().upper() != account_norm:
+            continue
+        if _normalize_position_symbol(position.symbol_name) != symbol_norm:
+            continue
+        if abs(float(position.volume)) > 0.0:
+            return False
+
+    return True
 
 def normalize_position_side(value: str | int | None) -> str:
     """

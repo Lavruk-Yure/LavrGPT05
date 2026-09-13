@@ -12,6 +12,7 @@ from collections import deque
 from datetime import UTC, datetime
 from typing import Optional, Protocol
 
+from engine.broker_position import BrokerPositionSnapshot
 from engine.ctrader_adapter import CTraderAdapter
 from engine.ctrader_history import (
     CTraderHistoryDownloadResult,
@@ -275,6 +276,20 @@ class CTraderRuntimeService:
             return []
 
         return adapter.get_positions()
+
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Повернути broker-neutral terminal snapshot cTrader positions."""
+        adapter = self.get_active_adapter()
+        account_id = str(self._account_state.account_id or "").strip()
+
+        if adapter is None:
+            return BrokerPositionSnapshot.failure_result(
+                broker="CTRADER",
+                account_id=account_id,
+                failure_reason="cTrader active adapter is unavailable.",
+            )
+
+        return adapter.get_positions_snapshot()
 
     def get_forex_quote_snapshot(
         self,

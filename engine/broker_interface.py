@@ -15,7 +15,7 @@ UI і RuntimeEngine повинні працювати
 from abc import ABC, abstractmethod
 
 from engine.broker_account import BrokerAccount
-from engine.broker_position import BrokerPosition
+from engine.broker_position import BrokerPosition, BrokerPositionSnapshot
 
 
 class BrokerInterface(ABC):
@@ -51,5 +51,10 @@ class BrokerInterface(ABC):
         """
         Отримати відкриті broker positions у canonical форматі.
         """
+
+        raise NotImplementedError
+
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Отримати broker-neutral terminal snapshot positions request."""
 
         raise NotImplementedError

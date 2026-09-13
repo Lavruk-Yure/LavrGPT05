@@ -38,6 +38,7 @@ from engine.broker_position import (
     POSITION_SIDE_BUY,
     POSITION_SIDE_SELL,
     BrokerPosition,
+    BrokerPositionSnapshot,
 )
 from engine.ctrader_history import (
     CTraderHistoricalBar,
@@ -75,6 +76,11 @@ oa_messages = import_module("ctrader_open_api.messages.OpenApiMessages_pb2")
 HOST_DEMO = EndPoints.PROTOBUF_DEMO_HOST
 HOST_LIVE = EndPoints.PROTOBUF_LIVE_HOST
 PORT = EndPoints.PROTOBUF_PORT
+
+CTRADER_POSITION_REQUEST_OUTCOME_SUCCESS = "SUCCESS"
+CTRADER_POSITION_REQUEST_OUTCOME_REQUEST_ERROR = "REQUEST_ERROR"
+CTRADER_POSITION_REQUEST_OUTCOME_TIMEOUT = "TIMEOUT"
+CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED = "DISCONNECTED"
 
 
 ProtoOAAccountAuthReq = getattr(oa_messages, "ProtoOAAccountAuthReq")
@@ -198,6 +204,9 @@ class CTraderAdapter(BrokerInterface):
 
         self._positions_event = threading.Event()
         self._positions_payload: list = []
+        self._positions_request_active = False
+        self._positions_request_outcome = ""
+        self._positions_request_failure_reason = ""
 
         self._positions_pnl_event = threading.Event()
         self._positions_pnl_payload: dict[str, float] = {}
@@ -387,6 +396,11 @@ class CTraderAdapter(BrokerInterface):
 
         self.client = None
         self._connecting = False
+        if self._positions_request_active:
+            self._complete_positions_request(
+                CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED,
+                "cTrader disconnected during positions request.",
+            )
         self._spot_event.clear()
         self._spot_prices = {}
         self._spot_subscribed_symbol_ids = set()
@@ -415,6 +429,9 @@ class CTraderAdapter(BrokerInterface):
 
         self._positions_event.clear()
         self._positions_payload = []
+        self._positions_request_active = False
+        self._positions_request_outcome = ""
+        self._positions_request_failure_reason = ""
 
         self._positions_pnl_event.clear()
         self._positions_pnl_payload = {}
@@ -984,6 +1001,11 @@ class CTraderAdapter(BrokerInterface):
             return
 
         self.logger.info("cTrader disconnected: %s", reason)
+        if self._positions_request_active:
+            self._complete_positions_request(
+                CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED,
+                f"cTrader disconnected: {reason}",
+            )
         self.state.connection_state = BrokerConnectionState.DISCONNECTED
         self.state.disconnected_event.set()
 
@@ -1882,14 +1904,25 @@ class CTraderAdapter(BrokerInterface):
             self.logger.warning(
                 "cTrader get_positions called while disconnected.",
             )
+            self._complete_positions_request(
+                CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED,
+                "cTrader adapter is disconnected.",
+            )
             return []
 
         if self.client is None:
             self.logger.warning("cTrader client is not initialized.")
+            self._complete_positions_request(
+                CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED,
+                "cTrader client is not initialized.",
+            )
             return []
 
         self._positions_event.clear()
         self._positions_payload = []
+        self._positions_request_active = True
+        self._positions_request_outcome = ""
+        self._positions_request_failure_reason = ""
 
         request = ProtoOAReconcileReq()
         request.ctidTraderAccountId = self.config.ctid_trader_account_id
@@ -1903,6 +1936,13 @@ class CTraderAdapter(BrokerInterface):
 
         if not finished:
             self.logger.error("cTrader reconcile timeout.")
+            self._complete_positions_request(
+                CTRADER_POSITION_REQUEST_OUTCOME_TIMEOUT,
+                "cTrader reconcile timeout.",
+            )
+            return []
+
+        if self._positions_request_outcome != CTRADER_POSITION_REQUEST_OUTCOME_SUCCESS:
             return []
 
         position_symbol_ids: set[int] = set()
@@ -1926,12 +1966,63 @@ class CTraderAdapter(BrokerInterface):
 
         return self._build_positions()
 
+    def get_positions_snapshot(self) -> BrokerPositionSnapshot:
+        """Отримати terminal snapshot cTrader positions request."""
+
+        positions = self.get_positions()
+        account_id = str(self.config.ctid_trader_account_id)
+
+        if self._positions_request_outcome == CTRADER_POSITION_REQUEST_OUTCOME_SUCCESS:
+            return BrokerPositionSnapshot.success_result(
+                broker="CTRADER",
+                account_id=account_id,
+                positions=positions,
+            )
+
+        failure_reason = self._positions_request_failure_reason
+
+        if not failure_reason:
+            failure_reason = self._positions_request_outcome or "UNKNOWN_FAILURE"
+
+        return BrokerPositionSnapshot.failure_result(
+            broker="CTRADER",
+            account_id=account_id,
+            failure_reason=failure_reason,
+        )
+
+    @property
+    def positions_request_outcome(self) -> str:
+        """Повернути terminal outcome останнього positions request."""
+
+        return self._positions_request_outcome
+
+    @property
+    def positions_request_failure_reason(self) -> str:
+        """Повернути failure reason останнього positions request."""
+
+        return self._positions_request_failure_reason
+
+    def _complete_positions_request(
+        self,
+        outcome: str,
+        failure_reason: str = "",
+    ) -> None:
+        """Зафіксувати terminal outcome поточного positions request."""
+
+        self._positions_request_active = False
+        self._positions_request_outcome = str(outcome).strip()
+        self._positions_request_failure_reason = str(failure_reason).strip()
+        self._positions_event.set()
+
     def _on_reconcile_res(self, payload) -> None:
         """
         Обробити ProtoOAReconcileRes.
         """
         if not self.is_session_alive():
             self.logger.warning("Ignoring callback from retired session.")
+            return
+        if not self._positions_request_active:
+            self.logger.debug("Late cTrader reconcile response ignored.")
             return
 
         self._positions_payload = list(getattr(payload, "position", []))
@@ -1941,7 +2032,9 @@ class CTraderAdapter(BrokerInterface):
             len(self._positions_payload),
         )
 
-        self._positions_event.set()
+        self._complete_positions_request(
+            CTRADER_POSITION_REQUEST_OUTCOME_SUCCESS,
+        )
 
     def _on_positions_deferred_error(self, failure) -> None:
         """
@@ -1950,9 +2043,16 @@ class CTraderAdapter(BrokerInterface):
         if not self.is_session_alive():
             self.logger.warning("Ignoring callback from retired session.")
             return
+        if not self._positions_request_active:
+            self.logger.debug("Late cTrader reconcile deferred error ignored.")
+            return
 
-        self.logger.error("cTrader reconcile request failed: %s", failure)
-        self._positions_event.set()
+        failure_reason = f"cTrader reconcile request failed: {failure}"
+        self.logger.error(failure_reason)
+        self._complete_positions_request(
+            CTRADER_POSITION_REQUEST_OUTCOME_REQUEST_ERROR,
+            failure_reason,
+        )
 
     @property
     def broker_state(self) -> str:
@@ -1989,6 +2089,12 @@ class CTraderAdapter(BrokerInterface):
         self._retired_disconnect_event.clear()
 
         current_client = self.client
+
+        if self._positions_request_active:
+            self._complete_positions_request(
+                CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED,
+                "cTrader session retired during positions request.",
+            )
 
         if current_client is None:
             self._retired_disconnect_event.set()
