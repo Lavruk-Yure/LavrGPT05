@@ -59,6 +59,10 @@ from core.workspace_runtime import (
     WorkspaceRuntimeError,
 )
 from core.workspace_signal import WorkspaceSignalRecord
+from engine.broker_position import (
+    BrokerPositionSnapshot,
+    broker_position_snapshot_confirms_flat,
+)
 from engine.ctrader_history import CTraderHistoryProgressCallback
 from engine.ib_history import IBHistoryProgressCallback
 from engine.risk.account_snapshot import WorkspaceRiskAccountSnapshot
@@ -254,6 +258,7 @@ class AlgorithmWorkspaceController:
                 trade_uid,
                 order_plan_uid,
             )
+            self._submit_workspace_auto_after_same_call_flat(record)
             return
         order_plan_uid_value = create_order_plan(
             trade_uid=trade_uid,
@@ -270,6 +275,7 @@ class AlgorithmWorkspaceController:
             trade_uid,
             order_plan_uid,
         )
+        self._submit_workspace_auto_after_same_call_flat(record)
 
     def _remember_workspace_submission_identity(
         self,
@@ -309,6 +315,98 @@ class AlgorithmWorkspaceController:
             str(signal_uid or "").strip(),
         )
         return self._workspace_submission_identities.get(key)
+
+    def workspace_same_call_position_snapshot_confirms_flat(
+        self,
+        workspace_uid: str,
+    ) -> bool:
+        """Перевірити exact broker flat на новому snapshot у цьому виклику."""
+        runtime = self.ensure_workspace_runtime(workspace_uid)
+        if runtime.context.data_mode != WORKSPACE_DATA_MODE_BROKER:
+            return False
+        if runtime.context.control_mode != WORKSPACE_CONTROL_MODE_AUTO:
+            return False
+
+        runtime_engine = self._runtime_engine
+        get_snapshot = getattr(
+            runtime_engine,
+            "get_workspace_broker_positions_snapshot",
+            None,
+        )
+        if not callable(get_snapshot):
+            return False
+        get_snapshot = cast(
+            Callable[[str, str], BrokerPositionSnapshot],
+            get_snapshot,
+        )
+
+        broker = str(runtime.context.broker or "").strip().upper()
+        account_id = str(runtime.context.account_id or "").strip()
+        symbol = str(runtime.context.symbol or "").strip()
+        if not broker or not account_id or not symbol:
+            return False
+
+        request_started_utc = datetime.now(UTC)
+        try:
+            snapshot = get_snapshot(broker, account_id)
+        except Exception:  # noqa
+            return False
+        evaluated_utc = datetime.now(UTC)
+        same_call_max_age = evaluated_utc - request_started_utc
+        if same_call_max_age.total_seconds() <= 0.0:
+            return False
+
+        return broker_position_snapshot_confirms_flat(
+            snapshot,
+            broker=broker,
+            account_id=account_id,
+            symbol=symbol,
+            now_utc=evaluated_utc,
+            max_age=same_call_max_age,
+        )
+
+    def _submit_workspace_auto_after_same_call_flat(
+        self,
+        record: WorkspaceSignalRecord,
+    ) -> None:
+        """Відправити AUTO plan лише після нового confirmed-flat snapshot."""
+        runtime = self._runtimes.get(record.workspace_uid)
+        if runtime is None:
+            raise RuntimeError(
+                "Workspace runtime is unavailable for AUTO submission"
+            )
+        if runtime.context.control_mode != WORKSPACE_CONTROL_MODE_AUTO:
+            return
+
+        identity = self._workspace_submission_identity_for_signal(
+            record.workspace_uid,
+            record.signal_uid,
+        )
+        if identity is None:
+            raise RuntimeError(
+                "Workspace AUTO submission identity is unavailable"
+            )
+        if not self.workspace_same_call_position_snapshot_confirms_flat(
+            record.workspace_uid
+        ):
+            return
+
+        submit = getattr(
+            self._runtime_engine,
+            "submit_workspace_execution_plan",
+            None,
+        )
+        if not callable(submit):
+            raise RuntimeError(
+                "Runtime Workspace submission method is unavailable"
+            )
+        trade_uid, order_plan_uid = identity
+        submit(
+            trade_uid,
+            order_plan_uid,
+            reverse_required=True,
+            confirmed_flat=True,
+        )
 
     def begin_workspace_runtime_start(
         self,

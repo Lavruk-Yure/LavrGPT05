@@ -25,7 +25,7 @@ OFFICE_EMAIL_INBOX: str = "erclavr@gmail.com"
 SMTP_HOST: str = "smtp.gmail.com"
 SMTP_PORT: int = 465
 SMTP_USER: str = "erclavr@gmail.com"  # email відправника (логін)
-SMTP_PASSWORD: str = "jpaf fymx ewqi akps"  # app password / пароль SMTP
+SMTP_PASSWORD: str = "nvpd xcql twed okge"  # app password / пароль SMTP
 
 
 def validate_smtp_settings() -> tuple[bool, str]:

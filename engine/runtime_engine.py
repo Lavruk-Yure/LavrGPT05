@@ -9,7 +9,7 @@ import json
 import logging
 import math
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Protocol
 
 from engine.broker_account import BrokerAccount
@@ -102,6 +102,7 @@ from engine.runtime_constants import (
 )
 from engine.runtime_context import RuntimeContext
 from engine.runtime_events import RuntimeEvent, RuntimeEventType
+from engine.runtime_execution_safety_policy import RuntimeExecutionSafetyPolicy
 from engine.runtime_reconnect_task import RuntimeReconnectTask
 from engine.runtime_repository import RuntimeRepository
 from engine.runtime_scheduler import RuntimeScheduler
@@ -395,6 +396,7 @@ class RuntimeEngine:
     def __init__(
         self,
         db_path: str | None = None,
+        execution_safety_policy: RuntimeExecutionSafetyPolicy | None = None,
     ) -> None:
         """
         Ініціалізація runtime engine.
@@ -405,6 +407,9 @@ class RuntimeEngine:
         self.broker_adapter: BrokerInterface | None = None
         self.ctrader_runtime_service: CTraderRuntimeServiceProtocol | None = None
         self.ib_runtime_service: IBRuntimeServiceProtocol | None = None
+        self.execution_safety_policy = execution_safety_policy
+        if self.execution_safety_policy is None:
+            self.execution_safety_policy = RuntimeExecutionSafetyPolicy()
 
         self.scheduler = RuntimeScheduler()
 
@@ -2799,6 +2804,79 @@ class RuntimeEngine:
 
         raise RuntimeError(
             f"Position snapshot is not supported for broker: {broker}"
+        )
+
+    def get_workspace_position_snapshot_max_age(
+        self,
+        broker_name: str,
+    ) -> timedelta | None:
+        """Повернути max age position snapshot для exact broker."""
+
+        return self.execution_safety_policy.resolve_position_snapshot_max_age(
+            broker_name
+        )
+
+    def get_workspace_broker_positions_snapshot(
+        self,
+        broker_name: str,
+        account_id: str,
+    ) -> BrokerPositionSnapshot:
+        """Повернути position snapshot для exact Workspace broker/account."""
+        broker = str(broker_name or "").strip().upper()
+        account = str(account_id or "").strip()
+
+        if broker not in {"IB", "CTRADER"}:
+            raise ValueError(f"Unsupported workspace broker: {broker_name!r}")
+        if not account:
+            raise RuntimeError(
+                f"Workspace account is required for broker mode: {broker}"
+            )
+
+        self.validate_workspace_broker_binding(broker, account)
+
+        if broker == "IB":
+            service = self.ib_runtime_service
+        else:
+            service = self.ctrader_runtime_service
+
+        if service is None:
+            raise RuntimeError(f"{broker} runtime service is not set")
+
+        snapshot = service.get_positions_snapshot()
+        snapshot_broker = str(snapshot.broker or "").strip().upper()
+        if snapshot_broker != broker:
+            failure_reason = "Position snapshot broker does not match Workspace broker"
+            return BrokerPositionSnapshot(
+                broker=broker,
+                account_id=account,
+                success=False,
+                observed_at_utc=snapshot.observed_at_utc,
+                positions=(),
+                failure_reason=failure_reason,
+            )
+
+        if not snapshot.success:
+            return BrokerPositionSnapshot(
+                broker=broker,
+                account_id=account,
+                success=False,
+                observed_at_utc=snapshot.observed_at_utc,
+                positions=(),
+                failure_reason=snapshot.failure_reason,
+            )
+
+        positions = tuple(
+            position
+            for position in snapshot.positions
+            if str(position.broker or "").strip().upper() == broker
+            and str(position.account_id or "").strip() == account
+        )
+        return BrokerPositionSnapshot(
+            broker=broker,
+            account_id=account,
+            success=True,
+            observed_at_utc=snapshot.observed_at_utc,
+            positions=positions,
         )
 
     def _enrich_ib_positions_from_runtime_repository(
