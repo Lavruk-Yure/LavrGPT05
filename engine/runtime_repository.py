@@ -720,6 +720,94 @@ class RuntimeRepository:
 
         return position_uid
 
+    def upsert_confirmed_position(
+        self,
+        trade_uid: str,
+        broker_order_uid: str,
+        broker: str,
+        broker_position_id: str | None,
+        symbol: str,
+        side: str,
+        volume: float,
+        open_price: float | None,
+        opened_utc: str | None,
+        source: str = "BROKER",
+    ) -> str:
+        """Create or update one Runtime Position from confirmed exposure."""
+        trade_uid_clean = str(trade_uid or "").strip()
+        broker_order_uid_clean = str(broker_order_uid or "").strip()
+        broker_clean = str(broker or "").strip().upper()
+        symbol_clean = str(symbol or "").strip().upper()
+        side_clean = str(side or "").strip().upper()
+        volume_value = abs(float(volume))
+
+        if not trade_uid_clean or not broker_order_uid_clean:
+            raise ValueError("Confirmed position identity is incomplete")
+        if not broker_clean or not symbol_clean or not side_clean:
+            raise ValueError("Confirmed position scope is incomplete")
+        if volume_value <= 0.0:
+            raise ValueError("Confirmed position volume must be positive")
+
+        existing = self.get_position_by_trade_uid(trade_uid_clean)
+        if existing is None:
+            return self.create_position(
+                trade_uid=trade_uid_clean,
+                broker_order_uid=broker_order_uid_clean,
+                broker=broker_clean,
+                broker_position_id=broker_position_id,
+                symbol=symbol_clean,
+                side=side_clean,
+                volume=volume_value,
+                open_price=open_price,
+                opened_utc=opened_utc,
+                state="OPEN",
+                source=source,
+            )
+
+        expected = {
+            "broker_order_uid": broker_order_uid_clean,
+            "broker": broker_clean,
+            "symbol": symbol_clean,
+            "side": side_clean,
+        }
+        mismatches = [
+            field
+            for field, expected_value in expected.items()
+            if str(existing.get(field) or "").strip().upper()
+            != str(expected_value).strip().upper()
+        ]
+        if mismatches:
+            raise RuntimeError(
+                "Confirmed Workspace position conflicts with persisted position: "
+                + ", ".join(mismatches)
+            )
+
+        position_uid = str(existing.get("position_uid") or "").strip()
+        self._connection.execute(
+            """
+            UPDATE positions
+            SET broker_position_id = COALESCE(?, broker_position_id),
+                volume = ?,
+                open_price = COALESCE(?, open_price),
+                opened_utc = COALESCE(?, opened_utc),
+                state = 'OPEN',
+                source = ?
+            WHERE position_uid = ?
+            """,
+            (
+                None
+                if broker_position_id is None
+                else str(broker_position_id).strip(),
+                volume_value,
+                open_price,
+                opened_utc,
+                str(source or "BROKER").strip().upper(),
+                position_uid,
+            ),
+        )
+        self._connection.commit()
+        return position_uid
+
     def get_trade_chain(
         self,
         trade_uid: str,

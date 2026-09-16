@@ -12,6 +12,7 @@ import time
 from datetime import UTC, datetime, timedelta
 from typing import Any, Protocol
 
+from core import ctrader_lot as ctr_lot
 from engine.broker_account import BrokerAccount
 from engine.broker_connection_state import BrokerConnectionState
 from engine.broker_interface import BrokerInterface
@@ -4724,6 +4725,72 @@ class RuntimeEngine:
             "broker_comment": broker_comment,
         }
 
+    def _map_workspace_terminal_broker_position(
+        self,
+        *,
+        broker: str,
+        account_id: str,
+        symbol: str,
+        side: str,
+        broker_result: Any,
+    ) -> BrokerPosition | None:
+        """Map terminal Workspace broker result to confirmed exposure."""
+        broker_norm = str(broker or "").strip().upper()
+        account_id_clean = str(account_id or "").strip()
+        symbol_norm = str(symbol or "").strip().upper()
+        side_norm = str(side or "").strip().upper()
+        context = getattr(self, "context", None)
+        account_mode = str(getattr(context, "account_mode", "") or "")
+
+        if broker_norm == "IB":
+            if not isinstance(broker_result, dict):
+                return None
+            status = str(broker_result.get("status") or "").strip().upper()
+            if status != "FILLED":
+                return None
+            filled = float(broker_result.get("filled") or 0.0)
+            avg_fill_price = float(broker_result.get("avg_fill_price") or 0.0)
+            if filled <= 0.0 or avg_fill_price <= 0.0:
+                return None
+            return BrokerPosition(
+                broker="IB",
+                account_id=account_id_clean,
+                account_mode=account_mode,
+                position_id=f"IB:{account_id_clean}:{symbol_norm}",
+                symbol_name=symbol_norm,
+                side=side_norm,
+                volume=filled,
+                entry_price=avg_fill_price,
+            )
+
+        if broker_norm != "CTRADER":
+            return None
+
+        position = getattr(broker_result, "position", None)
+        trade_data = getattr(position, "tradeData", None)
+        if position is None or trade_data is None:
+            return None
+
+        position_id = str(getattr(position, "positionId", "") or "").strip()
+        volume_raw = int(getattr(trade_data, "volume", 0) or 0)
+        volume = ctr_lot.api_volume_to_lots(volume_raw)
+        entry_price = float(getattr(position, "price", 0.0) or 0.0)
+        opened_utc = str(getattr(trade_data, "openTimestamp", "") or "")
+        if not position_id or volume <= 0.0 or entry_price <= 0.0:
+            return None
+
+        return BrokerPosition(
+            broker="CTRADER",
+            account_id=account_id_clean,
+            account_mode=account_mode,
+            position_id=position_id,
+            symbol_name=symbol_norm,
+            side=side_norm,
+            volume=volume,
+            entry_price=entry_price,
+            opened_utc=opened_utc,
+        )
+
     def submit_workspace_execution_plan(
         self,
         trade_uid: str,
@@ -4848,6 +4915,8 @@ class RuntimeEngine:
             execution_status = (
                 str(broker_result.get("status") or execution_status).strip().upper()
             )
+        elif broker == "CTRADER":
+            execution_status = "FILLED"
         broker_order_uid = self.repository.create_broker_order(
             trade_uid=trade_uid_clean,
             order_plan_uid=order_plan_uid_clean,
@@ -4858,14 +4927,134 @@ class RuntimeEngine:
             source="WORKSPACE",
             broker_comment=broker_comment,
         )
+        confirmed_position = self._map_workspace_terminal_broker_position(
+            broker=broker,
+            account_id=account_id,
+            symbol=symbol,
+            side=side,
+            broker_result=broker_result,
+        )
+        reconciliation = self.reconcile_workspace_broker_order(
+            trade_uid_clean,
+            order_plan_uid_clean,
+            broker_order_uid,
+            execution_status=execution_status,
+            confirmed_position=confirmed_position,
+        )
         return {
             "trade_uid": trade_uid_clean,
             "order_plan_uid": order_plan_uid_clean,
             "broker_order_uid": broker_order_uid,
             "broker_order_id": broker_order_id,
             "execution_status": execution_status,
+            "position_uid": str(reconciliation.get("position_uid") or ""),
             "already_submitted": False,
             "broker_result": broker_result,
+        }
+
+    def reconcile_workspace_broker_order(
+        self,
+        trade_uid: str,
+        order_plan_uid: str,
+        broker_order_uid: str,
+        *,
+        execution_status: str,
+        confirmed_position: BrokerPosition | None,
+    ) -> dict:
+        """Persist Workspace broker confirmation without losing causal identity."""
+        trade_uid_clean = str(trade_uid or "").strip()
+        order_plan_uid_clean = str(order_plan_uid or "").strip()
+        broker_order_uid_clean = str(broker_order_uid or "").strip()
+        status = str(execution_status or "").strip().upper()
+        if not all(
+            (trade_uid_clean, order_plan_uid_clean, broker_order_uid_clean, status)
+        ):
+            raise ValueError("Workspace reconciliation identity is incomplete")
+
+        chain = self.repository.get_trade_chain(trade_uid_clean)
+        trade = chain.get("trade")
+        trade_source = str(trade.get("source") or "").strip().upper() if trade else ""
+        if trade is None or trade_source != "WORKSPACE":
+            raise RuntimeError("Workspace persisted trade is unavailable")
+
+        plans = [
+            row
+            for row in chain.get("order_plans", [])
+            if str(row.get("order_plan_uid") or "").strip() == order_plan_uid_clean
+        ]
+        orders = [
+            row
+            for row in chain.get("broker_orders", [])
+            if str(row.get("broker_order_uid") or "").strip()
+            == broker_order_uid_clean
+        ]
+        if len(plans) != 1 or len(orders) != 1:
+            raise RuntimeError("Workspace persisted execution identity is unavailable")
+
+        plan = plans[0]
+        broker_order = orders[0]
+        if str(plan.get("source") or "").strip().upper() != "WORKSPACE":
+            raise RuntimeError("Workspace reconciliation requires WORKSPACE plan")
+        if str(broker_order.get("source") or "").strip().upper() != "WORKSPACE":
+            raise RuntimeError(
+                "Workspace reconciliation requires WORKSPACE broker order"
+            )
+        if (
+            str(broker_order.get("order_plan_uid") or "").strip()
+            != order_plan_uid_clean
+        ):
+            raise RuntimeError("Workspace broker order does not match execution plan")
+
+        self.repository.update_broker_order_execution_status(
+            broker_order_uid_clean,
+            status,
+        )
+
+        position_uid = ""
+        if confirmed_position is not None:
+            broker = str(trade.get("broker") or "").strip().upper()
+            account_id = str(trade.get("account_id") or "").strip().upper()
+            symbol = str(trade.get("symbol") or "").strip().upper()
+            side = str(plan.get("side") or "").strip().upper()
+            if str(confirmed_position.broker or "").strip().upper() != broker:
+                raise RuntimeError("Confirmed Workspace position broker mismatch")
+            if str(confirmed_position.account_id or "").strip().upper() != account_id:
+                raise RuntimeError("Confirmed Workspace position account mismatch")
+            if str(confirmed_position.symbol_name or "").strip().upper() != symbol:
+                raise RuntimeError("Confirmed Workspace position symbol mismatch")
+            if str(confirmed_position.side or "").strip().upper() != side:
+                raise RuntimeError("Confirmed Workspace position side mismatch")
+            if abs(float(confirmed_position.volume)) <= 0.0:
+                raise RuntimeError("Confirmed Workspace position has no exposure")
+            if status == "REJECTED":
+                raise RuntimeError(
+                    "Rejected Workspace order conflicts with confirmed exposure"
+                )
+
+            position_uid = self.repository.upsert_confirmed_position(
+                trade_uid=trade_uid_clean,
+                broker_order_uid=broker_order_uid_clean,
+                broker=broker,
+                broker_position_id=confirmed_position.position_id,
+                symbol=symbol,
+                side=side,
+                volume=confirmed_position.volume,
+                open_price=confirmed_position.entry_price,
+                opened_utc=confirmed_position.opened_utc or None,
+                source="BROKER",
+            )
+        elif status in {"FILLED", "PARTIALLY_FILLED", "PARTIAL"}:
+            raise RuntimeError(
+                "Workspace fill status requires broker-confirmed positive exposure"
+            )
+
+        return {
+            "trade_uid": trade_uid_clean,
+            "order_plan_uid": order_plan_uid_clean,
+            "broker_order_uid": broker_order_uid_clean,
+            "execution_status": status,
+            "position_uid": position_uid,
+            "confirmed_exposure": bool(position_uid),
         }
 
     def place_manual_market_order(
