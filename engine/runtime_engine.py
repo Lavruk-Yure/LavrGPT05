@@ -16,6 +16,7 @@ from core import ctrader_lot as ctr_lot
 from engine.broker_account import BrokerAccount
 from engine.broker_connection_state import BrokerConnectionState
 from engine.broker_interface import BrokerInterface
+from engine.broker_order_errors import BrokerTerminalOrderFailure
 from engine.broker_order_identity import (
     ORDER_CONTROL_MODE_MANUAL,
     build_broker_operation_comment,
@@ -4791,6 +4792,50 @@ class RuntimeEngine:
             opened_utc=opened_utc,
         )
 
+    def _map_workspace_terminal_failure_position(
+        self,
+        *,
+        broker: str,
+        account_id: str,
+        symbol: str,
+        side: str,
+        failure: BrokerTerminalOrderFailure,
+    ) -> BrokerPosition | None:
+        """Map typed terminal failure to confirmed positive exposure."""
+        if failure.filled <= 0.0:
+            return None
+
+        confirmed_price = float(failure.confirmed_price or 0.0)
+        if confirmed_price <= 0.0:
+            return None
+
+        broker_norm = str(broker or "").strip().upper()
+        account_id_clean = str(account_id or "").strip()
+        symbol_norm = str(symbol or "").strip().upper()
+        side_norm = str(side or "").strip().upper()
+        context = getattr(self, "context", None)
+        account_mode = str(getattr(context, "account_mode", "") or "")
+
+        if broker_norm == "IB":
+            position_id = f"IB:{account_id_clean}:{symbol_norm}"
+        elif broker_norm == "CTRADER":
+            position_id = str(failure.broker_position_id or "").strip()
+            if not position_id:
+                return None
+        else:
+            return None
+
+        return BrokerPosition(
+            broker=broker_norm,
+            account_id=account_id_clean,
+            account_mode=account_mode,
+            position_id=position_id,
+            symbol_name=symbol_norm,
+            side=side_norm,
+            volume=failure.filled,
+            entry_price=confirmed_price,
+        )
+
     def submit_workspace_execution_plan(
         self,
         trade_uid: str,
@@ -4881,33 +4926,105 @@ class RuntimeEngine:
             control_mode,
         )
 
-        if broker == "IB":
-            service = self.ib_runtime_service
-            if service is None:
-                raise RuntimeError("IB runtime service is not set")
-            broker_result = service.place_market_order(
-                symbol_name=symbol,
-                side=side,
-                quantity=base_units,
-                stop_loss=stop_loss,
-                take_profit=None,
-                comment=broker_comment,
+        try:
+            if broker == "IB":
+                service = self.ib_runtime_service
+                if service is None:
+                    raise RuntimeError("IB runtime service is not set")
+                broker_result = service.place_market_order(
+                    symbol_name=symbol,
+                    side=side,
+                    quantity=base_units,
+                    stop_loss=stop_loss,
+                    take_profit=None,
+                    comment=broker_comment,
+                )
+            elif broker == "CTRADER":
+                service = self.ctrader_runtime_service
+                if service is None:
+                    raise RuntimeError("cTrader runtime service is not set")
+                lots = base_units / 100000.0
+                broker_result = service.place_market_order(
+                    symbol_name=symbol,
+                    side=side,
+                    lots=lots,
+                    stop_loss=stop_loss,
+                    take_profit=None,
+                    comment=broker_comment,
+                )
+            else:
+                raise RuntimeError(f"Unsupported Workspace broker: {broker}")
+        except IBMarketOrderTimeoutError as timeout_error:
+            if broker != "IB":
+                raise
+            order_id = self._optional_positive_order_id(timeout_error.order_id)
+            if order_id is None:
+                raise RuntimeError(
+                    "Timed-out Workspace IB order id is invalid"
+                ) from timeout_error
+            broker_order_uid = self.repository.create_broker_order(
+                trade_uid=trade_uid_clean,
+                order_plan_uid=order_plan_uid_clean,
+                broker="IB",
+                broker_order_id=str(order_id),
+                execution_status=IB_MANUAL_OPEN_EXECUTION_STATUS_PENDING,
+                broker_timestamp=None,
+                source="WORKSPACE",
+                broker_comment=timeout_error.comment or broker_comment,
             )
-        elif broker == "CTRADER":
-            service = self.ctrader_runtime_service
-            if service is None:
-                raise RuntimeError("cTrader runtime service is not set")
-            lots = base_units / 100000.0
-            broker_result = service.place_market_order(
-                symbol_name=symbol,
-                side=side,
-                lots=lots,
-                stop_loss=stop_loss,
-                take_profit=None,
-                comment=broker_comment,
+            self.repository.create_pending_ib_manual_open(
+                trade_uid=trade_uid_clean,
+                order_plan_uid=order_plan_uid_clean,
+                broker_order_uid=broker_order_uid,
+                broker_order_id=order_id,
+                account_id=account_id,
+                symbol=timeout_error.symbol_name or symbol,
+                side=timeout_error.side or side,
+                quantity=timeout_error.quantity or base_units,
+                stop_loss_order_id=timeout_error.stop_loss_order_id,
+                take_profit_order_id=timeout_error.take_profit_order_id,
+                stop_loss=timeout_error.stop_loss,
+                take_profit=timeout_error.take_profit,
+                client_id=timeout_error.current_client_id,
+                comment=timeout_error.comment or broker_comment,
+                last_error=str(timeout_error),
             )
-        else:
-            raise RuntimeError(f"Unsupported Workspace broker: {broker}")
+            raise
+        except BrokerTerminalOrderFailure as failure:
+            if failure.broker != broker:
+                raise RuntimeError(
+                    "Workspace terminal failure broker identity mismatch"
+                ) from failure
+            broker_order_uid = self.repository.create_broker_order(
+                trade_uid=trade_uid_clean,
+                order_plan_uid=order_plan_uid_clean,
+                broker=broker,
+                broker_order_id=failure.broker_order_id,
+                execution_status=failure.status,
+                broker_timestamp=None,
+                source="WORKSPACE",
+                broker_comment=broker_comment,
+            )
+            confirmed_position = self._map_workspace_terminal_failure_position(
+                broker=broker,
+                account_id=account_id,
+                symbol=symbol,
+                side=side,
+                failure=failure,
+            )
+            if failure.filled > 0.0 and confirmed_position is None:
+                raise RuntimeError(
+                    "Workspace terminal failure has positive fill without "
+                    "confirmed position mapping"
+                ) from failure
+            self.reconcile_workspace_broker_order(
+                trade_uid_clean,
+                order_plan_uid_clean,
+                broker_order_uid,
+                execution_status=failure.status,
+                confirmed_position=confirmed_position,
+            )
+            raise
 
         broker_order_id = self._extract_broker_order_id(broker_result)
         execution_status = "SUBMITTED"

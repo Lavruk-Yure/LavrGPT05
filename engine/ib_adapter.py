@@ -30,6 +30,7 @@ from ibapi.wrapper import EWrapper
 
 from engine.broker_account import BrokerAccount
 from engine.broker_interface import BrokerInterface
+from engine.broker_order_errors import BrokerTerminalOrderFailure
 from engine.broker_order_identity import (
     ORDER_CONTROL_MODE_MANUAL,
     build_broker_order_comment,
@@ -3480,7 +3481,24 @@ class IBAdapter(BrokerInterface):
             )
 
         if status_text != "FILLED":
-            raise RuntimeError(f"IB MARKET order was not filled: {status_text}")
+            filled = float(status_row.get("filled", 0.0) or 0.0)
+            remaining = float(status_row.get("remaining", 0.0) or 0.0)
+            avg_fill_price = float(
+                status_row.get("avg_fill_price", 0.0) or 0.0
+            )
+            raise BrokerTerminalOrderFailure(
+                broker="IB",
+                broker_order_id=str(parent_order_id),
+                status=status_text or "UNKNOWN",
+                filled=filled,
+                remaining=remaining,
+                failure_reason=(
+                    "IB MARKET order reached a terminal non-filled status."
+                ),
+                confirmed_price=(
+                    avg_fill_price if avg_fill_price > 0.0 else None
+                ),
+            )
 
         return {
             "broker": "IB",

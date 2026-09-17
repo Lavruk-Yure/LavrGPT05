@@ -1,5 +1,9 @@
 {
   "lang_active": {
     "code": "uk"
+  },
+  "tokens_saved": {
+    "en": "Tokens saved: {path}",
+    "uk": "Збережені токени: {path}"
   }
 }

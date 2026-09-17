@@ -27,6 +27,7 @@ from core.token_manager import load_tokens
 from engine.broker_account import BrokerAccount
 from engine.broker_connection_state import BrokerConnectionState
 from engine.broker_interface import BrokerInterface
+from engine.broker_order_errors import BrokerTerminalOrderFailure
 from engine.broker_order_identity import (
     ORDER_CONTROL_MODE_MANUAL,
     build_broker_order_comment,
@@ -955,6 +956,35 @@ class CTraderAdapter(BrokerInterface):
             raise RuntimeError(timeout_message)
 
         if self._trade_error_text:
+            payload = self._trade_payload
+            execution_type = int(
+                getattr(payload, "executionType", 0) or 0
+            )
+            order = getattr(payload, "order", None)
+            order_id = (
+                getattr(order, "orderId", None) if order is not None else None
+            )
+            if (
+                execution_type == CTRADER_EXECUTION_TYPE_ORDER_REJECTED
+                and order_id is not None
+            ):
+                position = getattr(payload, "position", None)
+                position_id = (
+                    getattr(position, "positionId", None)
+                    if position is not None
+                    else None
+                )
+                raise BrokerTerminalOrderFailure(
+                    broker="CTRADER",
+                    broker_order_id=str(order_id),
+                    status="REJECTED",
+                    filled=0.0,
+                    remaining=0.0,
+                    failure_reason=self._trade_error_text,
+                    broker_position_id=(
+                        None if position_id is None else str(position_id)
+                    ),
+                )
             raise RuntimeError(self._trade_error_text)
 
         return self._trade_payload
