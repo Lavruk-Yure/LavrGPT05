@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import partial
 from importlib import import_module
+from typing import cast
 
 from ctrader_open_api import Client, Protobuf, TcpProtocol
 from ctrader_open_api.endpoints import EndPoints
@@ -41,6 +42,7 @@ from engine.broker_position import (
     BrokerPosition,
     BrokerPositionSnapshot,
 )
+from engine.ctrader_order_errors import CTraderMarketOrderTimeoutError
 from engine.ctrader_history import (
     CTraderHistoricalBar,
     CTraderHistoryDownloadResult,
@@ -127,6 +129,10 @@ ProtoOAGetTrendbarsRes = getattr(oa_messages, "ProtoOAGetTrendbarsRes")
 
 ProtoOAReconcileReq = getattr(oa_messages, "ProtoOAReconcileReq")
 ProtoOAReconcileRes = getattr(oa_messages, "ProtoOAReconcileRes")
+ProtoOAOrderListReq = getattr(oa_messages, "ProtoOAOrderListReq")
+ProtoOAOrderListRes = getattr(oa_messages, "ProtoOAOrderListRes")
+ProtoOADealListReq = getattr(oa_messages, "ProtoOADealListReq")
+ProtoOADealListRes = getattr(oa_messages, "ProtoOADealListRes")
 
 ProtoOAGetPositionUnrealizedPnLReq = getattr(
     oa_messages,
@@ -147,6 +153,8 @@ PAYLOAD_ASSET_LIST_RES = ProtoOAAssetListRes().payloadType
 PAYLOAD_TRADER_RES = ProtoOATraderRes().payloadType
 
 PAYLOAD_RECONCILE_RES = ProtoOAReconcileRes().payloadType
+PAYLOAD_ORDER_LIST_RES = ProtoOAOrderListRes().payloadType
+PAYLOAD_DEAL_LIST_RES = ProtoOADealListRes().payloadType
 
 PAYLOAD_EXECUTION_EVENT = ProtoOAExecutionEvent().payloadType
 PAYLOAD_ORDER_ERROR_EVENT = ProtoOAOrderErrorEvent().payloadType
@@ -205,6 +213,7 @@ class CTraderAdapter(BrokerInterface):
 
         self._positions_event = threading.Event()
         self._positions_payload: list = []
+        self._orders_payload: list = []
         self._positions_request_active = False
         self._positions_request_outcome = ""
         self._positions_request_failure_reason = ""
@@ -222,6 +231,18 @@ class CTraderAdapter(BrokerInterface):
         self._trade_event = threading.Event()
         self._trade_payload: object | None = None
         self._trade_error_text = ""
+
+        self._order_list_event = threading.Event()
+        self._order_list_payload: list = []
+        self._order_list_has_more = False
+        self._order_list_error_text = ""
+        self._order_list_request_active = False
+
+        self._deal_list_event = threading.Event()
+        self._deal_list_payload: list = []
+        self._deal_list_has_more = False
+        self._deal_list_error_text = ""
+        self._deal_list_request_active = False
 
         self._modify_sltp_event = threading.Event()
         self._modify_sltp_payload: object | None = None
@@ -402,6 +423,14 @@ class CTraderAdapter(BrokerInterface):
                 CTRADER_POSITION_REQUEST_OUTCOME_DISCONNECTED,
                 "cTrader disconnected during positions request.",
             )
+        if self._order_list_request_active:
+            self._order_list_error_text = "cTrader disconnected during order history."
+            self._order_list_request_active = False
+            self._order_list_event.set()
+        if self._deal_list_request_active:
+            self._deal_list_error_text = "cTrader disconnected during deal history."
+            self._deal_list_request_active = False
+            self._deal_list_event.set()
         self._spot_event.clear()
         self._spot_prices = {}
         self._spot_subscribed_symbol_ids = set()
@@ -430,6 +459,7 @@ class CTraderAdapter(BrokerInterface):
 
         self._positions_event.clear()
         self._positions_payload = []
+        self._orders_payload = []
         self._positions_request_active = False
         self._positions_request_outcome = ""
         self._positions_request_failure_reason = ""
@@ -447,6 +477,18 @@ class CTraderAdapter(BrokerInterface):
         self._trade_event.clear()
         self._trade_payload = None
         self._trade_error_text = ""
+
+        self._order_list_event.clear()
+        self._order_list_payload = []
+        self._order_list_has_more = False
+        self._order_list_error_text = ""
+        self._order_list_request_active = False
+
+        self._deal_list_event.clear()
+        self._deal_list_payload = []
+        self._deal_list_has_more = False
+        self._deal_list_error_text = ""
+        self._deal_list_request_active = False
 
     def wait_for_connect_result(self, timeout_seconds: float) -> bool:
         """Wait for a late cTrader connect/auth result without polling."""
@@ -757,7 +799,17 @@ class CTraderAdapter(BrokerInterface):
         deferred = self.client.send(request)
         deferred.addErrback(self._on_trade_deferred_error)
 
-        return self._wait_for_trade_result("cTrader MARKET order timeout.")
+        try:
+            return self._wait_for_trade_result("cTrader MARKET order timeout.")
+        except RuntimeError as exc:
+            if str(exc) != "cTrader MARKET order timeout.":
+                raise
+            raise CTraderMarketOrderTimeoutError(
+                symbol_name=symbol_name,
+                side=normalized_side,
+                lots=normalized_lots,
+                comment=broker_comment,
+            ) from exc
 
     def close_position(
         self,
@@ -957,13 +1009,9 @@ class CTraderAdapter(BrokerInterface):
 
         if self._trade_error_text:
             payload = self._trade_payload
-            execution_type = int(
-                getattr(payload, "executionType", 0) or 0
-            )
+            execution_type = int(getattr(payload, "executionType", 0) or 0)
             order = getattr(payload, "order", None)
-            order_id = (
-                getattr(order, "orderId", None) if order is not None else None
-            )
+            order_id = getattr(order, "orderId", None) if order is not None else None
             if (
                 execution_type == CTRADER_EXECUTION_TYPE_ORDER_REJECTED
                 and order_id is not None
@@ -1100,6 +1148,14 @@ class CTraderAdapter(BrokerInterface):
             self._on_reconcile_res(payload)
             return
 
+        if message.payloadType == PAYLOAD_ORDER_LIST_RES:
+            self._on_order_list_res(payload)
+            return
+
+        if message.payloadType == PAYLOAD_DEAL_LIST_RES:
+            self._on_deal_list_res(payload)
+            return
+
         if message.payloadType == PAYLOAD_POSITION_UNREALIZED_PNL_RES:
             self._on_position_unrealized_pnl_res(payload)
             return
@@ -1131,6 +1187,14 @@ class CTraderAdapter(BrokerInterface):
             if self._trendbars_request_active:
                 self._trendbars_error_text = error_text
                 self._trendbars_event.set()
+            if self._order_list_request_active:
+                self._order_list_error_text = error_text
+                self._order_list_request_active = False
+                self._order_list_event.set()
+            if self._deal_list_request_active:
+                self._deal_list_error_text = error_text
+                self._deal_list_request_active = False
+                self._deal_list_event.set()
             self.state.connected_event.set()
 
     def _on_trendbars_res(self, payload: object) -> None:
@@ -1950,6 +2014,7 @@ class CTraderAdapter(BrokerInterface):
 
         self._positions_event.clear()
         self._positions_payload = []
+        self._orders_payload = []
         self._positions_request_active = True
         self._positions_request_outcome = ""
         self._positions_request_failure_reason = ""
@@ -1995,6 +2060,210 @@ class CTraderAdapter(BrokerInterface):
         self._sync_owned_spot_subscriptions()
 
         return self._build_positions()
+
+    def get_workspace_reconcile_snapshot(self) -> dict[str, object]:
+        """Повернути positions і pending orders з одного reconcile."""
+        positions = self.get_positions()
+        if self._positions_request_outcome != CTRADER_POSITION_REQUEST_OUTCOME_SUCCESS:
+            return {
+                "success": False,
+                "positions": [],
+                "orders": [],
+                "failure_reason": (
+                    self._positions_request_failure_reason
+                    or self._positions_request_outcome
+                    or "UNKNOWN_FAILURE"
+                ),
+            }
+        return {
+            "success": True,
+            "positions": positions,
+            "orders": list(self._orders_payload),
+            "failure_reason": "",
+        }
+
+    def get_order_history(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Отримати bounded cTrader order history."""
+        if not self.is_connected() or self.client is None:
+            return {
+                "success": False,
+                "orders": [],
+                "has_more": False,
+                "failure_reason": "cTrader adapter is disconnected.",
+            }
+        self._order_list_event.clear()
+        self._order_list_payload = []
+        self._order_list_has_more = False
+        self._order_list_error_text = ""
+        self._order_list_request_active = True
+
+        request = ProtoOAOrderListReq()
+        request.ctidTraderAccountId = self.config.ctid_trader_account_id
+        request.fromTimestamp = self._datetime_to_epoch_millis(start_utc)
+        request.toTimestamp = self._datetime_to_epoch_millis(end_utc)
+
+        deferred = self.client.send(request)
+        deferred.addErrback(self._on_order_list_deferred_error)
+        finished = self._order_list_event.wait(timeout=CTRADER_WAIT_TIMEOUT_SECONDS)
+        if not finished:
+            self._order_list_request_active = False
+            self._order_list_error_text = "cTrader order history timeout."
+
+        return {
+            "success": finished and not self._order_list_error_text,
+            "orders": list(self._order_list_payload),
+            "has_more": self._order_list_has_more,
+            "failure_reason": self._order_list_error_text,
+        }
+
+    def get_deal_history(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Отримати bounded cTrader deal history як execution evidence."""
+        if not self.is_connected() or self.client is None:
+            return {
+                "success": False,
+                "deals": [],
+                "has_more": False,
+                "failure_reason": "cTrader adapter is disconnected.",
+            }
+        self._deal_list_event.clear()
+        self._deal_list_payload = []
+        self._deal_list_has_more = False
+        self._deal_list_error_text = ""
+        self._deal_list_request_active = True
+
+        request = ProtoOADealListReq()
+        request.ctidTraderAccountId = self.config.ctid_trader_account_id
+        request.fromTimestamp = self._datetime_to_epoch_millis(start_utc)
+        request.toTimestamp = self._datetime_to_epoch_millis(end_utc)
+
+        deferred = self.client.send(request)
+        deferred.addErrback(self._on_deal_list_deferred_error)
+        finished = self._deal_list_event.wait(timeout=CTRADER_WAIT_TIMEOUT_SECONDS)
+        if not finished:
+            self._deal_list_request_active = False
+            self._deal_list_error_text = "cTrader deal history timeout."
+
+        return {
+            "success": finished and not self._deal_list_error_text,
+            "deals": list(self._deal_list_payload),
+            "has_more": self._deal_list_has_more,
+            "failure_reason": self._deal_list_error_text,
+        }
+
+    def get_workspace_timeout_recovery_sources(
+        self,
+        correlation: str,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Зібрати cTrader recovery evidence без повторного submit."""
+        correlation_clean = str(correlation or "").strip()
+        if not correlation_clean.startswith("WSP:"):
+            raise ValueError("Workspace cTrader correlation must start with WSP:")
+
+        reconcile = self.get_workspace_reconcile_snapshot()
+
+        reconcile_orders = cast(
+            list[object],
+            reconcile.get("orders", []),
+        )
+        pending_orders = [
+            order
+            for order in reconcile_orders
+            if self._payload_has_correlation(order, correlation_clean)
+        ]
+
+        reconcile_positions = cast(
+            list[BrokerPosition],
+            reconcile.get("positions", []),
+        )
+        positions = [
+            position
+            for position in reconcile_positions
+            if self._position_has_correlation(position, correlation_clean)
+        ]
+
+        order_history = self.get_order_history(start_utc, end_utc)
+        order_history_items = cast(
+            list[object],
+            order_history.get("orders", []),
+        )
+        history_orders = [
+            order
+            for order in order_history_items
+            if self._payload_has_correlation(order, correlation_clean)
+        ]
+
+        recovered_order_ids = {
+            str(getattr(order, "orderId", "") or "").strip()
+            for order in pending_orders + history_orders
+        }
+        recovered_order_ids.discard("")
+
+        deal_history = self.get_deal_history(start_utc, end_utc)
+        deal_history_items = cast(
+            list[object],
+            deal_history.get("deals", []),
+        )
+        deals = [
+            deal
+            for deal in deal_history_items
+            if str(getattr(deal, "orderId", "") or "").strip()
+            in recovered_order_ids
+        ]
+
+        return {
+            "correlation": correlation_clean,
+            "reconcile_success": bool(reconcile.get("success")),
+            "pending_orders": pending_orders,
+            "positions": positions,
+            "order_history_success": bool(order_history.get("success")),
+            "history_orders": history_orders,
+            "order_history_has_more": bool(order_history.get("has_more")),
+            "deal_history_success": bool(deal_history.get("success")),
+            "deals": deals,
+            "deal_history_has_more": bool(deal_history.get("has_more")),
+        }
+
+    @staticmethod
+    def _payload_has_correlation(payload: object, correlation: str) -> bool:
+        """Перевірити WSP correlation у tradeData label/comment."""
+        trade_data = getattr(payload, "tradeData", None)
+        if trade_data is None:
+            return False
+        values = (
+            getattr(trade_data, "label", ""),
+            getattr(trade_data, "comment", ""),
+        )
+        return any(correlation in str(value or "") for value in values)
+
+    @staticmethod
+    def _position_has_correlation(
+        position: BrokerPosition,
+        correlation: str,
+    ) -> bool:
+        """Перевірити WSP correlation у broker-confirmed position."""
+        raw_payload = position.raw_payload or {}
+        values = (
+            raw_payload.get("label", ""),
+            raw_payload.get("broker_comment", ""),
+        )
+        return any(correlation in str(value or "") for value in values)
+
+    @staticmethod
+    def _datetime_to_epoch_millis(value: datetime) -> int:
+        """Перетворити aware UTC datetime на epoch milliseconds."""
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("cTrader recovery window requires aware datetime")
+        return int(value.astimezone(UTC).timestamp() * 1000.0)
 
     def get_positions_snapshot(self) -> BrokerPositionSnapshot:
         """Отримати terminal snapshot cTrader positions request."""
@@ -2056,10 +2325,12 @@ class CTraderAdapter(BrokerInterface):
             return
 
         self._positions_payload = list(getattr(payload, "position", []))
+        self._orders_payload = list(getattr(payload, "order", []))
 
         self.logger.info(
-            "cTrader reconcile received | positions=%s",
+            "cTrader reconcile received | positions=%s pending_orders=%s",
             len(self._positions_payload),
+            len(self._orders_payload),
         )
 
         self._complete_positions_request(
@@ -2083,6 +2354,40 @@ class CTraderAdapter(BrokerInterface):
             CTRADER_POSITION_REQUEST_OUTCOME_REQUEST_ERROR,
             failure_reason,
         )
+
+    def _on_order_list_res(self, payload: object) -> None:
+        """Завершити bounded order-history request."""
+        if not self._order_list_request_active:
+            return
+        self._order_list_payload = list(getattr(payload, "order", []))
+        self._order_list_has_more = bool(getattr(payload, "hasMore", False))
+        self._order_list_request_active = False
+        self._order_list_event.set()
+
+    def _on_order_list_deferred_error(self, failure: object) -> None:
+        """Завершити order-history request із помилкою transport."""
+        if not self._order_list_request_active:
+            return
+        self._order_list_error_text = f"cTrader order history failed: {failure}"
+        self._order_list_request_active = False
+        self._order_list_event.set()
+
+    def _on_deal_list_res(self, payload: object) -> None:
+        """Завершити bounded deal-history request."""
+        if not self._deal_list_request_active:
+            return
+        self._deal_list_payload = list(getattr(payload, "deal", []))
+        self._deal_list_has_more = bool(getattr(payload, "hasMore", False))
+        self._deal_list_request_active = False
+        self._deal_list_event.set()
+
+    def _on_deal_list_deferred_error(self, failure: object) -> None:
+        """Завершити deal-history request із помилкою transport."""
+        if not self._deal_list_request_active:
+            return
+        self._deal_list_error_text = f"cTrader deal history failed: {failure}"
+        self._deal_list_request_active = False
+        self._deal_list_event.set()
 
     @property
     def broker_state(self) -> str:

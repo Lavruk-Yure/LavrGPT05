@@ -396,6 +396,37 @@ class RuntimeRepository:
         ).fetchone()
         return None if row is None else dict(row)
 
+    def update_broker_order_identity_and_status(
+        self,
+        broker_order_uid: str,
+        *,
+        broker_order_id: str | None,
+        execution_status: str,
+        broker_timestamp: str | None = None,
+    ) -> None:
+        """Оновити recovered broker identity та execution status."""
+        broker_order_uid_clean = str(broker_order_uid or "").strip()
+        if not broker_order_uid_clean:
+            raise ValueError("Broker order uid is empty")
+
+        order_id_clean = str(broker_order_id or "").strip() or None
+        self._connection.execute(
+            """
+            UPDATE broker_orders
+            SET broker_order_id = COALESCE(?, broker_order_id),
+                execution_status = ?,
+                broker_timestamp = COALESCE(?, broker_timestamp)
+            WHERE broker_order_uid = ?
+            """,
+            (
+                order_id_clean,
+                str(execution_status or "").strip().upper(),
+                broker_timestamp,
+                broker_order_uid_clean,
+            ),
+        )
+        self._connection.commit()
+
     def update_broker_order_execution_status(
         self,
         broker_order_uid: str,

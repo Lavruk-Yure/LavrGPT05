@@ -67,6 +67,35 @@ class CTraderSessionManagerProtocol(Protocol):
         """
         ...
 
+    def get_workspace_reconcile_snapshot(self) -> dict[str, object]:
+        """Повернути cTrader positions і pending orders одним reconcile."""
+        ...
+
+    def get_order_history(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути bounded cTrader order history."""
+        ...
+
+    def get_deal_history(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути bounded cTrader deal history."""
+        ...
+
+    def get_workspace_timeout_recovery_sources(
+        self,
+        correlation: str,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути cTrader recovery evidence для Workspace timeout."""
+        ...
+
     def get_forex_quote_snapshot(
         self,
         symbol_names: list[str],
@@ -290,6 +319,77 @@ class CTraderRuntimeService:
             )
 
         return adapter.get_positions_snapshot()
+
+    def get_workspace_reconcile_snapshot(self) -> dict[str, object]:
+        """Повернути cTrader positions і pending orders одним reconcile."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return {
+                "success": False,
+                "positions": [],
+                "orders": [],
+                "failure_reason": "cTrader active adapter is unavailable.",
+            }
+        return adapter.get_workspace_reconcile_snapshot()
+
+    def get_order_history(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути bounded cTrader order history через active adapter."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return {
+                "success": False,
+                "orders": [],
+                "has_more": False,
+                "failure_reason": "cTrader active adapter is unavailable.",
+            }
+        return adapter.get_order_history(start_utc, end_utc)
+
+    def get_deal_history(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути bounded cTrader deal history через active adapter."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return {
+                "success": False,
+                "deals": [],
+                "has_more": False,
+                "failure_reason": "cTrader active adapter is unavailable.",
+            }
+        return adapter.get_deal_history(start_utc, end_utc)
+
+    def get_workspace_timeout_recovery_sources(
+        self,
+        correlation: str,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути cTrader recovery evidence для Workspace timeout."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return {
+                "correlation": str(correlation or "").strip(),
+                "reconcile_success": False,
+                "pending_orders": [],
+                "positions": [],
+                "order_history_success": False,
+                "history_orders": [],
+                "order_history_has_more": False,
+                "deal_history_success": False,
+                "deals": [],
+                "deal_history_has_more": False,
+            }
+        return adapter.get_workspace_timeout_recovery_sources(
+            correlation,
+            start_utc,
+            end_utc,
+        )
 
     def get_forex_quote_snapshot(
         self,

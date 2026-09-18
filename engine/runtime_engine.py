@@ -10,7 +10,7 @@ import logging
 import math
 import time
 from datetime import UTC, datetime, timedelta
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from core import ctrader_lot as ctr_lot
 from engine.broker_account import BrokerAccount
@@ -26,6 +26,7 @@ from engine.broker_order_identity import (
     strip_broker_order_identity,
 )
 from engine.broker_position import BrokerPosition, BrokerPositionSnapshot
+from engine.ctrader_order_errors import CTraderMarketOrderTimeoutError
 from engine.ctrader_history import (
     CTraderHistoryDownloadResult,
     CTraderHistoryProgressCallback,
@@ -189,6 +190,15 @@ class CTraderRuntimeServiceProtocol(Protocol):
 
     def get_positions_snapshot(self) -> BrokerPositionSnapshot:
         """Повернути broker-neutral terminal position snapshot."""
+        ...
+
+    def get_workspace_timeout_recovery_sources(
+        self,
+        correlation: str,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути cTrader timeout recovery evidence."""
         ...
 
     def get_broker_health(self) -> RuntimeBrokerHealth:
@@ -4836,6 +4846,195 @@ class RuntimeEngine:
             entry_price=confirmed_price,
         )
 
+    @staticmethod
+    def _ctrader_recovery_order_status(order: object) -> str:
+        """Нормалізувати cTrader orderStatus у recovery state."""
+        value = int(getattr(order, "orderStatus", 0) or 0)
+        if value == 2:
+            return "FILLED"
+        if value == 3:
+            return "REJECTED"
+        if value in {4, 5}:
+            return "CANCELLED"
+        return ""
+
+    @staticmethod
+    def _ctrader_recovery_order_id(payload: object) -> str:
+        """Повернути exact cTrader orderId з recovery payload."""
+        return str(getattr(payload, "orderId", "") or "").strip()
+
+    @staticmethod
+    def _ctrader_recovery_has_positive_deal(deal: object) -> bool:
+        """Перевірити broker-confirmed positive execution у DealList."""
+        filled = float(getattr(deal, "filledVolume", 0.0) or 0.0)
+        volume = float(getattr(deal, "volume", 0.0) or 0.0)
+        return max(filled, volume) > 0.0
+
+    def recover_ctrader_workspace_timeout(
+        self,
+        trade_uid: str,
+        order_plan_uid: str,
+        broker_order_uid: str,
+    ) -> dict:
+        """Відновити один causal cTrader timeout без повторного submit."""
+        trade_uid_clean = str(trade_uid or "").strip()
+        order_plan_uid_clean = str(order_plan_uid or "").strip()
+        broker_order_uid_clean = str(broker_order_uid or "").strip()
+        chain = self.repository.get_trade_chain(trade_uid_clean)
+        trade = chain.get("trade")
+        if trade is None:
+            raise RuntimeError("Workspace persisted trade is unavailable")
+
+        broker = str(trade.get("broker") or "").strip().upper()
+        if broker != "CTRADER":
+            raise RuntimeError("cTrader timeout recovery requires CTRADER trade")
+
+        plans = [
+            row
+            for row in chain.get("order_plans", [])
+            if str(row.get("order_plan_uid") or "").strip()
+            == order_plan_uid_clean
+        ]
+        orders = [
+            row
+            for row in chain.get("broker_orders", [])
+            if str(row.get("broker_order_uid") or "").strip()
+            == broker_order_uid_clean
+        ]
+        if len(plans) != 1 or len(orders) != 1:
+            raise RuntimeError("Workspace cTrader recovery identity is unavailable")
+
+        plan = plans[0]
+        broker_order = orders[0]
+        if str(plan.get("source") or "").strip().upper() != "WORKSPACE":
+            raise RuntimeError("Workspace cTrader recovery requires WORKSPACE plan")
+        if str(broker_order.get("source") or "").strip().upper() != "WORKSPACE":
+            raise RuntimeError(
+                "Workspace cTrader recovery requires WORKSPACE broker order"
+            )
+
+        service = self.ctrader_runtime_service
+        if service is None:
+            return {
+                "execution_status": "UNKNOWN",
+                "broker_order_id": broker_order.get("broker_order_id"),
+                "confirmed_exposure": False,
+                "resubmit_allowed": False,
+            }
+
+        broker_timestamp = str(broker_order.get("broker_timestamp") or "").strip()
+        try:
+            start_utc = datetime.fromisoformat(broker_timestamp)
+        except ValueError:
+            start_utc = datetime.now(UTC)
+        if start_utc.tzinfo is None:
+            start_utc = start_utc.replace(tzinfo=UTC)
+        start_utc = start_utc.astimezone(UTC)
+        end_utc = datetime.now(UTC)
+
+        trade_hint = trade_uid_clean.replace("-", "")[:12]
+        correlation = f"WSP:{trade_hint}"
+        evidence = service.get_workspace_timeout_recovery_sources(
+            correlation,
+            start_utc,
+            end_utc,
+        )
+
+        source_ok = all(
+            bool(evidence.get(name))
+            for name in (
+                "reconcile_success",
+                "order_history_success",
+                "deal_history_success",
+            )
+        )
+        pending_orders = cast(
+            list[object],
+            evidence.get("pending_orders") or [],
+        )
+        positions = cast(
+            list[BrokerPosition],
+            evidence.get("positions") or [],
+        )
+        history_orders = cast(
+            list[object],
+            evidence.get("history_orders") or [],
+        )
+        deals = cast(
+            list[object],
+            evidence.get("deals") or [],
+        )
+
+        recovered_ids = {
+            self._ctrader_recovery_order_id(payload)
+            for payload in pending_orders + history_orders + deals
+        }
+        recovered_ids.discard("")
+        recovered_order_id = (
+            next(iter(recovered_ids))
+            if len(recovered_ids) == 1
+            else None
+        )
+
+        terminal_statuses = {
+            self._ctrader_recovery_order_status(order)
+            for order in history_orders
+        }
+        terminal_statuses.discard("")
+        positive_execution = any(
+            self._ctrader_recovery_has_positive_deal(deal) for deal in deals
+        )
+        confirmed_position = positions[0] if len(positions) == 1 else None
+        confirmed_exposure = confirmed_position is not None
+        positive_evidence = positive_execution or confirmed_exposure
+
+        outcome = "UNKNOWN"
+        if source_ok and len(recovered_ids) <= 1 and len(terminal_statuses) <= 1:
+            terminal = next(iter(terminal_statuses), "")
+            if pending_orders:
+                if not terminal and not positive_evidence:
+                    outcome = "STILL_PENDING"
+            elif terminal == "REJECTED":
+                if not positive_evidence:
+                    outcome = "REJECTED"
+            elif terminal == "CANCELLED":
+                outcome = "CANCELLED"
+            elif terminal == "FILLED":
+                if positive_evidence:
+                    outcome = "FILLED"
+            elif positive_evidence:
+                outcome = "FILLED"
+
+        persisted_status = (
+            "PENDING_CONFIRMATION"
+            if outcome in {"STILL_PENDING", "UNKNOWN"}
+            else outcome
+        )
+        self.repository.update_broker_order_identity_and_status(
+            broker_order_uid_clean,
+            broker_order_id=recovered_order_id,
+            execution_status=persisted_status,
+        )
+
+        position_uid = ""
+        if confirmed_position is not None and outcome in {"FILLED", "CANCELLED"}:
+            reconciliation = self.reconcile_workspace_broker_order(
+                trade_uid_clean,
+                order_plan_uid_clean,
+                broker_order_uid_clean,
+                execution_status=outcome,
+                confirmed_position=confirmed_position,
+            )
+            position_uid = str(reconciliation.get("position_uid") or "")
+
+        return {
+            "execution_status": outcome,
+            "broker_order_id": recovered_order_id,
+            "position_uid": position_uid,
+            "confirmed_exposure": bool(position_uid),
+            "resubmit_allowed": False,
+        }
+
     def submit_workspace_execution_plan(
         self,
         trade_uid: str,
@@ -4882,12 +5081,36 @@ class RuntimeEngine:
         ]
         if existing_orders:
             existing = existing_orders[-1]
+            existing_uid = str(existing.get("broker_order_uid") or "")
+            existing_status = str(
+                existing.get("execution_status") or ""
+            ).strip().upper()
+            trade_broker = str(trade.get("broker") or "").strip().upper()
+            if (
+                trade_broker == "CTRADER"
+                and existing_status == "PENDING_CONFIRMATION"
+            ):
+                recovery = self.recover_ctrader_workspace_timeout(
+                    trade_uid_clean,
+                    order_plan_uid_clean,
+                    existing_uid,
+                )
+                return {
+                    "trade_uid": trade_uid_clean,
+                    "order_plan_uid": order_plan_uid_clean,
+                    "broker_order_uid": existing_uid,
+                    "broker_order_id": recovery.get("broker_order_id"),
+                    "execution_status": recovery.get("execution_status"),
+                    "position_uid": recovery.get("position_uid", ""),
+                    "already_submitted": True,
+                    "resubmit_allowed": False,
+                }
             return {
                 "trade_uid": trade_uid_clean,
                 "order_plan_uid": order_plan_uid_clean,
-                "broker_order_uid": str(existing.get("broker_order_uid") or ""),
+                "broker_order_uid": existing_uid,
                 "broker_order_id": existing.get("broker_order_id"),
-                "execution_status": str(existing.get("execution_status") or ""),
+                "execution_status": existing_status,
                 "already_submitted": True,
             }
 
@@ -4926,6 +5149,7 @@ class RuntimeEngine:
             control_mode,
         )
 
+        submission_started_utc = datetime.now(UTC)
         try:
             if broker == "IB":
                 service = self.ib_runtime_service
@@ -4990,6 +5214,38 @@ class RuntimeEngine:
                 last_error=str(timeout_error),
             )
             raise
+        except CTraderMarketOrderTimeoutError as timeout_error:
+            if broker != "CTRADER":
+                raise
+            broker_order_uid = self.repository.create_broker_order(
+                trade_uid=trade_uid_clean,
+                order_plan_uid=order_plan_uid_clean,
+                broker="CTRADER",
+                broker_order_id=None,
+                execution_status="PENDING_CONFIRMATION",
+                broker_timestamp=submission_started_utc.isoformat(),
+                source="WORKSPACE",
+                broker_comment=timeout_error.comment or broker_comment,
+            )
+            recovery = self.recover_ctrader_workspace_timeout(
+                trade_uid_clean,
+                order_plan_uid_clean,
+                broker_order_uid,
+            )
+            outcome = str(recovery.get("execution_status") or "UNKNOWN")
+            if outcome in {"STILL_PENDING", "UNKNOWN"}:
+                raise timeout_error
+            return {
+                "trade_uid": trade_uid_clean,
+                "order_plan_uid": order_plan_uid_clean,
+                "broker_order_uid": broker_order_uid,
+                "broker_order_id": recovery.get("broker_order_id"),
+                "execution_status": outcome,
+                "position_uid": recovery.get("position_uid", ""),
+                "already_submitted": True,
+                "recovered_after_timeout": True,
+                "resubmit_allowed": False,
+            }
         except BrokerTerminalOrderFailure as failure:
             if failure.broker != broker:
                 raise RuntimeError(
