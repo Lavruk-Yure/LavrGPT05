@@ -360,6 +360,13 @@ class IBRuntimeService:
 
         return adapter.get_positions_snapshot()
 
+    def get_execution_commission_events(self) -> list[dict[str, object]]:
+        """Повернути завершені IB execution/commission пари без broker request."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return []
+        return [dict(item) for item in adapter.get_execution_commission_events()]
+
     def place_market_order(
         self,
         symbol_name: str,

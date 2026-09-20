@@ -164,6 +164,12 @@ class _IBWrapper(EWrapper):
         self.execution_event = threading.Event()
         self.executions: list[dict[str, Any]] = []
 
+        self.execution_commission_lock = threading.RLock()
+        self.pending_execution_by_exec_id: dict[str, dict[str, Any]] = {}
+        self.pending_commission_by_exec_id: dict[str, dict[str, Any]] = {}
+        self.completed_execution_commission_keys: set[tuple[str, str, str]] = set()
+        self.execution_commission_events: list[dict[str, Any]] = []
+
         self.completed_orders_event = threading.Event()
         self.completed_orders: list[dict[str, Any]] = []
 
@@ -871,6 +877,7 @@ class _IBWrapper(EWrapper):
         """
         item = {
             "req_id": int(req_id),
+            "exec_id": str(getattr(execution, "execId", "") or "").strip(),
             "account": str(getattr(execution, "acctNumber", "") or ""),
             "symbol": str(getattr(contract, "symbol", "") or ""),
             "sec_type": str(getattr(contract, "secType", "") or ""),
@@ -885,11 +892,13 @@ class _IBWrapper(EWrapper):
         }
 
         self.executions.append(item)
+        self._record_execution_for_commission_pairing(item)
 
         self._logger.info(
-            "IB execDetails | reqId=%s | account=%s | symbol=%s.%s | "
+            "IB execDetails | reqId=%s | execId=%s | account=%s | symbol=%s.%s | "
             "side=%s | shares=%s | price=%s | time=%s | orderId=%s",
             item["req_id"],
+            item["exec_id"],
             item["account"],
             item["symbol"],
             item["currency"],
@@ -899,6 +908,116 @@ class _IBWrapper(EWrapper):
             item["time"],
             item["order_id"],
         )
+
+    def commissionAndFeesReport(  # noqa: N802
+        self,
+        commission_and_fees_report,
+    ) -> None:
+        """Pair one IB commission report with its execution by execId."""
+        exec_id = str(
+            getattr(commission_and_fees_report, "execId", "") or ""
+        ).strip()
+        if not exec_id:
+            self._logger.warning(
+                "IB commissionAndFeesReport ignored: missing execId."
+            )
+            return
+
+        item = {
+            "exec_id": exec_id,
+            "commission_and_fees": self._clean_ib_float(
+                getattr(commission_and_fees_report, "commissionAndFees", None)
+            ),
+            "currency": str(
+                getattr(commission_and_fees_report, "currency", "") or ""
+            ).strip(),
+            "realized_pnl": self._clean_ib_float(
+                getattr(commission_and_fees_report, "realizedPNL", None)
+            ),
+        }
+
+        with self.execution_commission_lock:
+            self.pending_commission_by_exec_id[exec_id] = item
+
+        self._try_complete_execution_commission_pair(exec_id)
+
+        self._logger.info(
+            "IB commissionAndFeesReport | execId=%s | commission=%s | "
+            "currency=%s | realizedPnL=%s",
+            item["exec_id"],
+            item["commission_and_fees"],
+            item["currency"],
+            item["realized_pnl"],
+        )
+
+    def _record_execution_for_commission_pairing(
+        self,
+        execution_item: dict[str, Any],
+    ) -> None:
+        """Cache one execution half and attempt causal execId pairing."""
+        exec_id = str(execution_item.get("exec_id") or "").strip()
+        if not exec_id:
+            return
+
+        with self.execution_commission_lock:
+            self.pending_execution_by_exec_id.setdefault(
+                exec_id,
+                dict(execution_item),
+            )
+
+        self._try_complete_execution_commission_pair(exec_id)
+
+    def _try_complete_execution_commission_pair(self, exec_id: str) -> None:
+        """Emit one normalized pair only after both callback halves exist."""
+        with self.execution_commission_lock:
+            execution = self.pending_execution_by_exec_id.get(exec_id)
+            commission = self.pending_commission_by_exec_id.get(exec_id)
+            if execution is None or commission is None:
+                return
+
+            account_id = str(execution.get("account") or "").strip()
+            if not account_id:
+                return
+
+            key = ("IB", account_id, exec_id)
+            if key in self.completed_execution_commission_keys:
+                self.pending_execution_by_exec_id.pop(exec_id, None)
+                self.pending_commission_by_exec_id.pop(exec_id, None)
+                return
+
+            commission_value = commission.get("commission_and_fees")
+            realized_pnl = commission.get("realized_pnl")
+            currency = str(commission.get("currency") or "").strip()
+            if commission_value is None or realized_pnl is None or not currency:
+                return
+
+            self.completed_execution_commission_keys.add(key)
+            self.execution_commission_events.append(
+                {
+                    "broker": "IB",
+                    "account_id": account_id,
+                    "exec_id": exec_id,
+                    "order_id": int(execution.get("order_id") or 0),
+                    "perm_id": int(execution.get("perm_id") or 0),
+                    "execution_time": str(execution.get("time") or ""),
+                    "symbol": str(execution.get("symbol") or ""),
+                    "execution_currency": str(
+                        execution.get("currency") or ""
+                    ),
+                    "shares": float(execution.get("shares") or 0.0),
+                    "price": float(execution.get("price") or 0.0),
+                    "commission_and_fees": float(commission_value),
+                    "commission_currency": currency,
+                    "broker_reported_realized_pnl": float(realized_pnl),
+                }
+            )
+            self.pending_execution_by_exec_id.pop(exec_id, None)
+            self.pending_commission_by_exec_id.pop(exec_id, None)
+
+    def get_execution_commission_events(self) -> list[dict[str, Any]]:
+        """Return a stable snapshot of completed IB execution/cost pairs."""
+        with self.execution_commission_lock:
+            return [dict(item) for item in self.execution_commission_events]
 
     def execDetailsEnd(  # noqa: N802
         self,
@@ -1130,6 +1249,10 @@ class IBAdapter(BrokerInterface):
         self._connected = False
         self._stopping = False
         self._broker_state = "DISCONNECTED"
+
+    def get_execution_commission_events(self) -> list[dict[str, Any]]:
+        """Return normalized IB execution/commission pairs without requests."""
+        return self._wrapper.get_execution_commission_events()
 
     @property
     def broker_state(self) -> str:
