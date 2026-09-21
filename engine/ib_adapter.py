@@ -169,6 +169,10 @@ class _IBWrapper(EWrapper):
         self.pending_commission_by_exec_id: dict[str, dict[str, Any]] = {}
         self.completed_execution_commission_keys: set[tuple[str, str, str]] = set()
         self.execution_commission_events: list[dict[str, Any]] = []
+        self.req_id_to_exec_ids: dict[int, set[str]] = {}
+        self.execution_recovery_end_req_ids: set[int] = set()
+        self.execution_recovery_failed_req_ids: set[int] = set()
+        self.execution_recovery_events: dict[int, threading.Event] = {}
 
         self.completed_orders_event = threading.Event()
         self.completed_orders: list[dict[str, Any]] = []
@@ -892,6 +896,10 @@ class _IBWrapper(EWrapper):
         }
 
         self.executions.append(item)
+        self._record_execution_recovery_exec_id(
+            req_id=int(req_id),
+            exec_id=str(item["exec_id"]),
+        )
         self._record_execution_for_commission_pairing(item)
 
         self._logger.info(
@@ -983,6 +991,7 @@ class _IBWrapper(EWrapper):
             if key in self.completed_execution_commission_keys:
                 self.pending_execution_by_exec_id.pop(exec_id, None)
                 self.pending_commission_by_exec_id.pop(exec_id, None)
+                self._try_complete_execution_recovery_requests(exec_id)
                 return
 
             commission_value = commission.get("commission_and_fees")
@@ -1009,15 +1018,107 @@ class _IBWrapper(EWrapper):
                     "commission_and_fees": float(commission_value),
                     "commission_currency": currency,
                     "broker_reported_realized_pnl": float(realized_pnl),
+                    "net_realized_pnl": float(realized_pnl),
                 }
             )
             self.pending_execution_by_exec_id.pop(exec_id, None)
             self.pending_commission_by_exec_id.pop(exec_id, None)
+            self._try_complete_execution_recovery_requests(exec_id)
 
     def get_execution_commission_events(self) -> list[dict[str, Any]]:
         """Return a stable snapshot of completed IB execution/cost pairs."""
         with self.execution_commission_lock:
             return [dict(item) for item in self.execution_commission_events]
+
+    def begin_execution_recovery(self, req_id: int) -> None:
+        """Зареєструвати один reqExecutions recovery snapshot."""
+        request_id = int(req_id)
+        with self.execution_commission_lock:
+            self.req_id_to_exec_ids[request_id] = set()
+            self.execution_recovery_end_req_ids.discard(request_id)
+            self.execution_recovery_failed_req_ids.discard(request_id)
+            self.execution_recovery_events[request_id] = threading.Event()
+
+    def _record_execution_recovery_exec_id(
+        self,
+        *,
+        req_id: int,
+        exec_id: str,
+    ) -> None:
+        """Додати знайдений execId до його recovery request."""
+        identity = str(exec_id or "").strip()
+        with self.execution_commission_lock:
+            expected = self.req_id_to_exec_ids.get(int(req_id))
+            if expected is not None and identity:
+                expected.add(identity)
+
+    def _try_complete_execution_recovery_requests(self, exec_id: str) -> None:
+        """Завершити snapshots, у яких уже наявні всі execution/cost пари."""
+        completed_exec_ids = {
+            str(item.get("exec_id") or "")
+            for item in self.execution_commission_events
+        }
+        for req_id, expected_exec_ids in self.req_id_to_exec_ids.items():
+            if exec_id not in expected_exec_ids:
+                continue
+            if req_id not in self.execution_recovery_end_req_ids:
+                continue
+            if req_id in self.execution_recovery_failed_req_ids:
+                continue
+            if expected_exec_ids.issubset(completed_exec_ids):
+                self.execution_recovery_events[req_id].set()
+
+    def fail_execution_recovery(self, req_id: int) -> None:
+        """Fail-close recovery request без права commit coverage."""
+        request_id = int(req_id)
+        with self.execution_commission_lock:
+            self.execution_recovery_failed_req_ids.add(request_id)
+            event = self.execution_recovery_events.get(request_id)
+            if event is not None:
+                event.set()
+
+    def wait_for_execution_commission_pairs(
+        self,
+        req_id: int,
+        timeout: float,
+    ) -> bool:
+        """Чекати завершення всіх пар конкретного recovery request."""
+        with self.execution_commission_lock:
+            event = self.execution_recovery_events.get(int(req_id))
+        if event is None:
+            return False
+        return event.wait(timeout=timeout)
+
+    def get_execution_recovery_result(
+        self,
+        req_id: int,
+    ) -> dict[str, Any]:
+        """Повернути completed events і authoritative completion state."""
+        request_id = int(req_id)
+        with self.execution_commission_lock:
+            expected_exec_ids = set(
+                self.req_id_to_exec_ids.get(request_id, set())
+            )
+            events = [
+                dict(item)
+                for item in self.execution_commission_events
+                if str(item.get("exec_id") or "") in expected_exec_ids
+            ]
+            completed_exec_ids = {
+                str(item.get("exec_id") or "") for item in events
+            }
+            source_complete = (
+                request_id in self.execution_recovery_end_req_ids
+                and request_id not in self.execution_recovery_failed_req_ids
+                and expected_exec_ids.issubset(completed_exec_ids)
+            )
+            return {
+                "req_id": request_id,
+                "expected_exec_ids": sorted(expected_exec_ids),
+                "completed_exec_ids": sorted(completed_exec_ids),
+                "events": events,
+                "source_complete": source_complete,
+            }
 
     def execDetailsEnd(  # noqa: N802
         self,
@@ -1026,6 +1127,17 @@ class _IBWrapper(EWrapper):
         """
         IB executions snapshot end callback.
         """
+        request_id = int(req_id)
+        with self.execution_commission_lock:
+            if request_id in self.req_id_to_exec_ids:
+                self.execution_recovery_end_req_ids.add(request_id)
+                expected_exec_ids = self.req_id_to_exec_ids[request_id]
+                completed_exec_ids = {
+                    str(item.get("exec_id") or "")
+                    for item in self.execution_commission_events
+                }
+                if expected_exec_ids.issubset(completed_exec_ids):
+                    self.execution_recovery_events[request_id].set()
         self._logger.info("IB execDetailsEnd received. reqId=%s", req_id)
         self.execution_event.set()
 
@@ -1253,6 +1365,40 @@ class IBAdapter(BrokerInterface):
     def get_execution_commission_events(self) -> list[dict[str, Any]]:
         """Return normalized IB execution/commission pairs without requests."""
         return self._wrapper.get_execution_commission_events()
+
+    def recover_daily_execution_commission_events(
+        self,
+        account_id: str,
+    ) -> dict[str, Any]:
+        """Відновити authoritative IB execution/cost snapshot для account."""
+        account = str(account_id or "").strip()
+        if not account:
+            raise ValueError("IB recovery account_id is empty")
+
+        with self._execution_lock:
+            req_id = self._get_next_execution_req_id()
+            self._wrapper.begin_execution_recovery(req_id)
+
+            execution_filter = ExecutionFilter()
+            execution_filter.acctCode = account
+
+            try:
+                self._client.reqExecutions(req_id, execution_filter)
+            except Exception:
+                self._wrapper.fail_execution_recovery(req_id)
+                raise
+
+            finished = self._wrapper.wait_for_execution_commission_pairs(
+                req_id,
+                timeout=IB_EXECUTIONS_TIMEOUT_SECONDS,
+            )
+            if not finished:
+                self._wrapper.fail_execution_recovery(req_id)
+
+            result = self._wrapper.get_execution_recovery_result(req_id)
+            result["account_id"] = account
+            result["timed_out"] = not finished
+            return result
 
     @property
     def broker_state(self) -> str:

@@ -1,5 +1,6 @@
-# runtime_engine.py
-"""Канонічний runtime engine ATS-двигуна LGE.
+"""runtime_engine.py
+
+Канонічний runtime engine ATS-двигуна LGE.
 
 Оркеструє runtime state, broker services, події та SQLite без Qt/UI.
 Broker-history API підтримує необов'язковий neutral progress callback.
@@ -314,6 +315,17 @@ class IBRuntimeServiceProtocol(Protocol):
 
     def get_managed_accounts(self) -> list[str]:
         """Return IB accounts visible through the active session."""
+        ...
+
+    def get_execution_commission_events(self) -> list[dict[str, object]]:
+        """Повернути completed IB live execution/commission events."""
+        ...
+
+    def recover_daily_execution_commission_events(
+        self,
+        account_id: str,
+    ) -> dict[str, object]:
+        """Повернути authoritative IB daily realized recovery result."""
         ...
 
     def get_historical_bars(
@@ -3001,6 +3013,83 @@ class RuntimeEngine:
                 "service_class": service.__class__.__name__,
             },
         )
+
+    def recover_ib_daily_realized_events(
+        self,
+        *,
+        account_id: str,
+        coverage_start_utc: datetime,
+        coverage_end_utc: datetime,
+    ) -> dict[str, object]:
+        """Persist IB recovery events і commit coverage лише після completion."""
+        service = self.ib_runtime_service
+        if service is None:
+            raise RuntimeError("IB runtime service is not set")
+
+        recovery = service.recover_daily_execution_commission_events(
+            account_id
+        )
+        raw_events = recovery.get("events")
+        events = (
+            [dict(item) for item in raw_events if isinstance(item, dict)]
+            if isinstance(raw_events, list)
+            else []
+        )
+
+        for event in events:
+            self.repository.upsert_ib_daily_realized_event(
+                account_id=str(event.get("account_id") or account_id),
+                exec_id=str(event.get("exec_id") or ""),
+                execution_time=str(event.get("execution_time") or ""),
+                net_realized_pnl=float(
+                    str(event.get("net_realized_pnl") or "0")
+                ),
+                payload=event,
+            )
+
+        source_complete = recovery.get("source_complete") is True
+        if source_complete:
+            self.repository.record_ib_daily_realized_coverage(
+                account_id=account_id,
+                start_utc=coverage_start_utc,
+                end_utc=coverage_end_utc,
+                source="REQ_EXECUTIONS_RECOVERY",
+            )
+
+        return {
+            "account_id": account_id,
+            "events_persisted": len(events),
+            "source_complete": source_complete,
+            "coverage_committed": source_complete,
+        }
+
+    def persist_ib_daily_realized_live_events(self) -> dict[str, object]:
+        """Persist completed IB live events без coverage authority."""
+        service = self.ib_runtime_service
+        if service is None:
+            return {
+                "events_processed": 0,
+                "coverage_committed": False,
+            }
+
+        events = service.get_execution_commission_events()
+        for event in events:
+            if not isinstance(event, dict):
+                raise TypeError("IB live realized event must be a dictionary")
+            self.repository.upsert_ib_daily_realized_event(
+                account_id=str(event.get("account_id") or ""),
+                exec_id=str(event.get("exec_id") or ""),
+                execution_time=str(event.get("execution_time") or ""),
+                net_realized_pnl=float(
+                    str(event.get("net_realized_pnl") or "0")
+                ),
+                payload=event,
+            )
+
+        return {
+            "events_processed": len(events),
+            "coverage_committed": False,
+        }
 
     def download_ctrader_historical_bars(
         self,

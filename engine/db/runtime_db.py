@@ -20,7 +20,7 @@ from pathlib import Path
 
 from core.app_paths import BASE_DIR
 
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 
 
 RUNTIME_TABLES_SQL = """
@@ -240,6 +240,34 @@ ON ib_fx_external_exposures (account_id, symbol, evidence_status);
 
 CREATE INDEX IF NOT EXISTS idx_ib_pending_open_orders_active
 ON ib_pending_open_orders (is_active, execution_status);
+
+CREATE TABLE IF NOT EXISTS ib_daily_realized_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL,
+    exec_id TEXT NOT NULL,
+    execution_time TEXT NOT NULL,
+    net_realized_pnl REAL NOT NULL,
+    payload_json TEXT NOT NULL,
+    created_utc TEXT NOT NULL,
+    updated_utc TEXT NOT NULL,
+    UNIQUE (account_id, exec_id)
+);
+
+CREATE TABLE IF NOT EXISTS ib_daily_realized_coverage (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL,
+    start_utc TEXT NOT NULL,
+    end_utc TEXT NOT NULL,
+    source TEXT NOT NULL,
+    created_utc TEXT NOT NULL,
+    UNIQUE (account_id, start_utc, end_utc, source)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ib_daily_realized_events_account_time
+ON ib_daily_realized_events (account_id, execution_time);
+
+CREATE INDEX IF NOT EXISTS idx_ib_daily_realized_coverage_account_start
+ON ib_daily_realized_coverage (account_id, start_utc, end_utc);
 """
 
 
@@ -322,7 +350,7 @@ def _ensure_runtime_column(
 def migrate_runtime_schema(
     connection: sqlite3.Connection,
 ) -> None:
-    """Apply additive Runtime schema migrations through schema v10."""
+    """Apply additive Runtime schema migrations through schema v11."""
     _ensure_runtime_column(
         connection,
         "trades",

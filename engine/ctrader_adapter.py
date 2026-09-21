@@ -2158,6 +2158,167 @@ class CTraderAdapter(BrokerInterface):
             "failure_reason": self._deal_list_error_text,
         }
 
+    def get_deal_net_realized_events(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Нормалізувати closed cTrader deals у net-realized events."""
+        history = self.get_deal_history(start_utc, end_utc)
+        if not bool(history.get("success")):
+            return {
+                "success": False,
+                "events": [],
+                "has_more": bool(history.get("has_more")),
+                "failure_reason": str(history.get("failure_reason") or ""),
+            }
+
+        if bool(history.get("has_more")):
+            return {
+                "success": False,
+                "events": [],
+                "has_more": True,
+                "failure_reason": "cTrader deal history pagination incomplete.",
+            }
+
+        deals = cast(list[object], history.get("deals", []))
+        events: list[dict[str, object]] = []
+        seen_keys: set[tuple[str, str]] = set()
+
+        for deal in deals:
+            event, failure_reason = self._normalize_deal_net_realized_event(deal)
+            if failure_reason:
+                return {
+                    "success": False,
+                    "events": [],
+                    "has_more": False,
+                    "failure_reason": failure_reason,
+                }
+            if event is None:
+                continue
+
+            key = (
+                str(event["account_id"]),
+                str(event["deal_id"]),
+            )
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            events.append(event)
+
+        return {
+            "success": True,
+            "events": events,
+            "has_more": False,
+            "failure_reason": "",
+        }
+
+    def _normalize_deal_net_realized_event(
+        self,
+        deal: object,
+    ) -> tuple[dict[str, object] | None, str]:
+        """Нормалізувати closed deal у canonical event."""
+        if not self._proto_field_present(deal, "closePositionDetail"):
+            return None, ""
+
+        close_detail = getattr(deal, "closePositionDetail", None)
+        if close_detail is None:
+            return None, "cTrader closed deal has no closePositionDetail."
+
+        deal_id = self._optional_proto_scalar(deal, "dealId")
+        order_id = self._optional_proto_scalar(deal, "orderId")
+        position_id = self._optional_proto_scalar(deal, "positionId")
+        filled_volume = self._optional_proto_scalar(deal, "filledVolume")
+        execution_timestamp = self._optional_proto_scalar(
+            deal,
+            "executionTimestamp",
+        )
+        gross_profit = self._optional_proto_scalar(close_detail, "grossProfit")
+        swap = self._optional_proto_scalar(close_detail, "swap")
+        commission = self._optional_proto_scalar(close_detail, "commission")
+        money_digits_raw = self._optional_proto_scalar(close_detail, "moneyDigits")
+        pnl_conversion_fee = self._optional_proto_scalar(
+            close_detail,
+            "pnlConversionFee",
+        )
+
+        required_values = (
+            deal_id,
+            order_id,
+            position_id,
+            filled_volume,
+            execution_timestamp,
+            gross_profit,
+            swap,
+            commission,
+            money_digits_raw,
+            pnl_conversion_fee,
+        )
+        if any(value is None for value in required_values):
+            return None, "cTrader closed deal has incomplete net-realized fields."
+
+        account_id = str(self.config.ctid_trader_account_id).strip()
+        if not account_id:
+            return None, "cTrader closed deal account identity is missing."
+
+        deal_id_int = int(deal_id)
+        order_id_int = int(order_id)
+        position_id_int = int(position_id)
+        filled_volume_int = int(filled_volume)
+        execution_timestamp_int = int(execution_timestamp)
+        money_digits = int(money_digits_raw)
+        if (
+            deal_id_int <= 0
+            or order_id_int <= 0
+            or position_id_int <= 0
+            or filled_volume_int <= 0
+            or execution_timestamp_int <= 0
+            or money_digits < 0
+        ):
+            return None, "cTrader closed deal identity or scaling is invalid."
+
+        scale = 10**money_digits
+        gross_realized_pnl = float(gross_profit) / scale
+        swap_pnl_effect = float(swap) / scale
+        commission_pnl_effect = float(commission) / scale
+        pnl_conversion_fee_effect = float(pnl_conversion_fee) / scale
+        net_realized_pnl = (
+            gross_realized_pnl
+            + swap_pnl_effect
+            + commission_pnl_effect
+            + pnl_conversion_fee_effect
+        )
+
+        return (
+            {
+                "broker": "CTRADER",
+                "account_id": account_id,
+                "deal_id": str(deal_id_int),
+                "order_id": str(order_id_int),
+                "position_id": str(position_id_int),
+                "execution_timestamp": execution_timestamp_int,
+                "filled_volume_raw": filled_volume_int,
+                "money_digits": money_digits,
+                "gross_realized_pnl": gross_realized_pnl,
+                "swap_pnl_effect": swap_pnl_effect,
+                "commission_pnl_effect": commission_pnl_effect,
+                "pnl_conversion_fee_pnl_effect": pnl_conversion_fee_effect,
+                "net_realized_pnl": net_realized_pnl,
+            },
+            "",
+        )
+
+    @staticmethod
+    def _proto_field_present(payload: object, field_name: str) -> bool:
+        """Перевірити presence protobuf field без default value."""
+        has_field = getattr(payload, "HasField", None)
+        if callable(has_field):
+            try:
+                return bool(has_field(field_name))
+            except (TypeError, ValueError):
+                return getattr(payload, field_name, None) is not None
+        return getattr(payload, field_name, None) is not None
+
     def get_workspace_timeout_recovery_sources(
         self,
         correlation: str,

@@ -1,7 +1,6 @@
-# main_logic.py
-# -*- coding: utf-8 -*-
-"""
-core/main_logic.py — головне робоче вікно LGE.
+"""main_logic.py
+
+Головне робоче вікно LGE.
 
 Функції:
 - ліва панель навігації (Моніторинг / Ордери / Налаштування / Про програму) +
@@ -315,6 +314,7 @@ QToolButton#tbExit:pressed {
         self.action_about.triggered.connect(self._open_about_dialog)
         self.action_exit.triggered.connect(self.request_application_exit)
         self._last_broker_states: dict[str, str] = {}
+        self._ib_daily_realized_recovery_key: tuple[str, str, int] | None = None
 
         # =========================================================
         # APPLY TRANSLATION (початковий)
@@ -1622,6 +1622,18 @@ QToolButton#tbExit:pressed {
             except Exception:  # noqa
                 logger.exception("IB broker health/account refresh failed.")
 
+            try:
+                self._recover_ib_daily_realized_account_day_once(
+                    runtime_engine
+                )
+            except Exception:  # noqa
+                logger.exception("IB daily realized recovery failed.")
+
+            try:
+                runtime_engine.persist_ib_daily_realized_live_events()
+            except Exception:  # noqa
+                logger.exception("IB live realized event persistence failed.")
+
         ctrader_service = runtime_engine.ctrader_runtime_service
         if ctrader_service is not None:
             try:
@@ -1636,6 +1648,56 @@ QToolButton#tbExit:pressed {
             self._last_account_refresh_monotonic = now_monotonic
 
         self._update_brokers_statusbar()
+
+    def _recover_ib_daily_realized_account_day_once(
+        self,
+        runtime_engine: RuntimeEngine,
+        evaluation_utc: datetime | None = None,
+    ) -> dict[str, object] | None:
+        """Запустити один IB recovery на account/day/connection generation."""
+        service = runtime_engine.ib_runtime_service
+        if service is None:
+            self._ib_daily_realized_recovery_key = None
+            return None
+
+        if not service.get_broker_health().is_connected():
+            self._ib_daily_realized_recovery_key = None
+            return None
+
+        account_state = service.get_account_state()
+        account_id = str(account_state.account_id or "").strip()
+        if not account_id:
+            return None
+
+        get_active_adapter = getattr(service, "get_active_adapter", None)
+        if not callable(get_active_adapter):
+            return None
+        active_adapter = get_active_adapter()
+        if active_adapter is None:
+            return None
+
+        evaluation = evaluation_utc or datetime.now(UTC)
+        evaluation = evaluation.astimezone(UTC)
+        day_start = evaluation.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+        recovery_key = (
+            account_id,
+            day_start.date().isoformat(),
+            id(active_adapter),
+        )
+        if self._ib_daily_realized_recovery_key == recovery_key:
+            return None
+
+        self._ib_daily_realized_recovery_key = recovery_key
+        return runtime_engine.recover_ib_daily_realized_events(
+            account_id=account_id,
+            coverage_start_utc=day_start,
+            coverage_end_utc=evaluation,
+        )
 
     def _notify_broker_state_changes(
         self,

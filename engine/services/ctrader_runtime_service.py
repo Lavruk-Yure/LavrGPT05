@@ -364,6 +364,22 @@ class CTraderRuntimeService:
             }
         return adapter.get_deal_history(start_utc, end_utc)
 
+    def get_deal_net_realized_events(
+        self,
+        start_utc: datetime,
+        end_utc: datetime,
+    ) -> dict[str, object]:
+        """Повернути normalized closed-deal net-realized events."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return {
+                "success": False,
+                "events": [],
+                "has_more": False,
+                "failure_reason": "cTrader active adapter is unavailable.",
+            }
+        return adapter.get_deal_net_realized_events(start_utc, end_utc)
+
     def get_workspace_timeout_recovery_sources(
         self,
         correlation: str,

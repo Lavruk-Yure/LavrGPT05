@@ -13,6 +13,7 @@ Runtime Repository для persistence layer LGE.
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 from datetime import UTC, datetime
 from typing import Any
@@ -826,9 +827,7 @@ class RuntimeRepository:
             WHERE position_uid = ?
             """,
             (
-                None
-                if broker_position_id is None
-                else str(broker_position_id).strip(),
+                None if broker_position_id is None else str(broker_position_id).strip(),
                 volume_value,
                 open_price,
                 opened_utc,
@@ -3926,6 +3925,214 @@ class RuntimeRepository:
     def _optional_upper_text(value: object) -> str | None:
         text = str(value or "").strip().upper()
         return text or None
+
+    def upsert_ib_daily_realized_event(
+        self,
+        *,
+        account_id: str,
+        exec_id: str,
+        execution_time: str,
+        net_realized_pnl: float,
+        payload: dict[str, object],
+    ) -> None:
+        """Persist one canonical IB realized event, fail-closed on conflict."""
+        account = str(account_id or "").strip()
+        identity = str(exec_id or "").strip()
+        execution_time_clean = str(execution_time or "").strip()
+        amount = float(net_realized_pnl)
+
+        if not account or not identity or not execution_time_clean:
+            raise ValueError("IB daily realized event identity is incomplete")
+        if not math.isfinite(amount):
+            raise ValueError("IB daily realized event amount is invalid")
+
+        payload_json = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        existing = self._connection.execute(
+            """
+            SELECT execution_time, net_realized_pnl, payload_json
+            FROM ib_daily_realized_events
+            WHERE account_id = ?
+              AND exec_id = ?
+            """,
+            (account, identity),
+        ).fetchone()
+
+        if existing is not None:
+            same = (
+                str(existing["execution_time"]) == execution_time_clean
+                and float(existing["net_realized_pnl"]) == amount
+                and str(existing["payload_json"]) == payload_json
+            )
+            if not same:
+                raise ValueError(
+                    "IB daily realized event conflicts with persisted exec_id"
+                )
+            return
+
+        now = utc_now_iso()
+        self._connection.execute(
+            """
+            INSERT INTO ib_daily_realized_events (
+                account_id,
+                exec_id,
+                execution_time,
+                net_realized_pnl,
+                payload_json,
+                created_utc,
+                updated_utc
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                account,
+                identity,
+                execution_time_clean,
+                amount,
+                payload_json,
+                now,
+                now,
+            ),
+        )
+        self._connection.commit()
+
+    def list_ib_daily_realized_events(
+        self,
+        *,
+        account_id: str,
+    ) -> list[dict[str, object]]:
+        """Return persisted canonical IB realized events for one account."""
+        account = str(account_id or "").strip()
+        if not account:
+            return []
+
+        rows = self._connection.execute(
+            """
+            SELECT exec_id, execution_time, net_realized_pnl, payload_json
+            FROM ib_daily_realized_events
+            WHERE account_id = ?
+            ORDER BY execution_time, exec_id
+            """,
+            (account,),
+        ).fetchall()
+        result: list[dict[str, object]] = []
+
+        for row in rows:
+            payload_raw = json.loads(str(row["payload_json"]))
+            payload = dict(payload_raw) if isinstance(payload_raw, dict) else {}
+            payload["broker"] = "IB"
+            payload["account_id"] = account
+            payload["exec_id"] = str(row["exec_id"])
+            payload["execution_time"] = str(row["execution_time"])
+            payload["net_realized_pnl"] = float(row["net_realized_pnl"])
+            result.append(payload)
+
+        return result
+
+    def record_ib_daily_realized_coverage(
+        self,
+        *,
+        account_id: str,
+        start_utc: datetime,
+        end_utc: datetime,
+        source: str,
+    ) -> None:
+        """Persist one authoritative IB observation/recovery coverage interval."""
+        account = str(account_id or "").strip()
+        source_clean = str(source or "").strip().upper()
+        start = self._require_aware_utc(start_utc, "start_utc")
+        end = self._require_aware_utc(end_utc, "end_utc")
+
+        if not account or not source_clean:
+            raise ValueError("IB daily realized coverage identity is incomplete")
+        if start >= end:
+            raise ValueError("IB daily realized coverage interval is invalid")
+
+        self._connection.execute(
+            """
+            INSERT OR IGNORE INTO ib_daily_realized_coverage (
+                account_id, start_utc, end_utc, source, created_utc
+            )
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                account,
+                start.isoformat(),
+                end.isoformat(),
+                source_clean,
+                utc_now_iso(),
+            ),
+        )
+        self._connection.commit()
+
+    def list_ib_daily_realized_coverage(
+        self,
+        *,
+        account_id: str,
+    ) -> list[tuple[datetime, datetime]]:
+        """Return persisted IB coverage intervals for one account."""
+        account = str(account_id or "").strip()
+        if not account:
+            return []
+
+        rows = self._connection.execute(
+            """
+            SELECT start_utc, end_utc
+            FROM ib_daily_realized_coverage
+            WHERE account_id = ?
+            ORDER BY start_utc, end_utc
+            """,
+            (account,),
+        ).fetchall()
+        return [
+            (
+                datetime.fromisoformat(str(row["start_utc"])).astimezone(UTC),
+                datetime.fromisoformat(str(row["end_utc"])).astimezone(UTC),
+            )
+            for row in rows
+        ]
+
+    def ib_daily_realized_coverage_is_complete(
+        self,
+        *,
+        account_id: str,
+        day_start_utc: datetime,
+        evaluation_utc: datetime,
+    ) -> bool:
+        """Return whether durable coverage is contiguous through evaluation."""
+        day_start = self._require_aware_utc(day_start_utc, "day_start_utc")
+        evaluation = self._require_aware_utc(
+            evaluation_utc,
+            "evaluation_utc",
+        )
+        if day_start >= evaluation:
+            return False
+
+        cursor = day_start
+        intervals = self.list_ib_daily_realized_coverage(
+            account_id=account_id,
+        )
+        for start, end in intervals:
+            if end <= cursor:
+                continue
+            if start > cursor:
+                return False
+            cursor = max(cursor, end)
+            if cursor >= evaluation:
+                return True
+
+        return cursor >= evaluation
+
+    @staticmethod
+    def _require_aware_utc(value: datetime, field_name: str) -> datetime:
+        """Normalize one timezone-aware datetime to UTC."""
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError(f"{field_name} must be timezone-aware")
+        return value.astimezone(UTC)
 
     def mark_position_closed_by_broker_position_id(
         self,

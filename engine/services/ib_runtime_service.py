@@ -367,6 +367,23 @@ class IBRuntimeService:
             return []
         return [dict(item) for item in adapter.get_execution_commission_events()]
 
+    def recover_daily_execution_commission_events(
+        self,
+        account_id: str,
+    ) -> dict[str, object]:
+        """Виконати fail-closed IB daily realized recovery snapshot."""
+        adapter = self.get_active_adapter()
+        if adapter is None or not adapter.is_connected():
+            return {
+                "account_id": str(account_id or "").strip(),
+                "events": [],
+                "source_complete": False,
+                "timed_out": False,
+            }
+        return dict(
+            adapter.recover_daily_execution_commission_events(account_id)
+        )
+
     def place_market_order(
         self,
         symbol_name: str,
