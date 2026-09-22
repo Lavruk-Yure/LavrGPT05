@@ -32,6 +32,10 @@ from engine.ctrader_history import (
     CTraderHistoryDownloadResult,
     CTraderHistoryProgressCallback,
 )
+from engine.daily_realized_pnl import (
+    BrokerDailyRealizedPnlResult,
+    aggregate_broker_daily_realized_pnl,
+)
 from engine.db.runtime_db import (
     connect_runtime_db,
     get_runtime_database_path,
@@ -3090,6 +3094,43 @@ class RuntimeEngine:
             "events_processed": len(events),
             "coverage_committed": False,
         }
+
+    def read_ib_daily_realized_pnl_snapshot(
+        self,
+        *,
+        account_id: str,
+        evaluation_utc: datetime,
+    ) -> BrokerDailyRealizedPnlResult:
+        """Прочитати causal IB account-day PnL лише з durable store."""
+        if not isinstance(evaluation_utc, datetime):
+            raise TypeError("evaluation_utc must be datetime")
+        if evaluation_utc.tzinfo is None or evaluation_utc.utcoffset() is None:
+            raise ValueError("evaluation_utc must be timezone-aware")
+
+        evaluation = evaluation_utc.astimezone(UTC)
+        day_start = evaluation.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+        source_complete = (
+            self.repository.ib_daily_realized_coverage_is_complete(
+                account_id=account_id,
+                day_start_utc=day_start,
+                evaluation_utc=evaluation,
+            )
+        )
+        events = self.repository.list_ib_daily_realized_events(
+            account_id=account_id,
+        )
+        return aggregate_broker_daily_realized_pnl(
+            broker="IB",
+            account_id=account_id,
+            events=events,
+            evaluation_utc=evaluation,
+            source_complete=source_complete,
+        )
 
     def download_ctrader_historical_bars(
         self,

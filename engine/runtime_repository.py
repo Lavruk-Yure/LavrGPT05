@@ -1,5 +1,5 @@
-# runtime_repository.py
-"""
+"""runtime_repository.py.
+
 Runtime Repository для persistence layer LGE.
 
 Поточний етап RoadMap82:
@@ -12,6 +12,7 @@ Runtime Repository для persistence layer LGE.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import sqlite3
@@ -2266,21 +2267,32 @@ class RuntimeRepository:
             evidence_snapshot=evidence_snapshot,
         )
 
+        authority_accounts = self._ib_reconciliation_authority_accounts(
+            evidence_snapshot
+        )
+        captured_utc = self._normalize_aware_timestamp_text(
+            snapshot.captured_utc,
+            "snapshot.captured_utc",
+        )
+        snapshot_digest = self._ib_reconciliation_snapshot_digest(snapshot)
         open_orders = list(evidence_snapshot.get("open_orders") or [])
         completed_orders = list(evidence_snapshot.get("completed_orders") or [])
         executions = list(evidence_snapshot.get("executions") or [])
         current_client_id = self._optional_int_value(
             evidence_snapshot.get("current_client_id")
         )
-        captured_utc = str(snapshot.captured_utc or "").strip()
         legs_written = 0
         orders_written = 0
         open_legs = 0
         closed_legs = 0
-
         self._connection.execute("SAVEPOINT ib_virtual_leg_sync")
 
         try:
+            self._validate_ib_reconciliation_authority_conflicts(
+                account_ids=authority_accounts,
+                captured_utc=captured_utc,
+                snapshot_digest=snapshot_digest,
+            )
             for leg in snapshot.legs:
                 closed_utc = self._ib_virtual_leg_closed_utc(
                     leg=leg,
@@ -2505,6 +2517,11 @@ class RuntimeRepository:
                     )
 
             external_exposures = self._sync_ib_fx_external_exposures_no_commit(snapshot)
+            authority_rows_written = self._upsert_ib_reconciliation_authority_no_commit(
+                account_ids=authority_accounts,
+                captured_utc=captured_utc,
+                snapshot_digest=snapshot_digest,
+            )
             self._connection.execute("RELEASE ib_virtual_leg_sync")
             self._connection.commit()
         except Exception:
@@ -2520,7 +2537,155 @@ class RuntimeRepository:
             "open_legs": open_legs,
             "closed_legs": closed_legs,
             "external_exposures": external_exposures,
+            "authority_accounts": authority_accounts,
+            "authority_rows_written": authority_rows_written,
         }
+
+    def get_ib_virtual_leg_reconciliation_authority(
+        self,
+        *,
+        account_id: str,
+    ) -> dict[str, object] | None:
+        """Прочитати latest complete reconciliation authority exact account."""
+        account = str(account_id or "").strip()
+        if not account:
+            return None
+
+        row = self._connection.execute(
+            """
+            SELECT account_id, captured_utc, source_complete, snapshot_digest
+            FROM ib_virtual_leg_reconciliation_authority
+            WHERE account_id = ?
+            """,
+            (account,),
+        ).fetchone()
+        if row is None:
+            return None
+        return {
+            "account_id": str(row["account_id"]),
+            "captured_utc": str(row["captured_utc"]),
+            "source_complete": bool(row["source_complete"]),
+            "snapshot_digest": str(row["snapshot_digest"]),
+        }
+
+    @staticmethod
+    def _ib_reconciliation_authority_accounts(
+        evidence_snapshot: dict[str, Any],
+    ) -> list[str]:
+        """Нормалізувати exact accounts повного IB evidence snapshot."""
+        accounts = sorted(
+            {
+                str(value or "").strip()
+                for value in evidence_snapshot.get("account_ids") or []
+                if str(value or "").strip()
+            }
+        )
+        if not accounts:
+            raise RuntimeError("IB reconciliation authority accounts are empty")
+        return accounts
+
+    @staticmethod
+    def _ib_reconciliation_snapshot_digest(
+        snapshot: IBVirtualPositionLegReconciliationSnapshot,
+    ) -> str:
+        """Побудувати deterministic digest causal reconciliation payload."""
+        payload = snapshot.to_dict()
+        payload["captured_utc"] = RuntimeRepository._normalize_aware_timestamp_text(
+            snapshot.captured_utc,
+            "snapshot.captured_utc",
+        )
+        payload_json = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        return hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
+
+    def _validate_ib_reconciliation_authority_conflicts(
+        self,
+        *,
+        account_ids: list[str],
+        captured_utc: str,
+        snapshot_digest: str,
+    ) -> None:
+        """Fail closed on stale or conflicting reconciliation authority."""
+        captured = datetime.fromisoformat(captured_utc)
+        for account_id in account_ids:
+            row = self._connection.execute(
+                """
+                SELECT captured_utc, source_complete, snapshot_digest
+                FROM ib_virtual_leg_reconciliation_authority
+                WHERE account_id = ?
+                """,
+                (account_id,),
+            ).fetchone()
+            if row is None:
+                continue
+
+            persisted = datetime.fromisoformat(str(row["captured_utc"]))
+            if persisted > captured:
+                raise RuntimeError("IB reconciliation authority is newer")
+            if persisted == captured and (
+                not bool(row["source_complete"])
+                or str(row["snapshot_digest"]) != snapshot_digest
+            ):
+                raise RuntimeError("IB reconciliation authority conflicts")
+
+    def _upsert_ib_reconciliation_authority_no_commit(
+        self,
+        *,
+        account_ids: list[str],
+        captured_utc: str,
+        snapshot_digest: str,
+    ) -> int:
+        """Persist complete account authorities inside caller savepoint."""
+        rows_written = 0
+        now_utc = utc_now_iso()
+        for account_id in account_ids:
+            existing = self._connection.execute(
+                """
+                SELECT captured_utc, source_complete, snapshot_digest
+                FROM ib_virtual_leg_reconciliation_authority
+                WHERE account_id = ?
+                """,
+                (account_id,),
+            ).fetchone()
+            if existing is not None and (
+                str(existing["captured_utc"]) == captured_utc
+                and bool(existing["source_complete"])
+                and str(existing["snapshot_digest"]) == snapshot_digest
+            ):
+                continue
+
+            self._connection.execute(
+                """
+                INSERT INTO ib_virtual_leg_reconciliation_authority (
+                    account_id,
+                    captured_utc,
+                    source_complete,
+                    snapshot_digest,
+                    created_utc,
+                    updated_utc
+                )
+                VALUES (?, ?, 1, ?, ?, ?)
+                ON CONFLICT(account_id) DO UPDATE SET
+                    captured_utc = excluded.captured_utc,
+                    source_complete = excluded.source_complete,
+                    snapshot_digest = excluded.snapshot_digest,
+                    updated_utc = excluded.updated_utc
+                """,
+                (
+                    account_id,
+                    captured_utc,
+                    snapshot_digest,
+                    now_utc,
+                    now_utc,
+                ),
+            )
+            rows_written += 1
+        return rows_written
 
     def _sync_ib_fx_external_exposures_no_commit(
         self,
@@ -3178,6 +3343,23 @@ class RuntimeRepository:
         if not bool(evidence_snapshot.get("complete")):
             raise RuntimeError("IB virtual-leg evidence is incomplete")
 
+        snapshot_captured = RuntimeRepository._normalize_aware_timestamp_text(
+            snapshot.captured_utc,
+            "snapshot.captured_utc",
+        )
+        evidence_captured = RuntimeRepository._normalize_aware_timestamp_text(
+            evidence_snapshot.get("captured_utc"),
+            "evidence_snapshot.captured_utc",
+        )
+        if snapshot_captured != evidence_captured:
+            raise RuntimeError("IB reconciliation capture timestamps differ")
+
+        authority_accounts = set(
+            RuntimeRepository._ib_reconciliation_authority_accounts(evidence_snapshot)
+        )
+        if any(leg.account_id not in authority_accounts for leg in snapshot.legs):
+            raise RuntimeError("IB virtual leg account is outside evidence scope")
+
         for flag_name in (
             "positions_complete",
             "open_orders_complete",
@@ -3217,6 +3399,20 @@ class RuntimeRepository:
 
         if len(position_uids) != len(set(position_uids)):
             raise RuntimeError("Duplicate position_uid in virtual-leg snapshot")
+
+    @staticmethod
+    def _normalize_aware_timestamp_text(value: object, field_name: str) -> str:
+        """Нормалізувати timezone-aware ISO timestamp до UTC."""
+        text = str(value or "").strip()
+        if not text:
+            raise ValueError(f"{field_name} is required")
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError(f"{field_name} is invalid") from exc
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError(f"{field_name} must be timezone-aware")
+        return parsed.astimezone(UTC).isoformat()
 
     def _upsert_ib_virtual_position_leg_no_commit(
         self,

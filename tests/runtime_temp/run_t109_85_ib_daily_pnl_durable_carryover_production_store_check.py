@@ -160,7 +160,7 @@ def main() -> None:
         risk_snapshot_wiring_added = False
         broker_requests = 0
 
-        assert SCHEMA_VERSION == 11
+        assert SCHEMA_VERSION == 12
         assert schema_version == SCHEMA_VERSION
         assert event_table_present
         assert coverage_table_present
@@ -202,7 +202,7 @@ def main() -> None:
         )
         print(
             "factual_verdict=A. IB_DAILY_PNL_DURABLE_CARRYOVER_"
-            "PRODUCTION_STORE_GREEN_WITH_SCHEMA_11_RESTART_PERSISTENCE_"
+            "PRODUCTION_STORE_GREEN_WITH_SCHEMA_12_RESTART_PERSISTENCE_"
             "EXECID_DEDUP_CONFLICT_FAIL_CLOSED_AND_COVERAGE_GAP_DETECTION"
         )
         connection.close()

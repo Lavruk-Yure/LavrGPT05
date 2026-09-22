@@ -8,8 +8,9 @@ WorkspaceRuntime без обходу RuntimeEngine/BrokerRuntimeService. RoadMap
 execution перевіряє WorkspaceRuntime. Broker adapters з цих шляхів не
 викликаються. Broker-history progress передається через neutral callback.
 RoadMap109 додає мінімальний cached account-state route: після успішного BROKER
-start controller переносить currency та equity лише з exact broker/account
-binding у WorkspaceRiskAccountSnapshot без refresh або нового broker request.
+start controller переносить currency, equity та coverage-authorized IB daily
+realized PnL лише з exact broker/account binding у WorkspaceRiskAccountSnapshot
+без refresh або нового broker request.
 """
 
 from __future__ import annotations
@@ -41,7 +42,10 @@ from core.workspace_history_export import (
     WorkspaceHistoryCsvExportResult,
     WorkspaceHistoryCsvWriter,
 )
-from core.workspace_market_event import WorkspaceMarketEvent
+from core.workspace_market_event import (
+    WorkspaceMarketEvent,
+    normalize_market_timestamp,
+)
 from core.workspace_ownership import (
     WorkspaceOrderSnapshot,
     WorkspaceOwnedSnapshot,
@@ -459,24 +463,58 @@ class AlgorithmWorkspaceController:
                 "cached broker account binding does not match workspace",
             )
             return None
+        snapshot_value = (
+            str(getattr(account_state, "snapshot_utc", "") or "").strip()
+            or datetime.now(UTC)
+        )
+        snapshot_utc = normalize_market_timestamp(snapshot_value)
+        daily_realized_pnl = None
+        if runtime.context.broker == "IB":
+            daily_realized_pnl = self._ib_daily_realized_pnl_for_snapshot(
+                account_id=bound_account_id,
+                evaluation_utc=snapshot_utc,
+            )
         return runtime.set_risk_account_snapshot(
             WorkspaceRiskAccountSnapshot(
-                snapshot_utc=(
-                    str(getattr(account_state, "snapshot_utc", "") or "").strip()
-                    or datetime.now(UTC)
-                ),
+                snapshot_utc=snapshot_utc,
                 workspace_uid=runtime.context.workspace_uid,
                 broker=runtime.context.broker,
                 account_id=runtime.context.account_id,
                 source_mode=runtime.context.data_mode,
                 equity=getattr(account_state, "equity", None),
-                daily_realized_pnl=None,
+                daily_realized_pnl=daily_realized_pnl,
                 open_positions_count=None,
                 currency=getattr(account_state, "currency", None),
                 binding_verified=True,
                 synthetic=False,
             )
         )
+
+    def _ib_daily_realized_pnl_for_snapshot(
+        self,
+        *,
+        account_id: str,
+        evaluation_utc: datetime,
+    ) -> float | None:
+        """Прочитати coverage-authorized durable IB PnL без broker request."""
+        reader = getattr(
+            self._runtime_engine,
+            "read_ib_daily_realized_pnl_snapshot",
+            None,
+        )
+        if not callable(reader):
+            return None
+        try:
+            result = reader(
+                account_id=account_id,
+                evaluation_utc=evaluation_utc,
+            )
+        except Exception:  # noqa
+            return None
+        if getattr(result, "success", False) is not True:
+            return None
+        value = getattr(result, "daily_realized_pnl", None)
+        return None if value is None else float(value)
 
     def _cached_workspace_account_state(self, broker: str) -> object | None:
         """Прочитати broker cache без refresh або прямого adapter call."""

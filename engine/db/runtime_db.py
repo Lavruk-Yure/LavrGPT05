@@ -1,5 +1,5 @@
-# runtime_db.py
-"""
+"""runtime_db.py.
+
 Канонічний SQLite bootstrap для runtime ATS LGE.
 
 Поточний етап:
@@ -20,7 +20,7 @@ from pathlib import Path
 
 from core.app_paths import BASE_DIR
 
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 
 
 RUNTIME_TABLES_SQL = """
@@ -154,6 +154,16 @@ CREATE TABLE IF NOT EXISTS ib_virtual_position_legs (
     FOREIGN KEY (trade_uid) REFERENCES trades (trade_uid)
 );
 
+CREATE TABLE IF NOT EXISTS ib_virtual_leg_reconciliation_authority (
+    account_id TEXT PRIMARY KEY,
+    captured_utc TEXT NOT NULL,
+    source_complete INTEGER NOT NULL,
+    snapshot_digest TEXT NOT NULL,
+    created_utc TEXT NOT NULL,
+    updated_utc TEXT NOT NULL,
+    CHECK (source_complete IN (0, 1))
+);
+
 CREATE TABLE IF NOT EXISTS ib_virtual_position_leg_orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     position_uid TEXT NOT NULL,
@@ -227,6 +237,9 @@ ON ib_virtual_position_legs (broker_position_id);
 
 CREATE INDEX IF NOT EXISTS idx_ib_virtual_legs_status
 ON ib_virtual_position_legs (leg_status, reconciliation_status);
+
+CREATE INDEX IF NOT EXISTS idx_ib_virtual_leg_authority_captured
+ON ib_virtual_leg_reconciliation_authority (captured_utc);
 
 CREATE INDEX IF NOT EXISTS idx_ib_virtual_leg_orders_position
 ON ib_virtual_position_leg_orders (position_uid, order_role);
@@ -350,7 +363,7 @@ def _ensure_runtime_column(
 def migrate_runtime_schema(
     connection: sqlite3.Connection,
 ) -> None:
-    """Apply additive Runtime schema migrations through schema v11."""
+    """Apply additive Runtime schema migrations through schema v12."""
     _ensure_runtime_column(
         connection,
         "trades",
