@@ -1205,6 +1205,21 @@ class RuntimeEngine:
         RuntimeRepository performs any SQLite write.
         """
         evidence_snapshot = self.get_ib_virtual_position_leg_evidence_snapshot()
+        return self.sync_reconciled_ib_virtual_position_legs_from_evidence(
+            evidence_snapshot
+        )
+
+    def sync_reconciled_ib_virtual_position_legs_from_evidence(
+        self,
+        evidence_snapshot: dict[str, Any],
+    ) -> dict[str, Any]:
+        """
+        Persist-ити supplied complete IB evidence без нового broker request.
+
+        Caller виконує метод у repository owner thread. Evidence можна зібрати
+        у worker, але seed reads, reconciliation build та atomic SQLite
+        persistence лишаються разом у цьому route.
+        """
         snapshot = self._build_open_runtime_position_leg_snapshot(evidence_snapshot)
         persistence = self.repository.sync_reconciled_ib_virtual_position_leg_snapshot(
             snapshot=snapshot,
@@ -3130,6 +3145,32 @@ class RuntimeEngine:
             events=events,
             evaluation_utc=evaluation,
             source_complete=source_complete,
+        )
+
+    def read_ib_workspace_open_positions_count(
+        self,
+        *,
+        account_id: str,
+        workspace_uid: str,
+        evaluation_utc: datetime,
+    ) -> int | None:
+        """Прочитати exact workspace IB count лише з durable store."""
+        return self.repository.read_ib_workspace_open_positions_count(
+            account_id=account_id,
+            workspace_uid=workspace_uid,
+            evaluation_utc=evaluation_utc,
+        )
+
+    def read_ib_risk_shared_durable_watermark(
+        self,
+        *,
+        account_id: str,
+        cached_account_utc: datetime,
+    ) -> datetime | None:
+        """Прочитати спільний IB risk timestamp лише з durable authority."""
+        return self.repository.read_ib_risk_shared_durable_watermark(
+            account_id=account_id,
+            cached_account_utc=cached_account_utc,
         )
 
     def download_ctrader_historical_bars(

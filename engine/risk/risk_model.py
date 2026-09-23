@@ -6,7 +6,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from core.workspace_market_event import normalize_market_timestamp
 from engine.risk.constants import (
@@ -19,7 +19,10 @@ from engine.risk.constants import (
     RISK_DECISION_BLOCK,
     RISK_DECISIONS,
     RISK_REASON_ACCOUNT_BINDING_MISMATCH,
+    RISK_REASON_ACCOUNT_SNAPSHOT_FUTURE,
     RISK_REASON_ACCOUNT_SNAPSHOT_MISSING,
+    RISK_REASON_ACCOUNT_SNAPSHOT_STALE,
+    RISK_REASON_ACCOUNT_SNAPSHOT_TIMESTAMP_MISSING,
     RISK_REASON_APPROVED,
     RISK_REASON_DAILY_LOSS_LIMIT_REACHED,
     RISK_REASON_DAILY_PNL_SNAPSHOT_MISSING,
@@ -38,6 +41,7 @@ from engine.risk.constants import (
     WORKSPACE_RISK_SETTING_REQUIRE_STOP_LOSS,
     WORKSPACE_RISK_SETTING_RISK_PERCENT,
 )
+from engine.runtime_constants import RUNTIME_ACCOUNT_REFRESH_INTERVAL_SECONDS
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +157,7 @@ class WorkspaceRiskRequest:
     market_valid: bool
     spread_guard_passed: bool
     signal_uid: str | None = None
+    account_snapshot_utc: datetime | None = None
 
     def __post_init__(self) -> None:
         workspace_uid = str(self.workspace_uid or "").strip()
@@ -229,6 +234,12 @@ class WorkspaceRiskRequest:
             "signal_uid",
             str(self.signal_uid or "").strip() or None,
         )
+        if self.account_snapshot_utc is not None:
+            object.__setattr__(
+                self,
+                "account_snapshot_utc",
+                normalize_market_timestamp(self.account_snapshot_utc),
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -410,6 +421,26 @@ class WorkspaceRiskEvaluator:
                 RISK_REASON_ACCOUNT_BINDING_MISMATCH,
                 "workspace account binding is not verified",
             )
+        if request.source_mode == "BROKER":
+            if request.account_snapshot_utc is None:
+                return (
+                    RISK_REASON_ACCOUNT_SNAPSHOT_TIMESTAMP_MISSING,
+                    "broker account snapshot timestamp is required",
+                )
+            snapshot_age = request.timestamp - request.account_snapshot_utc
+            if snapshot_age < timedelta(0):
+                return (
+                    RISK_REASON_ACCOUNT_SNAPSHOT_FUTURE,
+                    "broker account snapshot is newer than risk decision",
+                )
+            max_snapshot_age = timedelta(
+                seconds=RUNTIME_ACCOUNT_REFRESH_INTERVAL_SECONDS,
+            )
+            if snapshot_age > max_snapshot_age:
+                return (
+                    RISK_REASON_ACCOUNT_SNAPSHOT_STALE,
+                    "broker account snapshot exceeded refresh interval",
+                )
         if request.equity is None or request.equity <= 0.0:
             return (
                 RISK_REASON_ACCOUNT_SNAPSHOT_MISSING,

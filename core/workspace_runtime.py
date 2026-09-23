@@ -2471,6 +2471,9 @@ class WorkspaceRuntime:
             market_valid=True,
             spread_guard_passed=self.context.spread_ok,
             signal_uid=signal_uid,
+            account_snapshot_utc=(
+                snapshot.snapshot_utc if snapshot is not None else None
+            ),
         )
         decision = self.evaluate_risk_request(request)
         event_name = "RISK_ALLOWED" if decision.allowed else "RISK_BLOCKED"

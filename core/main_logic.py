@@ -43,6 +43,10 @@ from core.about_dialog import AboutDialog
 from core.algorithm_workspace_area import AlgorithmWorkspaceArea
 from core.app_paths import ROOT_CONF_PATH
 from core.config_manager import ConfigManager
+from core.ib_reconciliation_lifecycle import (
+    IBReconciliationLifecycleBridge,
+    complete_ib_risk_sources_after_reconciliation,
+)
 from core.lang_manager import LANG
 from core.license_manager import LicenseManager
 from core.license_status import (
@@ -127,6 +131,11 @@ class MainAppWindow(QMainWindow):
         self._trial_watch_timer: QTimer | None = None
         self._market_state_timer: QTimer | None = None
         self._last_account_refresh_monotonic = 0.0
+        self._ib_reconciliation_lifecycle = IBReconciliationLifecycleBridge(
+            lambda: getattr(session_state, "CURRENT_RUNTIME_ENGINE", None),
+            self,
+            persistence_callback=self._on_ib_reconciliation_persisted,
+        )
 
         # =========================================================
         # LEFT PANEL
@@ -1211,6 +1220,10 @@ QToolButton#tbExit:pressed {
                 self._stop_main_window_timers,
             )
             self._run_shutdown_step(
+                "IB reconciliation lifecycle shutdown failed.",
+                self._ib_reconciliation_lifecycle.shutdown,
+            )
+            self._run_shutdown_step(
                 "Secondary window shutdown failed.",
                 self._close_secondary_windows,
             )
@@ -1634,6 +1647,23 @@ QToolButton#tbExit:pressed {
             except Exception:  # noqa
                 logger.exception("IB live realized event persistence failed.")
 
+            if should_refresh_account:
+                try:
+                    self._ib_reconciliation_lifecycle.request_refresh(
+                        runtime_engine
+                    )
+                except Exception:  # noqa
+                    logger.exception(
+                        "IB reconciliation lifecycle refresh failed."
+                    )
+
+            try:
+                self.page_monitoring.sync_broker_risk_account_snapshots(
+                    "IB"
+                )
+            except Exception:  # noqa
+                logger.exception("IB workspace risk snapshot refresh failed.")
+
         ctrader_service = runtime_engine.ctrader_runtime_service
         if ctrader_service is not None:
             try:
@@ -1697,6 +1727,29 @@ QToolButton#tbExit:pressed {
             account_id=account_id,
             coverage_start_utc=day_start,
             coverage_end_utc=evaluation,
+        )
+
+    def _on_ib_reconciliation_persisted(
+        self,
+        runtime_engine: RuntimeEngine,
+        reconciliation_result: dict[str, Any],
+    ) -> None:
+        """Продовжити PnL coverage до authority та rebuild IB risk."""
+        if self._shutdown_in_progress or self._shutdown_complete:
+            return
+        complete_ib_risk_sources_after_reconciliation(
+            runtime_engine.ib_runtime_service,
+            lambda account_id, start_utc, end_utc: (
+                runtime_engine.recover_ib_daily_realized_events(
+                    account_id=account_id,
+                    coverage_start_utc=start_utc,
+                    coverage_end_utc=end_utc,
+                )
+            ),
+            reconciliation_result,
+            lambda: self.page_monitoring.sync_broker_risk_account_snapshots(
+                "IB"
+            ),
         )
 
     def _notify_broker_state_changes(

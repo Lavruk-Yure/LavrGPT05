@@ -429,6 +429,26 @@ class AlgorithmWorkspaceController:
         self.sync_workspace_risk_account_snapshot(workspace_uid)
         return runtime
 
+    def sync_attached_broker_risk_account_snapshots(
+        self,
+        broker: str,
+    ) -> dict[str, WorkspaceRiskAccountSnapshot | None]:
+        """Оновити attached BROKER risk snapshots із cached/durable sources."""
+        broker_name = str(broker or "").strip().upper()
+        if not broker_name:
+            return {}
+
+        results: dict[str, WorkspaceRiskAccountSnapshot | None] = {}
+        for workspace_uid, runtime in tuple(self._runtimes.items()):
+            if runtime.context.data_mode != WORKSPACE_DATA_MODE_BROKER:
+                continue
+            if runtime.context.broker != broker_name:
+                continue
+            results[workspace_uid] = self.sync_workspace_risk_account_snapshot(
+                workspace_uid
+            )
+        return results
+
     def sync_workspace_risk_account_snapshot(
         self,
         workspace_uid: str,
@@ -469,11 +489,25 @@ class AlgorithmWorkspaceController:
         )
         snapshot_utc = normalize_market_timestamp(snapshot_value)
         daily_realized_pnl = None
+        open_positions_count = None
         if runtime.context.broker == "IB":
-            daily_realized_pnl = self._ib_daily_realized_pnl_for_snapshot(
+            shared_watermark = self._ib_risk_shared_durable_watermark(
                 account_id=bound_account_id,
-                evaluation_utc=snapshot_utc,
+                cached_account_utc=snapshot_utc,
             )
+            if shared_watermark is not None:
+                snapshot_utc = shared_watermark
+                daily_realized_pnl = self._ib_daily_realized_pnl_for_snapshot(
+                    account_id=bound_account_id,
+                    evaluation_utc=snapshot_utc,
+                )
+                open_positions_count = (
+                    self._ib_open_positions_count_for_snapshot(
+                        account_id=bound_account_id,
+                        workspace_uid=runtime.context.workspace_uid,
+                        evaluation_utc=snapshot_utc,
+                    )
+                )
         return runtime.set_risk_account_snapshot(
             WorkspaceRiskAccountSnapshot(
                 snapshot_utc=snapshot_utc,
@@ -483,12 +517,39 @@ class AlgorithmWorkspaceController:
                 source_mode=runtime.context.data_mode,
                 equity=getattr(account_state, "equity", None),
                 daily_realized_pnl=daily_realized_pnl,
-                open_positions_count=None,
+                open_positions_count=open_positions_count,
                 currency=getattr(account_state, "currency", None),
                 binding_verified=True,
                 synthetic=False,
             )
         )
+
+    def _ib_risk_shared_durable_watermark(
+        self,
+        *,
+        account_id: str,
+        cached_account_utc: datetime,
+    ) -> datetime | None:
+        """Прочитати causal IB watermark без broker request."""
+        reader = getattr(
+            self._runtime_engine,
+            "read_ib_risk_shared_durable_watermark",
+            None,
+        )
+        if not callable(reader):
+            return None
+        try:
+            value = reader(
+                account_id=account_id,
+                cached_account_utc=cached_account_utc,
+            )
+        except Exception:  # noqa
+            return None
+        if not isinstance(value, datetime):
+            return None
+        if value.tzinfo is None or value.utcoffset() is None:
+            return None
+        return value.astimezone(UTC)
 
     def _ib_daily_realized_pnl_for_snapshot(
         self,
@@ -515,6 +576,33 @@ class AlgorithmWorkspaceController:
             return None
         value = getattr(result, "daily_realized_pnl", None)
         return None if value is None else float(value)
+
+    def _ib_open_positions_count_for_snapshot(
+        self,
+        *,
+        account_id: str,
+        workspace_uid: str,
+        evaluation_utc: datetime,
+    ) -> int | None:
+        """Прочитати authority-gated workspace IB count без broker request."""
+        reader = getattr(
+            self._runtime_engine,
+            "read_ib_workspace_open_positions_count",
+            None,
+        )
+        if not callable(reader):
+            return None
+        try:
+            value = reader(
+                account_id=account_id,
+                workspace_uid=workspace_uid,
+                evaluation_utc=evaluation_utc,
+            )
+        except Exception:  # noqa
+            return None
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            return None
+        return value
 
     def _cached_workspace_account_state(self, broker: str) -> object | None:
         """Прочитати broker cache без refresh або прямого adapter call."""

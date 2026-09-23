@@ -2568,6 +2568,63 @@ class RuntimeRepository:
             "snapshot_digest": str(row["snapshot_digest"]),
         }
 
+    def read_ib_workspace_open_positions_count(
+        self,
+        *,
+        account_id: str,
+        workspace_uid: str,
+        evaluation_utc: datetime,
+    ) -> int | None:
+        """Прочитати authority-gated exact workspace IB open-leg count."""
+        if not isinstance(evaluation_utc, datetime):
+            raise TypeError("evaluation_utc must be datetime")
+        if evaluation_utc.tzinfo is None or evaluation_utc.utcoffset() is None:
+            raise ValueError("evaluation_utc must be timezone-aware")
+
+        account = str(account_id or "").strip()
+        workspace = str(workspace_uid or "").strip()
+        if not account or not workspace:
+            return None
+
+        authority = self._connection.execute(
+            """
+            SELECT captured_utc, source_complete
+            FROM ib_virtual_leg_reconciliation_authority
+            WHERE account_id = ?
+            """,
+            (account,),
+        ).fetchone()
+        if authority is None or not bool(authority["source_complete"]):
+            return None
+
+        try:
+            captured = datetime.fromisoformat(str(authority["captured_utc"]))
+        except ValueError:
+            return None
+        if captured.tzinfo is None or captured.utcoffset() is None:
+            return None
+        if captured.astimezone(UTC) > evaluation_utc.astimezone(UTC):
+            return None
+
+        row = self._connection.execute(
+            """
+            SELECT COUNT(DISTINCT legs.position_uid) AS open_count
+            FROM ib_virtual_position_legs legs
+            INNER JOIN trades
+                ON trades.trade_uid = legs.trade_uid
+            WHERE legs.account_id = ?
+              AND trades.account_id = ?
+              AND trades.broker = 'IB'
+              AND trades.workspace_uid = ?
+              AND legs.remaining_volume > 0.0
+              AND legs.leg_status != 'CLOSED'
+            """,
+            (account, account, workspace),
+        ).fetchone()
+        if row is None:
+            return None
+        return int(row["open_count"])
+
     @staticmethod
     def _ib_reconciliation_authority_accounts(
         evidence_snapshot: dict[str, Any],
@@ -4322,6 +4379,47 @@ class RuntimeRepository:
                 return True
 
         return cursor >= evaluation
+
+    def read_ib_risk_shared_durable_watermark(
+        self,
+        *,
+        account_id: str,
+        cached_account_utc: datetime,
+    ) -> datetime | None:
+        """Вивести complete reconciliation time за causal PnL coverage."""
+        cached_account = self._require_aware_utc(
+            cached_account_utc,
+            "cached_account_utc",
+        )
+        authority = self.get_ib_virtual_leg_reconciliation_authority(
+            account_id=account_id,
+        )
+        if authority is None or authority.get("source_complete") is not True:
+            return None
+
+        try:
+            captured = datetime.fromisoformat(str(authority["captured_utc"]))
+        except (KeyError, ValueError):
+            return None
+        if captured.tzinfo is None or captured.utcoffset() is None:
+            return None
+
+        watermark = captured.astimezone(UTC)
+        if cached_account > watermark:
+            return None
+        day_start = watermark.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+        if not self.ib_daily_realized_coverage_is_complete(
+            account_id=account_id,
+            day_start_utc=day_start,
+            evaluation_utc=watermark,
+        ):
+            return None
+        return watermark
 
     @staticmethod
     def _require_aware_utc(value: datetime, field_name: str) -> datetime:

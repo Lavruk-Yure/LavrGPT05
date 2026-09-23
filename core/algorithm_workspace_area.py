@@ -186,6 +186,7 @@ from core.workspace_signal_presentation import (
     workspace_signal_reason_code_text,
     workspace_signal_timeframe_mode_text,
 )
+from engine.risk.account_snapshot import WorkspaceRiskAccountSnapshot
 from engine.runtime_constants import WORKSPACE_REPLAY_SOURCE_CSV
 from ui.ui_algorithm_workspace_area import Ui_AlgorithmWorkspaceArea
 from ui.ui_algorithm_workspace_create_dialog import (
@@ -4654,6 +4655,17 @@ class AlgorithmWorkspaceArea(QWidget):
         """Refresh public account names and balances for broker-data WSPs."""
         for workspace_uid in tuple(self._windows):
             self._refresh_workspace_account_balance(workspace_uid)
+
+    def sync_broker_risk_account_snapshots(
+        self,
+        broker: str,
+    ) -> dict[str, WorkspaceRiskAccountSnapshot | None]:
+        """Оновити attached broker WSP risk snapshots без broker refresh."""
+        if self._shutdown_complete:
+            return {}
+        return self.controller.sync_attached_broker_risk_account_snapshots(
+            broker
+        )
 
     def current_workspace_uid(self) -> str | None:
         """Return the active MDI workspace UID."""
