@@ -1,16 +1,16 @@
-# LGE Runtime 07 — RoadMap101–108
+# LGE Runtime 07 — RoadMap101–109
 
 ## Якість MACD, режим Alligator та Candidate F
 
 Дата початку: 2026-08-17  
 Дата базового checkpoint: 2026-08-21  
-Дата актуалізації: 2026-09-08
+Дата актуалізації: 2026-09-24
 
 ---
 
 # 1. Призначення MD7
 
-`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-108.
+`LGE_Runtime_07.md` є канонічним high-level runtime checkpoint для RoadMap101-109.
 
 RoadMap101 продовжив стабілізований Historical Replay після RoadMap100 і був
 присвячений не механічному підбору PnL, а побудові причинно-часової логіки
@@ -1234,9 +1234,10 @@ BROKER runtime-path тепер підтримує completed bars: partial curren
 rollover, timestamps лишаються strictly increasing, а MACD і Alligator
 приймають completed BROKER bars.
 
-Це не означає готовність broker execution. BROKER market-data та read-only
-signal observation operational, але AUTO і SEMI execution лишаються
-`PARTIAL / DATA_OPERATIONAL_EXECUTION_NOT_WIRED`.
+На момент RoadMap107 це ще не означало готовність broker execution: BROKER
+market-data та read-only signal observation були operational, а AUTO і SEMI
+execution лишалися `PARTIAL / DATA_OPERATIONAL_EXECUTION_NOT_WIRED`. Цей
+історичний стан superseded канонічним RoadMap109, див. розділ 28.
 
 WSP profile refresh і MDI Tile/Cascade behavior стабілізовані без зміни
 Candidate F trading semantics.
@@ -1315,3 +1316,103 @@ Canonical registered-path baseline збережено:
 
 RoadMap107 змінив runtime compatibility для completed BROKER bars і пов’язані
 runtime/UI contracts, але не Candidate F trading semantics.
+
+---
+
+# 28. RoadMap109 — Workspace BROKER signal-to-execution production path
+
+RoadMap109 закрив production-межу від completed BROKER bar до керованого
+Workspace broker execution path для `AUTO` / `SEMI`, не змінюючи Candidate F
+trading semantics, Replay chronology, entry/exit thresholds або canonical
+Replay baseline.
+
+Канонічний causal path:
+
+```text
+completed BROKER bar
+    -> Candidate F accepted signal
+    -> WorkspaceTradeIntent
+    -> WorkspaceRiskAccountSnapshot
+    -> risk ALLOW
+    -> persisted workspace trade identity
+    -> persisted execution order plan
+    -> controller execution gate
+    -> AUTO: same-call confirmed-flat check -> submission
+    -> SEMI: confirmation hold before submission
+    -> terminal result / reconciliation / identity-preserving recovery
+```
+
+## 28.1. Risk snapshot contract
+
+Risk evaluation використовує broker/account-bound snapshot із causal
+decision-time semantics. Канонічні складові, доведені RoadMap109:
+
+```text
+equity                    = account-bound runtime source
+daily_realized_pnl        = durable broker-derived net realized source
+open_positions_count      = durable broker/account position authority
+snapshot timestamp        = decision-time freshness contract
+missing / future / stale  = fail-closed
+```
+
+Risk snapshot не повинен створювати прихований broker request у момент
+рішення. Повний snapshot допускає risk evaluation; неповний або нечинний за
+часом snapshot блокує execution.
+
+## 28.2. Execution identity and safety contract
+
+Після `risk=ALLOW` production path зберігає причинну identity через trade та
+order-plan lifecycle. Execution safety включає:
+
+```text
+workspace trade identity persistence
+order-plan identity persistence
+duplicate-submit protection
+same-call confirmed-flat gate for AUTO
+position-snapshot freshness policy
+SEMI confirmation hold
+terminal confirmation / reject / cancel handling
+pending-timeout identity-preserving recovery
+position reconciliation with fail-closed behavior
+```
+
+Terminal failure або recovery не повинні губити `trade_uid` /
+`order_plan_uid` і не повинні створювати нову логічну угоду замість
+відновлення існуючої identity.
+
+## 28.3. Production closure
+
+Фінальні T109-111…T109-113 закрили risk-snapshot та post-risk execution
+boundaries. T109-113 підтвердив:
+
+```text
+post_risk_identity_path_closed=True
+semi_confirmation_boundary_closed=True
+controller_production_contract_closed=True
+submission_safety_contract_closed=True
+terminal_recovery_contract_closed=True
+workspace_broker_execution_boundary_closed=True
+production_change_required=False
+actual_broker_requests=0
+actual_broker_execution_attempted=False
+```
+
+Канонічне рішення RoadMap109:
+
+```text
+WORKSPACE_BROKER_EXECUTION_FULL_PRODUCTION_CLOSURE_GREEN
+NO_ADDITIONAL_PRODUCTION_CHANGE_REQUIRED
+```
+
+`broker_requests=0` та `actual_broker_execution_attempted=False` тут описують
+TEST_ONLY closure regression: тест доводить production wiring через локальні
+evidence endpoints і навмисно не відправляє реальний broker order. Це не
+скасовує наявний production submission path.
+
+RoadMap109 не змінює canonical Candidate F Replay metrics:
+
+```text
+2025: 42 trades | 30W | 11L | 1 BE | net +4.03 | PF 1.5424 | DD 3.58
+2026: 18 trades | 15W | 2L  | 1 BE | net +3.68 | PF 3.7669 | DD 1.20
+```
+
