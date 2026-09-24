@@ -7400,5 +7400,22 @@
     "en": "Downloading: {percent}% · requests {requests} · bars {bars} · earliest bar {covered_start} UTC",
     "uk": "Завантаження: {percent}% · запитів {requests} · барів {bars} · найраніший бар {covered_start} UTC",
     "pl": "Pobieranie: {percent}% · zapytań {requests} · barów {bars} · najwcześniejszy bar {covered_start} UTC"
+  },
+  "AlgorithmWorkspaceHistoricalSummaryDialog.breakEven": {
+    "en": "Break-even:",
+    "uk": "Беззбиткові:",
+    "pl": "Break-even:",
+    "de": "Break-even:",
+    "fr": "À l’équilibre :"
+  },
+  "AlgorithmWorkspaceParametersDialog.logicLegacy": {
+    "en": "Legacy",
+    "uk": "Legacy"
+  },
+  "LoginWindow.errorOtherMachine": {
+    "en": "This license belongs to another computer. This LGE.conf cannot be used on this device. Delete the current LGE.conf and complete a new activation for this computer. A separate payment is required.",
+    "uk": "Ліцензія призначена для іншого комп’ютера. Цей LGE.conf не можна використовувати на цьому пристрої. Видаліть поточний LGE.conf і пройдіть нову активацію для цього комп’ютера. Потрібна окрема оплата.",
+    "de": "Diese Lizenz gehört zu einem anderen Computer. Diese LGE.conf kann auf diesem Gerät nicht verwendet werden. Löschen Sie die aktuelle LGE.conf und führen Sie eine neue Aktivierung für diesen Computer durch. Eine separate Zahlung ist erforderlich.",
+    "fr": "Cette licence appartient à un autre ordinateur. Ce fichier LGE.conf ne peut pas être utilisé sur cet appareil. Supprimez le fichier LGE.conf actuel et effectuez une nouvelle activation pour cet ordinateur. Un paiement séparé est requis."
   }
 }

@@ -86,6 +86,30 @@ LGE_TRANSLATION_GLOSSARY: Mapping[str, Mapping[str, str]] = {
 # short isolated machine-translation request. UI modules still call only
 # LangManager.tr(key, fallback); the policy is applied centrally.
 CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
+    "LoginWindow.errorOtherMachine": {
+        "en": (
+            "This license belongs to another computer. This LGE.conf cannot "
+            "be used on this device. Delete the current LGE.conf and complete "
+            "a new activation for this computer. A separate payment is required."
+        ),
+        "uk": (
+            "Ліцензія призначена для іншого комп’ютера. Цей LGE.conf не можна "
+            "використовувати на цьому пристрої. Видаліть поточний LGE.conf і "
+            "пройдіть нову активацію для цього комп’ютера. Потрібна окрема оплата."
+        ),
+        "de": (
+            "Diese Lizenz gehört zu einem anderen Computer. Diese LGE.conf kann "
+            "auf diesem Gerät nicht verwendet werden. Löschen Sie die aktuelle "
+            "LGE.conf und führen Sie eine neue Aktivierung für diesen Computer "
+            "durch. Eine separate Zahlung ist erforderlich."
+        ),
+        "fr": (
+            "Cette licence appartient à un autre ordinateur. Ce fichier LGE.conf "
+            "ne peut pas être utilisé sur cet appareil. Supprimez le fichier "
+            "LGE.conf actuel et effectuez une nouvelle activation pour cet "
+            "ordinateur. Un paiement séparé est requis."
+        ),
+    },
     "CommonConfirmDialog.btnYes": {
         "uk": "Так",
         "pl": "Tak",
@@ -2621,17 +2645,21 @@ def translation_override_for_key(key: str, language: str) -> str | None:
 def apply_central_translation_overrides(
     catalog: MutableMapping[str, object],
 ) -> int:
-    """Update existing catalog entries with exact centralized translations."""
+    """Apply exact centralized translations and seed canonical new keys."""
     updated = 0
 
     for key, translations in CENTRAL_TRANSLATION_OVERRIDES.items():
         entry = catalog.get(key)
         if not isinstance(entry, dict):
-            continue
+            english = translations.get("en")
+            if not isinstance(english, str) or not english.strip():
+                continue
+            entry = {}
+            catalog[key] = entry
 
         source_text = entry.get("en")
         if not isinstance(source_text, str):
-            source_text = ""
+            source_text = translations.get("en", "")
 
         for language, text in translations.items():
             normalized_text = restore_format_placeholders(source_text, text)

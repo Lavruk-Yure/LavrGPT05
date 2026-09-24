@@ -266,7 +266,15 @@ class LoginWindow(QMainWindow):
                     lang_mgr=self._lang_mgr,
                     title="CommonErrorDialog.windowTitle",
                     header="CommonErrorDialog.lblHeader",
-                    details="SettingsPageLicense.statusOtherMachine",
+                    details=self._lang_mgr.tr(
+                        "LoginWindow.errorOtherMachine",
+                        (
+                            "This license belongs to another computer. This "
+                            "LGE.conf cannot be used on this device. Delete the "
+                            "current LGE.conf and complete a new activation for "
+                            "this computer. A separate payment is required."
+                        ),
+                    ),
                 )
                 return
 
