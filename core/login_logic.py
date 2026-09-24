@@ -250,7 +250,7 @@ class LoginWindow(QMainWindow):
 
             # If compute/update fails -> treat as bad conf
             try:
-                LicenseManager.compute_and_update(
+                license_result = LicenseManager.compute_and_update(
                     conf.to_dict(),
                     now=datetime.now(UTC),
                     app_version=app_version,
@@ -258,6 +258,16 @@ class LoginWindow(QMainWindow):
             except Exception:  # noqa
                 self.result = "bad_conf"
                 self.close()
+                return
+
+            if license_result.status == LicenseManager.ST_OTHER_MACHINE:
+                CommonErrorDialog.show_dialog(
+                    parent=self,
+                    lang_mgr=self._lang_mgr,
+                    title="CommonErrorDialog.windowTitle",
+                    header="CommonErrorDialog.lblHeader",
+                    details="SettingsPageLicense.statusOtherMachine",
+                )
                 return
 
             self._open_main()

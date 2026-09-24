@@ -5,5 +5,8 @@
   "tokens_saved": {
     "en": "Tokens saved: {path}",
     "uk": "Збережені токени: {path}"
+  },
+  "AlgorithmWorkspaceWindow.signalGoJournalHint": {
+    "en": "Open journal records for the selected signal timestamp."
   }
 }
