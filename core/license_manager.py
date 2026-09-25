@@ -691,10 +691,10 @@ class LicenseManager:
             )
 
         if status in (cls.ST_TRIAL_OK, cls.ST_NO_LICENSE):
-            # Free / trial
-            live_manual = False
+            # Free / trial: manual доступний, AUTO заборонений.
+            live_manual = True
             live_semi = False
-            auto_demo = True
+            auto_demo = False
             auto_full = False
 
         elif status == cls.ST_TRIAL_EXPIRED:
@@ -765,6 +765,13 @@ class LicenseManager:
                 tp["trial_days"] = TRIAL_DAYS
             if "warn_before_expiry_days" not in tp:
                 tp["warn_before_expiry_days"] = TRIAL_WARN_BEFORE_EXPIRY_DAYS
+
+        # До явного старту trial діє поточна production-політика.
+        # Уже активований trial не переписуємо заднім числом.
+        if cls._norm_edition(lic.get("edition")) == "free" and not lic.get(
+            "activated_at"
+        ):
+            lic["trial_policy"]["trial_days"] = TRIAL_DAYS
 
         return lic
 
