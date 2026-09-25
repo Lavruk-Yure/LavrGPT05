@@ -59,6 +59,7 @@ from core.orders_page import OrdersPage
 from core.session_repository import SessionRepository, SessionRepositoryError
 from core.settings_center import SettingsCenter
 from core.ui_translator import UITranslator
+from engine.ctrader_adapter import CTraderAdapter
 from engine.market_availability_state import MARKET_CLOSED
 from engine.runtime_constants import RUNTIME_ACCOUNT_REFRESH_INTERVAL_SECONDS
 from engine.runtime_engine import RuntimeEngine
@@ -83,6 +84,33 @@ def log_cp(name: str, **kw: Any) -> None:
         return
     msg = f"[MAIN:{name}] " + ", ".join(f"{k}={v!r}" for k, v in kw.items())
     print(msg)
+
+
+def _create_ctrader_adapter_from_config(account_mode: str) -> CTraderAdapter:
+    """Створити cTrader adapter зі штатних налаштувань LGE.conf."""
+    conf_obj = session_state.CURRENT_CONFIG
+    if conf_obj is None:
+        raise RuntimeError("LGE.conf не завантажено")
+
+    client_id = str(conf_obj.get("ctrader", "client_id", "") or "").strip()
+    client_secret = str(
+        conf_obj.get("ctrader", "client_secret", "") or ""
+    ).strip()
+    account_id = str(conf_obj.get("ctrader", "account_id", "") or "").strip()
+
+    if not client_id:
+        raise RuntimeError("cTrader Client ID не задано в LGE.conf")
+    if not client_secret:
+        raise RuntimeError("cTrader Client Secret не задано в LGE.conf")
+    if not account_id:
+        raise RuntimeError("cTrader Account ID не задано в LGE.conf")
+
+    return CTraderAdapter.from_credentials(
+        client_id=client_id,
+        client_secret=client_secret,
+        account_id=account_id,
+        account_mode=account_mode,
+    )
 
 
 class MainAppWindow(QMainWindow):
@@ -387,7 +415,11 @@ QToolButton#tbExit:pressed {
             runtime_engine.set_ib_runtime_service(IBRuntimeService())
 
         if runtime_engine.ctrader_runtime_service is None:
-            runtime_engine.set_ctrader_runtime_service(CTraderRuntimeService())
+            runtime_engine.set_ctrader_runtime_service(
+                CTraderRuntimeService(
+                    adapter_factory=_create_ctrader_adapter_from_config,
+                )
+            )
 
         if runtime_engine.context.runtime_state == RuntimeState.OFF:
             runtime_engine.startup()

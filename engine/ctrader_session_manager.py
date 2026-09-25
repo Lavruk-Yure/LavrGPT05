@@ -11,6 +11,7 @@ import logging
 import socket
 import threading
 import time
+from collections.abc import Callable
 from datetime import datetime
 from typing import Optional
 
@@ -36,10 +37,11 @@ class CTraderSessionManager:
     Lifecycle manager для cTrader adapter.
     """
 
-    def __init__(self) -> None:
-        """
-        Ініціалізація manager.
-        """
+    def __init__(
+        self,
+        adapter_factory: Callable[[str], CTraderAdapter] | None = None,
+    ) -> None:
+        """Ініціалізувати manager з опціональною фабрикою adapter."""
         self._lock = threading.RLock()
 
         self._session_generation: int = 0
@@ -47,6 +49,13 @@ class CTraderSessionManager:
         self._active_adapter: Optional[CTraderAdapter] = None
 
         self._active_account_mode: str = ""
+
+        self._adapter_factory = adapter_factory or self._adapter_from_env
+
+    @staticmethod
+    def _adapter_from_env(account_mode: str) -> CTraderAdapter:
+        """Back-compat factory для non-GUI ENV flow."""
+        return CTraderAdapter.from_env(account_mode=account_mode)
 
     # =========================================================
     # PUBLIC
@@ -291,9 +300,7 @@ class CTraderSessionManager:
             normalized_mode,
         )
 
-        candidate_adapter = CTraderAdapter.from_env(
-            account_mode=normalized_mode,
-        )
+        candidate_adapter = self._adapter_factory(normalized_mode)
 
         candidate_adapter.set_session_generation(session_generation)
 

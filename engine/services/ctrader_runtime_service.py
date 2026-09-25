@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 from collections import deque
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Optional, Protocol
 
@@ -134,11 +135,15 @@ class CTraderRuntimeService:
     def __init__(
         self,
         session_manager: Optional[CTraderSessionManagerProtocol] = None,
+        adapter_factory: Callable[[str], CTraderAdapter] | None = None,
     ) -> None:
-        """
-        Ініціалізувати cTrader runtime service.
-        """
-        self._session_manager = session_manager or CTraderSessionManager()
+        """Ініціалізувати cTrader runtime service."""
+        if session_manager is not None:
+            self._session_manager = session_manager
+        else:
+            self._session_manager = CTraderSessionManager(
+                adapter_factory=adapter_factory,
+            )
 
         self._account_state = RuntimeAccountState()
 

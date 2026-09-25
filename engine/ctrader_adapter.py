@@ -261,6 +261,40 @@ class CTraderAdapter(BrokerInterface):
         self._retired_disconnect_event = threading.Event()
 
     @classmethod
+    def from_credentials(
+        cls,
+        client_id: str,
+        client_secret: str,
+        account_id: int | str,
+        account_mode: str = "DEMO",
+        logger: logging.Logger | None = None,  # noqa
+    ) -> "CTraderAdapter":
+        """Створити adapter з явних credentials + tokens.json."""
+
+        normalized_client_id = str(client_id or "").strip()
+        normalized_client_secret = str(client_secret or "").strip()
+        account_id_text = str(account_id or "").strip()
+
+        if not normalized_client_id:
+            raise RuntimeError("cTrader Client ID не задано")
+        if not normalized_client_secret:
+            raise RuntimeError("cTrader Client Secret не задано")
+        if not account_id_text.isdigit():
+            raise RuntimeError("cTrader Account ID має бути цілим числом")
+
+        access_token = _ensure_access_token()
+
+        config = CTraderRuntimeConfig(
+            client_id=normalized_client_id,
+            client_secret=normalized_client_secret,
+            access_token=access_token,
+            ctid_trader_account_id=int(account_id_text),
+            account_mode=account_mode.strip().upper(),
+        )
+
+        return cls(config=config, logger=logger)
+
+    @classmethod
     def from_env(
         cls,
         account_mode: str = "DEMO",
@@ -275,24 +309,13 @@ class CTraderAdapter(BrokerInterface):
         - CTRADER_ACCOUNT_ID
         """
 
-        client_id = _get_env_required("CTRADER_CLIENT_ID")
-        client_secret = _get_env_required("CTRADER_CLIENT_SECRET")
-        account_id_text = _get_env_required("CTRADER_ACCOUNT_ID")
-
-        if not account_id_text.isdigit():
-            raise RuntimeError("CTRADER_ACCOUNT_ID має бути цілим числом")
-
-        access_token = _ensure_access_token()
-
-        config = CTraderRuntimeConfig(
-            client_id=client_id,
-            client_secret=client_secret,
-            access_token=access_token,
-            ctid_trader_account_id=int(account_id_text),
-            account_mode=account_mode.strip().upper(),
+        return cls.from_credentials(
+            client_id=_get_env_required("CTRADER_CLIENT_ID"),
+            client_secret=_get_env_required("CTRADER_CLIENT_SECRET"),
+            account_id=_get_env_required("CTRADER_ACCOUNT_ID"),
+            account_mode=account_mode,
+            logger=logger,
         )
-
-        return cls(config=config, logger=logger)
 
     def _next_connect_generation(self) -> int:
         """
