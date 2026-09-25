@@ -447,6 +447,28 @@ class CTraderConnectionDialog(QDialog):
             return
 
         try:
+            account_id = str(self.ui.comboAccountId.currentData() or "").strip()
+
+            if not account_id:
+                accounts = self._run_account_list_probe_subprocess(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                )
+                self._load_accounts_to_combo(accounts)
+                self._update_buttons_state()
+
+                QMessageBox.information(
+                    self,
+                    "cTrader",
+                    self._lang_mgr.tr(
+                        "CTraderConnectionDialog.msgAccountListLoaded",
+                        "Account list loaded successfully.",
+                    ),
+                )
+                return
+
+            self._save_to_conf()
+
             account_mode = self.ui.comboAccountMode.currentData()
 
             if account_mode == "LIVE":
