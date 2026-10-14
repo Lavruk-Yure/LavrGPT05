@@ -157,6 +157,11 @@ class IBReconciliationLifecycleBridge(QObject):
         if self._shutting_down or self._in_flight:
             return False
 
+        get_active_broker = getattr(runtime_engine, "get_active_broker", None)
+        if callable(get_active_broker) and get_active_broker() != "IB":
+            self._last_discard_reason = "IB broker is not active"
+            return False
+
         service = runtime_engine.ib_runtime_service
         if service is None:
             self._last_discard_reason = "IB runtime service is unavailable"

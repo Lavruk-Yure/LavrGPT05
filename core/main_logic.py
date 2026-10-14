@@ -19,8 +19,8 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import UTC, datetime
 from collections.abc import Callable
+from datetime import UTC, datetime
 from typing import Any
 
 from PySide6.QtCore import QEvent, QRect, Qt, QTimer
@@ -86,6 +86,50 @@ def log_cp(name: str, **kw: Any) -> None:
     print(msg)
 
 
+def _create_ib_runtime_service_from_config() -> IBRuntimeService:
+    """Створити IB runtime service зі штатних engine.ib налаштувань."""
+    conf_obj = session_state.CURRENT_CONFIG
+    if conf_obj is None:
+        return IBRuntimeService()
+
+    engine_ib = conf_obj.get("engine", "ib") or {}
+    if not isinstance(engine_ib, dict):
+        return IBRuntimeService()
+
+    host = str(engine_ib.get("host") or "").strip() or None
+
+    try:
+        port = int(engine_ib.get("port"))
+    except (TypeError, ValueError):
+        port = None
+
+    if port is not None and not 1 <= port <= 65535:
+        port = None
+
+    try:
+        client_id = int(engine_ib.get("client_id"))
+    except (TypeError, ValueError):
+        client_id = None
+
+    if client_id is not None and not 1 <= client_id <= 9999:
+        client_id = None
+
+    account_mode = str(conf_obj.get("engine", "account_mode") or "DEMO").upper()
+
+    if account_mode == "LIVE":
+        return IBRuntimeService(
+            host=host,
+            live_port=port,
+            client_id=client_id,
+        )
+
+    return IBRuntimeService(
+        host=host,
+        demo_port=port,
+        client_id=client_id,
+    )
+
+
 def _create_ctrader_adapter_from_config(account_mode: str) -> CTraderAdapter:
     """Створити cTrader adapter зі штатних налаштувань LGE.conf."""
     conf_obj = session_state.CURRENT_CONFIG
@@ -93,9 +137,7 @@ def _create_ctrader_adapter_from_config(account_mode: str) -> CTraderAdapter:
         raise RuntimeError("LGE.conf не завантажено")
 
     client_id = str(conf_obj.get("ctrader", "client_id", "") or "").strip()
-    client_secret = str(
-        conf_obj.get("ctrader", "client_secret", "") or ""
-    ).strip()
+    client_secret = str(conf_obj.get("ctrader", "client_secret", "") or "").strip()
     account_id = str(conf_obj.get("ctrader", "account_id", "") or "").strip()
 
     if not client_id:
@@ -351,6 +393,7 @@ QToolButton#tbExit:pressed {
         self.action_about.triggered.connect(self._open_about_dialog)
         self.action_exit.triggered.connect(self.request_application_exit)
         self._last_broker_states: dict[str, str] = {}
+        self._ib_user_notice_codes_seen: set[int] = set()
         self._ib_daily_realized_recovery_key: tuple[str, str, int] | None = None
 
         # =========================================================
@@ -412,7 +455,9 @@ QToolButton#tbExit:pressed {
             self.page_monitoring.set_runtime_engine(runtime_engine)
 
         if runtime_engine.ib_runtime_service is None:
-            runtime_engine.set_ib_runtime_service(IBRuntimeService())
+            runtime_engine.set_ib_runtime_service(
+                _create_ib_runtime_service_from_config()
+            )
 
         if runtime_engine.ctrader_runtime_service is None:
             runtime_engine.set_ctrader_runtime_service(
@@ -1392,6 +1437,7 @@ QToolButton#tbExit:pressed {
             return
 
         self._sb_runtime_alert.setText("")
+        self._sb_runtime_alert.setToolTip("")
         self._update_brokers_statusbar()
         self._update_market_state_banner()
 
@@ -1667,10 +1713,10 @@ QToolButton#tbExit:pressed {
             except Exception:  # noqa
                 logger.exception("IB broker health/account refresh failed.")
 
+            self._consume_ib_user_notices(ib_service)
+
             try:
-                self._recover_ib_daily_realized_account_day_once(
-                    runtime_engine
-                )
+                self._recover_ib_daily_realized_account_day_once(runtime_engine)
             except Exception:  # noqa
                 logger.exception("IB daily realized recovery failed.")
 
@@ -1681,18 +1727,12 @@ QToolButton#tbExit:pressed {
 
             if should_refresh_account:
                 try:
-                    self._ib_reconciliation_lifecycle.request_refresh(
-                        runtime_engine
-                    )
+                    self._ib_reconciliation_lifecycle.request_refresh(runtime_engine)
                 except Exception:  # noqa
-                    logger.exception(
-                        "IB reconciliation lifecycle refresh failed."
-                    )
+                    logger.exception("IB reconciliation lifecycle refresh failed.")
 
             try:
-                self.page_monitoring.sync_broker_risk_account_snapshots(
-                    "IB"
-                )
+                self.page_monitoring.sync_broker_risk_account_snapshots("IB")
             except Exception:  # noqa
                 logger.exception("IB workspace risk snapshot refresh failed.")
 
@@ -1710,6 +1750,47 @@ QToolButton#tbExit:pressed {
             self._last_account_refresh_monotonic = now_monotonic
 
         self._update_brokers_statusbar()
+
+    def _consume_ib_user_notices(self, ib_service: IBRuntimeService) -> None:
+        """Показати важливі IB notices у status bar."""
+        try:
+            notices = ib_service.drain_user_notices()
+        except Exception:  # noqa
+            logger.exception("IB user notice drain failed.")
+            return
+
+        for notice in notices:
+            raw_code = notice.get("code")
+            if not isinstance(raw_code, (int, str)):
+                continue
+
+            try:
+                code = int(raw_code)
+            except ValueError:
+                continue
+
+            if code != 2172:
+                continue
+            if code in self._ib_user_notice_codes_seen:
+                continue
+
+            self._ib_user_notice_codes_seen.add(code)
+            broker_message = str(notice.get("message") or "").strip()
+            message = self._lang_mgr.tr(
+                "RuntimeAlert.ibApiVersionUpdateRequired",
+                "IBKR [2172]: потрібно оновити версію API/TWS.",
+            )
+
+            if hasattr(self, "_sb_runtime_alert"):
+                self._sb_runtime_alert.setText(message)
+                self._sb_runtime_alert.setToolTip(broker_message)
+                self._sb_runtime_alert.setStyleSheet("color: orange;")
+
+            logger.warning(
+                "IB user-visible notice code=%s message=%s",
+                code,
+                broker_message,
+            )
 
     def _recover_ib_daily_realized_account_day_once(
         self,
@@ -1779,9 +1860,7 @@ QToolButton#tbExit:pressed {
                 )
             ),
             reconciliation_result,
-            lambda: self.page_monitoring.sync_broker_risk_account_snapshots(
-                "IB"
-            ),
+            lambda: self.page_monitoring.sync_broker_risk_account_snapshots("IB"),
         )
 
     def _notify_broker_state_changes(
@@ -1817,6 +1896,7 @@ QToolButton#tbExit:pressed {
 
                 if hasattr(self, "_sb_runtime_alert"):
                     self._sb_runtime_alert.setText(message)
+                    self._sb_runtime_alert.setToolTip("")
                     self._sb_runtime_alert.setStyleSheet("color: lightgreen;")
 
                 logger.warning("%s connection restored.", broker_name)
@@ -1840,6 +1920,7 @@ QToolButton#tbExit:pressed {
 
                 if hasattr(self, "_sb_runtime_alert"):
                     self._sb_runtime_alert.setText(message)
+                    self._sb_runtime_alert.setToolTip("")
                     self._sb_runtime_alert.setStyleSheet("color: orange;")
 
                 logger.warning(

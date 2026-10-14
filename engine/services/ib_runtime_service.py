@@ -148,17 +148,56 @@ class IBRuntimeService:
     def __init__(
         self,
         session_manager: Optional[IBSessionManagerProtocol] = None,
+        *,
+        host: str | None = None,
+        demo_port: int | None = None,
+        live_port: int | None = None,
+        client_id: int | None = None,
     ) -> None:
         """
         Ініціалізувати IB runtime service.
         """
-        self._session_manager = session_manager or IBSessionManager()
+        if session_manager is None:
+            session_manager = IBSessionManager(
+                host=host,
+                demo_port=demo_port,
+                live_port=live_port,
+                client_id=client_id,
+            )
+
+        self._session_manager = session_manager
 
         self._account_state = RuntimeAccountState()
 
         self._broker_health = RuntimeBrokerHealth()
 
         self._runtime_events = deque(maxlen=100)
+
+    def configure_connection(
+        self,
+        *,
+        host: str,
+        demo_port: int,
+        client_id: int,
+    ) -> None:
+        """
+        Оновити DEMO/PAPER connection settings без broker-запиту.
+
+        Активну IB session не переналаштовуємо на ходу.
+        """
+        adapter = self._session_manager.get_active_adapter()
+        if adapter is not None and adapter.is_connected():
+            raise RuntimeError(
+                "Cannot change IB connection settings while connected."
+            )
+
+        self._session_manager = IBSessionManager(
+            host=host,
+            demo_port=demo_port,
+            client_id=client_id,
+        )
+        self._account_state.clear()
+        self._broker_health.clear()
 
     def connect_demo(self) -> IBAdapter:
         """
@@ -301,6 +340,13 @@ class IBRuntimeService:
         Повернути список останніх runtime events.
         """
         return list(self._runtime_events)
+
+    def drain_user_notices(self) -> list[dict[str, object]]:
+        """Повернути user-visible IB notices без broker request."""
+        adapter = self.get_active_adapter()
+        if adapter is None:
+            return []
+        return [dict(item) for item in adapter.drain_user_notices()]
 
     def get_virtual_position_leg_evidence_snapshot(self) -> dict:
         """

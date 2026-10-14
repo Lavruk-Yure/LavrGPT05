@@ -118,6 +118,7 @@ class _IBWrapper(EWrapper):
         self._logger = logger
 
         self.state_callback: Callable[[str], None] | None = None
+        self.user_notice_callback: Callable[[dict[str, Any]], None] | None = None
 
         self.connected_event = threading.Event()
         self.account_summary_event = threading.Event()
@@ -771,7 +772,19 @@ class _IBWrapper(EWrapper):
             self.order_errors.append(f"IB order error {error_code}: {error_string}")
             self.order_event.set()
 
-        if error_code in {202, 2100, 2104, 2106, 2158, 399, 2109}:
+        if error_code == 2172:
+            if self.user_notice_callback is not None:
+                self.user_notice_callback(
+                    {
+                        "code": int(error_code),
+                        "message": str(error_string or "").strip(),
+                        "severity": "WARNING",
+                    }
+                )
+            self._logger.warning(message, *args)
+            return
+
+        if error_code in {202, 2100, 2104, 2106, 2107, 2158, 399, 2109}:
             self._logger.info(message, *args)
             return
 
@@ -1335,6 +1348,11 @@ class IBAdapter(BrokerInterface):
         self._wrapper = _IBWrapper(self._logger)
 
         self._wrapper.state_callback = self._set_broker_state
+        self._wrapper.user_notice_callback = self._record_user_notice
+
+        self._user_notice_lock = threading.RLock()
+        self._user_notices: list[dict[str, Any]] = []
+        self._user_notice_codes: set[int] = set()
 
         self._order_id_lock = threading.RLock()
 
@@ -7750,6 +7768,26 @@ class IBAdapter(BrokerInterface):
             return {}
 
         return rows[-1]
+
+    def drain_user_notices(self) -> list[dict[str, Any]]:
+        """Повернути й очистити user-visible IB notices без broker request."""
+        with self._user_notice_lock:
+            notices = [dict(item) for item in self._user_notices]
+            self._user_notices.clear()
+        return notices
+
+    def _record_user_notice(self, notice: dict[str, Any]) -> None:
+        """Зберегти один notice-код один раз на generation IBAdapter."""
+        try:
+            code = int(notice.get("code"))
+        except (TypeError, ValueError):
+            return
+
+        with self._user_notice_lock:
+            if code in self._user_notice_codes:
+                return
+            self._user_notice_codes.add(code)
+            self._user_notices.append(dict(notice))
 
     def _run_client_loop(self) -> None:
         """

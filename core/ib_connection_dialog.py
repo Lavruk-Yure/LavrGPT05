@@ -52,19 +52,18 @@ class IBConnectionDialog(QDialog):
 
     def _init_values(self) -> None:
         """
-        Заповнити перші runtime-значення IB.
-
-        RoadMap76:
-        поки DEMO/PAPER через TWS 127.0.0.1:7497.
+        Заповнити connection settings зі штатного LGE.conf.
         """
-        self.ui.editHost.setText("127.0.0.1")
-        self.ui.editHost.setReadOnly(True)
+        host, port, client_id = self._load_saved_connection_settings()
 
-        self.ui.spinPort.setValue(7497)
-        self.ui.spinPort.setReadOnly(True)
+        self.ui.editHost.setText(host)
+        self.ui.editHost.setReadOnly(False)
 
-        self.ui.spinClientId.setValue(1)
-        self.ui.spinClientId.setReadOnly(True)
+        self.ui.spinPort.setValue(port)
+        self.ui.spinPort.setReadOnly(False)
+
+        self.ui.spinClientId.setValue(client_id)
+        self.ui.spinClientId.setReadOnly(False)
 
         for button in (
             self.ui.btnRefresh,
@@ -94,7 +93,7 @@ class IBConnectionDialog(QDialog):
         self.ui.btnConnect.clicked.connect(self._on_connect)
         self.ui.btnDisconnect.clicked.connect(self._on_disconnect)
         self.ui.btnRefresh.clicked.connect(self._on_refresh_clicked)
-        self.ui.btnOk.clicked.connect(self.accept)
+        self.ui.btnOk.clicked.connect(self._on_ok)
         self.ui.btnCancel.clicked.connect(self.reject)
         self.ui.comboAccounts.currentIndexChanged.connect(self._on_account_changed)
 
@@ -122,6 +121,8 @@ class IBConnectionDialog(QDialog):
         self.ui.btnRefresh.setEnabled(False)
 
         try:
+            self._save_ib_runtime_config()
+            self._apply_connection_settings_to_runtime()
             ok = self._runtime_engine.connect_ib_demo()
             self._refresh_status()
             self._update_buttons_state()
@@ -170,6 +171,27 @@ class IBConnectionDialog(QDialog):
             self._refresh_status()
 
             self._update_buttons_state()
+
+    def _on_ok(self) -> None:
+        """Зберегти IB connection settings і закрити діалог."""
+        selected_account_id = self.ui.comboAccounts.currentData()
+        self._save_ib_runtime_config(
+            account_id=str(selected_account_id) if selected_account_id else None
+        )
+        self.accept()
+
+    def _apply_connection_settings_to_runtime(self) -> None:
+        """Передати поточні DEMO/PAPER settings у runtime service."""
+        service = self._runtime_engine.ib_runtime_service
+        if service is None:
+            raise RuntimeError("IBRuntimeService is not initialized.")
+
+        ib_service = cast(IBRuntimeService, service)
+        ib_service.configure_connection(
+            host=self.ui.editHost.text().strip() or "127.0.0.1",
+            demo_port=int(self.ui.spinPort.value()),
+            client_id=int(self.ui.spinClientId.value()),
+        )
 
     def _on_disconnect(self) -> None:
         """
@@ -262,6 +284,7 @@ class IBConnectionDialog(QDialog):
         service = self._runtime_engine.ib_runtime_service
 
         if service is None:
+            self._set_connection_fields_editable(True)
             self.ui.btnConnect.setEnabled(True)
             self.ui.btnDisconnect.setEnabled(False)
             return
@@ -270,18 +293,27 @@ class IBConnectionDialog(QDialog):
         state = str(getattr(health, "state", "UNKNOWN"))
 
         if state == "CONNECTED":
+            self._set_connection_fields_editable(False)
             self.ui.btnConnect.setEnabled(False)
             self.ui.btnDisconnect.setEnabled(True)
             return
 
         if state in {"CONNECTING", "RECONNECTING"}:
+            self._set_connection_fields_editable(False)
             self.ui.btnConnect.setEnabled(False)
             self.ui.btnDisconnect.setEnabled(False)
             return
 
+        self._set_connection_fields_editable(True)
         self.ui.btnConnect.setEnabled(True)
         self.ui.btnDisconnect.setEnabled(False)
         self._refresh_buttons_visual_state()
+
+    def _set_connection_fields_editable(self, editable: bool) -> None:
+        """Дозволити редагування connection settings лише поза active session."""
+        self.ui.editHost.setReadOnly(not editable)
+        self.ui.spinPort.setReadOnly(not editable)
+        self.ui.spinClientId.setReadOnly(not editable)
 
     def _refresh_buttons_visual_state(self) -> None:
         """
@@ -531,6 +563,46 @@ class IBConnectionDialog(QDialog):
             )
 
         return account_id
+
+    @staticmethod
+    def _load_saved_connection_settings() -> tuple[str, int, int]:
+        """Прочитати host/port/client_id з LGE.conf із TWS fallback."""
+        from core import session_state
+
+        conf_obj = session_state.CURRENT_CONFIG
+        if conf_obj is None:
+            return "127.0.0.1", 7497, 1
+
+        account_mode = str(
+            conf_obj.get("engine", "account_mode") or "DEMO"
+        ).upper()
+        default_port = 7496 if account_mode == "LIVE" else 7497
+
+        engine_ib = conf_obj.get("engine", "ib") or {}
+        if not isinstance(engine_ib, dict):
+            return "127.0.0.1", default_port, 1
+
+        host = str(engine_ib.get("host") or "127.0.0.1").strip()
+        if not host:
+            host = "127.0.0.1"
+
+        try:
+            port = int(engine_ib.get("port"))
+        except (TypeError, ValueError):
+            port = default_port
+
+        if not 1 <= port <= 65535:
+            port = default_port
+
+        try:
+            client_id = int(engine_ib.get("client_id"))
+        except (TypeError, ValueError):
+            client_id = 1
+
+        if not 1 <= client_id <= 9999:
+            client_id = 1
+
+        return host, port, client_id
 
     @staticmethod
     def _load_saved_account_id() -> str:

@@ -4,5 +4,9 @@
   },
   "AlgorithmWorkspaceWindow.signalGoJournalHint": {
     "en": "Open journal records for the selected signal timestamp."
+  },
+  "RuntimeAlert.ibApiVersionUpdateRequired": {
+    "en": "IBKR [2172]: потрібно оновити версію API/TWS.",
+    "uk": "IBKR [2172]: потрібно оновити версію API/TWS."
   }
 }
