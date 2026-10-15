@@ -85,9 +85,7 @@ def complete_ib_risk_sources_after_reconciliation(
         or not ib_runtime_service.get_broker_health().is_connected()
     ):
         return None
-    account_id = str(
-        ib_runtime_service.get_account_state().account_id or ""
-    ).strip()
+    account_id = str(ib_runtime_service.get_account_state().account_id or "").strip()
     if not account_id or account_id not in authority_accounts:
         return None
 
@@ -113,9 +111,7 @@ class IBReconciliationLifecycleBridge(QObject):
         runtime_engine_provider: Callable[[], object | None],
         parent: QObject | None = None,
         *,
-        persistence_callback: (
-            Callable[[Any, dict[str, Any]], None] | None
-        ) = None,
+        persistence_callback: Callable[[Any, dict[str, Any]], None] | None = None,
     ) -> None:
         """Ініціалізувати coordinator у thread affinity його owner-а."""
         super().__init__(parent)
@@ -150,6 +146,17 @@ class IBReconciliationLifecycleBridge(QObject):
         """Повернути причину останнього fail-closed discard."""
         return self._last_discard_reason
 
+    @staticmethod
+    def _execution_mode_allows_background_refresh(
+        runtime_engine: _RuntimeEngineProtocol,
+    ) -> bool:
+        """Дозволити background reconciliation лише для торгових режимів."""
+        context = getattr(runtime_engine, "context", None)
+        execution_mode = (
+            str(getattr(context, "execution_mode", "OFF") or "OFF").strip().upper()
+        )
+        return execution_mode in {"MANUAL", "SEMI", "AUTO"}
+
     def request_refresh(self, runtime_engine: _RuntimeEngineProtocol) -> bool:
         """Запустити один evidence-only worker для current IB generation."""
         if QThread.currentThread() != self.thread():
@@ -160,6 +167,12 @@ class IBReconciliationLifecycleBridge(QObject):
         get_active_broker = getattr(runtime_engine, "get_active_broker", None)
         if callable(get_active_broker) and get_active_broker() != "IB":
             self._last_discard_reason = "IB broker is not active"
+            return False
+
+        if not self._execution_mode_allows_background_refresh(runtime_engine):
+            self._last_discard_reason = (
+                "IB reconciliation disabled while orders are OFF"
+            )
             return False
 
         service = runtime_engine.ib_runtime_service
@@ -235,9 +248,7 @@ class IBReconciliationLifecycleBridge(QObject):
         try:
             self._evidence_ready.emit(payload)
         except RuntimeError:
-            logger.debug(
-                "IB reconciliation evidence discarded after QObject teardown."
-            )
+            logger.debug("IB reconciliation evidence discarded after QObject teardown.")
 
     def _finish_refresh(self, payload_object: object) -> None:
         """Persist supplied evidence у coordinator owner thread."""
@@ -277,11 +288,7 @@ class IBReconciliationLifecycleBridge(QObject):
         active_adapter = service.get_active_adapter()
         account_id = str(getattr(account_state, "account_id", "") or "").strip()
         current_key = (id(runtime_engine), account_id, id(active_adapter))
-        if (
-            not health.is_connected()
-            or active_adapter is None
-            or current_key != key
-        ):
+        if not health.is_connected() or active_adapter is None or current_key != key:
             self._last_discard_reason = "IB connection generation changed"
             return
 
@@ -298,8 +305,7 @@ class IBReconciliationLifecycleBridge(QObject):
 
         try:
             persist_supplied_evidence = (
-                runtime_engine
-                .sync_reconciled_ib_virtual_position_legs_from_evidence
+                runtime_engine.sync_reconciled_ib_virtual_position_legs_from_evidence
             )
             result = persist_supplied_evidence(evidence)
         except Exception as exc:  # noqa: BLE001

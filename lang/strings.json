@@ -8,5 +8,11 @@
   "RuntimeAlert.ibApiVersionUpdateRequired": {
     "en": "IBKR [2172]: потрібно оновити версію API/TWS.",
     "uk": "IBKR [2172]: потрібно оновити версію API/TWS."
+  },
+  "IBConnectionDialog.lblHelp": {
+    "en": "Start TWS or IB Gateway first. TWS ports: Paper/DEMO 7497, Live 7496. IB Gateway ports: Paper/DEMO 4002, Live 4001.",
+    "uk": "Спочатку запустіть TWS або IB Gateway. Порти TWS: Paper/DEMO 7497, Live 7496. Порти IB Gateway: Paper/DEMO 4002, Live 4001.",
+    "de": "Starten Sie zuerst TWS oder IB Gateway. TWS-Ports: Paper/DEMO 7497, Live 7496. IB-Gateway-Ports: Paper/DEMO 4002, Live 4001.",
+    "fr": "Démarrez d’abord TWS ou IB Gateway. Ports TWS : Paper/DEMO 7497, Live 7496. Ports IB Gateway : Paper/DEMO 4002, Live 4001."
   }
 }

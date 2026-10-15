@@ -153,8 +153,9 @@ class IBConnectionDialog(QDialog):
                     "IBConnectionDialog.msgConnectionFailed",
                     (
                         "IB connection failed. Check that TWS / IB Gateway "
-                        "is running, API socket clients are enabled, "
-                        "and the port is 7497 for Paper or 7496 for Live."
+                        "is running, API socket clients are enabled, and use "
+                        "TWS Paper 7497 / Live 7496 or IB Gateway Paper 4002 "
+                        "/ Live 4001."
                     ),
                 ),
             )
@@ -458,8 +459,8 @@ class IBConnectionDialog(QDialog):
                 "IBConnectionDialog.lblHelp",
                 (
                     "Start TWS or IB Gateway first. "
-                    "For Paper/DEMO TWS use port 7497. "
-                    "For LIVE TWS use port 7496."
+                    "TWS ports: Paper/DEMO 7497, Live 7496. "
+                    "IB Gateway ports: Paper/DEMO 4002, Live 4001."
                 ),
             )
         )

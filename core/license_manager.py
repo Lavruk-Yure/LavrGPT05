@@ -52,6 +52,13 @@ def log_lp(name: str, **kw: Any) -> None:
     print(msg)
 
 
+def _hidden_subprocess_kwargs() -> Dict[str, Any]:
+    """Повертає параметри subprocess без видимого console-вікна у Windows."""
+    if os.name != "nt":
+        return {}
+    return {"creationflags": subprocess.CREATE_NO_WINDOW}
+
+
 def load_public_key_b64_from_resources() -> str:
     f = QFile(":/keys/_public_ed25519.b64")
 
@@ -534,6 +541,7 @@ class LicenseManager:
                 text=True,
                 check=False,
                 timeout=5,
+                **_hidden_subprocess_kwargs(),
             )
             out = (cp.stdout or "").strip()
             for line in out.splitlines():
@@ -564,6 +572,7 @@ class LicenseManager:
                 text=True,
                 check=False,
                 timeout=8,
+                **_hidden_subprocess_kwargs(),
             )
             s = (cp.stdout or "").strip()
             if not s:

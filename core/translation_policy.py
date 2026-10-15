@@ -86,6 +86,49 @@ LGE_TRANSLATION_GLOSSARY: Mapping[str, Mapping[str, str]] = {
 # short isolated machine-translation request. UI modules still call only
 # LangManager.tr(key, fallback); the policy is applied centrally.
 CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
+    "IBConnectionDialog.lblHelp": {
+        "en": (
+            "Start TWS or IB Gateway first. TWS ports: Paper/DEMO 7497, "
+            "Live 7496. IB Gateway ports: Paper/DEMO 4002, Live 4001."
+        ),
+        "uk": (
+            "Спочатку запустіть TWS або IB Gateway. Порти TWS: "
+            "Paper/DEMO 7497, Live 7496. Порти IB Gateway: "
+            "Paper/DEMO 4002, Live 4001."
+        ),
+        "de": (
+            "Starten Sie zuerst TWS oder IB Gateway. TWS-Ports: "
+            "Paper/DEMO 7497, Live 7496. IB-Gateway-Ports: "
+            "Paper/DEMO 4002, Live 4001."
+        ),
+        "fr": (
+            "Démarrez d’abord TWS ou IB Gateway. Ports TWS : "
+            "Paper/DEMO 7497, Live 7496. Ports IB Gateway : "
+            "Paper/DEMO 4002, Live 4001."
+        ),
+    },
+    "IBConnectionDialog.msgConnectionFailed": {
+        "en": (
+            "IB connection failed. Check that TWS / IB Gateway is running, "
+            "API socket clients are enabled, and use TWS Paper 7497 / "
+            "Live 7496 or IB Gateway Paper 4002 / Live 4001."
+        ),
+        "uk": (
+            "Не вдалося підключитися до IB. Перевірте, що TWS / IB Gateway "
+            "запущено, API socket clients дозволено, і використовуйте порти: "
+            "TWS Paper 7497 / Live 7496 або IB Gateway Paper 4002 / Live 4001."
+        ),
+        "de": (
+            "IB-Verbindung fehlgeschlagen. Prüfen Sie, ob TWS / IB Gateway "
+            "läuft, API-Socket-Clients aktiviert sind, und verwenden Sie: "
+            "TWS Paper 7497 / Live 7496 oder IB Gateway Paper 4002 / Live 4001."
+        ),
+        "fr": (
+            "Échec de la connexion IB. Vérifiez que TWS / IB Gateway est "
+            "démarré, que les clients socket API sont autorisés, et utilisez : "
+            "TWS Paper 7497 / Live 7496 ou IB Gateway Paper 4002 / Live 4001."
+        ),
+    },
     "LoginWindow.errorOtherMachine": {
         "en": (
             "This license belongs to another computer. This LGE.conf cannot "
