@@ -7417,5 +7417,61 @@
     "uk": "Ліцензія призначена для іншого комп’ютера. Цей LGE.conf не можна використовувати на цьому пристрої. Видаліть поточний LGE.conf і пройдіть нову активацію для цього комп’ютера. Потрібна окрема оплата.",
     "de": "Diese Lizenz gehört zu einem anderen Computer. Diese LGE.conf kann auf diesem Gerät nicht verwendet werden. Löschen Sie die aktuelle LGE.conf und führen Sie eine neue Aktivierung für diesen Computer durch. Eine separate Zahlung ist erforderlich.",
     "fr": "Cette licence appartient à un autre ordinateur. Ce fichier LGE.conf ne peut pas être utilisé sur cet appareil. Supprimez le fichier LGE.conf actuel et effectuez une nouvelle activation pour cet ordinateur. Un paiement séparé est requis."
+  },
+  "LicenseRequestDialog.btnViewPayment": {
+    "en": "Payment instructions",
+    "uk": "Інструкція з оплати",
+    "de": "Zahlungsanweisung",
+    "fr": "Instructions de paiement",
+    "pl": "Instrukcje płatności"
+  },
+  "LicenseRequestDialog.btnCopyPayment": {
+    "en": "Copy instructions",
+    "uk": "Копіювати інструкцію",
+    "de": "Anweisung kopieren",
+    "fr": "Copier les instructions",
+    "pl": "Kopiuj instrukcje"
+  },
+  "LicenseRequestDialog.msgPaymentCopied": {
+    "en": "Payment instructions copied.",
+    "uk": "Інструкцію з оплати скопійовано.",
+    "de": "Zahlungsanweisung kopiert.",
+    "fr": "Instructions de paiement copiées.",
+    "pl": "Instrukcje płatności skopiowano."
+  },
+  "LicensePaymentPreviewDialog.windowTitle": {
+    "en": "Payment instructions (Proforma)",
+    "uk": "Інструкція з оплати (Proforma)",
+    "de": "Zahlungsanweisung (Proforma)",
+    "fr": "Instructions de paiement (Proforma)",
+    "pl": "Instrukcje płatności (Proforma)"
+  },
+  "LicensePaymentPreviewDialog.lblTestWarning": {
+    "en": "TEST PAYMENT DETAILS — DO NOT PAY",
+    "uk": "ТЕСТОВІ РЕКВІЗИТИ — НЕ ОПЛАЧУВАТИ",
+    "de": "TEST-ZAHLUNGSDATEN — NICHT BEZAHLEN",
+    "fr": "COORDONNÉES DE TEST — NE PAS PAYER",
+    "pl": "TESTOWE DANE PŁATNOŚCI — NIE PŁACIĆ"
+  },
+  "LicensePaymentPreviewDialog.btnCopy": {
+    "en": "Copy instructions",
+    "uk": "Копіювати інструкцію",
+    "de": "Anweisung kopieren",
+    "fr": "Copier les instructions",
+    "pl": "Kopiuj instrukcje"
+  },
+  "LicensePaymentPreviewDialog.btnClose": {
+    "en": "Close",
+    "uk": "Закрити",
+    "de": "Schließen",
+    "fr": "Fermer",
+    "pl": "Zamknij"
+  },
+  "LicensePaymentPreviewDialog.msgCopied": {
+    "en": "Payment instructions copied.",
+    "uk": "Інструкцію з оплати скопійовано.",
+    "de": "Zahlungsanweisung kopiert.",
+    "fr": "Instructions de paiement copiées.",
+    "pl": "Instrukcje płatności skopiowano."
   }
 }

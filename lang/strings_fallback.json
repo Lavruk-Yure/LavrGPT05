@@ -3319,9 +3319,11 @@
     "pl": "Połączenie z Interactive Brokers"
   },
   "IBConnectionDialog.lblHelp": {
-    "en": "Start TWS or IB Gateway first. For Paper/DEMO TWS use port 7497. For LIVE TWS use port 7496.",
-    "uk": "Спочатку запустіть TWS або IB Gateway. Для версії TWS «Paper/DEMO» використовуйте порт 7497. Для версії TWS «LIVE» використовуйте порт 7496.",
-    "pl": "Najpierw uruchom TWS lub IB Gateway. W przypadku TWS w trybie testowym (Paper/DEMO) użyj portu 7497. W przypadku TWS w trybie rzeczywistym (LIVE) użyj portu 7496."
+    "en": "Start TWS or IB Gateway first. TWS ports: Paper/DEMO 7497, Live 7496. IB Gateway ports: Paper/DEMO 4002, Live 4001.",
+    "uk": "Спочатку запустіть TWS або IB Gateway. Порти TWS: Paper/DEMO 7497, Live 7496. Порти IB Gateway: Paper/DEMO 4002, Live 4001.",
+    "pl": "Najpierw uruchom TWS lub IB Gateway. W przypadku TWS w trybie testowym (Paper/DEMO) użyj portu 7497. W przypadku TWS w trybie rzeczywistym (LIVE) użyj portu 7496.",
+    "de": "Starten Sie zuerst TWS oder IB Gateway. TWS-Ports: Paper/DEMO 7497, Live 7496. IB-Gateway-Ports: Paper/DEMO 4002, Live 4001.",
+    "fr": "Démarrez d’abord TWS ou IB Gateway. Ports TWS : Paper/DEMO 7497, Live 7496. Ports IB Gateway : Paper/DEMO 4002, Live 4001."
   },
   "IBConnectionDialog.lblHost": {
     "en": "Host",
@@ -7417,5 +7419,81 @@
     "uk": "Ліцензія призначена для іншого комп’ютера. Цей LGE.conf не можна використовувати на цьому пристрої. Видаліть поточний LGE.conf і пройдіть нову активацію для цього комп’ютера. Потрібна окрема оплата.",
     "de": "Diese Lizenz gehört zu einem anderen Computer. Diese LGE.conf kann auf diesem Gerät nicht verwendet werden. Löschen Sie die aktuelle LGE.conf und führen Sie eine neue Aktivierung für diesen Computer durch. Eine separate Zahlung ist erforderlich.",
     "fr": "Cette licence appartient à un autre ordinateur. Ce fichier LGE.conf ne peut pas être utilisé sur cet appareil. Supprimez le fichier LGE.conf actuel et effectuez une nouvelle activation pour cet ordinateur. Un paiement séparé est requis."
+  },
+  "LicenseRequestDialog.btnViewPayment": {
+    "en": "Payment instructions",
+    "uk": "Інструкція з оплати",
+    "de": "Zahlungsanweisung",
+    "fr": "Instructions de paiement",
+    "pl": "Instrukcje płatności"
+  },
+  "LicenseRequestDialog.btnCopyPayment": {
+    "en": "Copy instructions",
+    "uk": "Копіювати інструкцію",
+    "de": "Anweisung kopieren",
+    "fr": "Copier les instructions",
+    "pl": "Kopiuj instrukcje"
+  },
+  "LicenseRequestDialog.msgPaymentCopied": {
+    "en": "Payment instructions copied.",
+    "uk": "Інструкцію з оплати скопійовано.",
+    "de": "Zahlungsanweisung kopiert.",
+    "fr": "Instructions de paiement copiées.",
+    "pl": "Instrukcje płatności skopiowano."
+  },
+  "LicensePaymentPreviewDialog.windowTitle": {
+    "en": "Payment instructions (Proforma)",
+    "uk": "Інструкція з оплати (Proforma)",
+    "de": "Zahlungsanweisung (Proforma)",
+    "fr": "Instructions de paiement (Proforma)",
+    "pl": "Instrukcje płatności (Proforma)"
+  },
+  "LicensePaymentPreviewDialog.lblTestWarning": {
+    "en": "TEST PAYMENT DETAILS — DO NOT PAY",
+    "uk": "ТЕСТОВІ РЕКВІЗИТИ — НЕ ОПЛАЧУВАТИ",
+    "de": "TEST-ZAHLUNGSDATEN — NICHT BEZAHLEN",
+    "fr": "COORDONNÉES DE TEST — NE PAS PAYER",
+    "pl": "TESTOWE DANE PŁATNOŚCI — NIE PŁACIĆ"
+  },
+  "LicensePaymentPreviewDialog.btnCopy": {
+    "en": "Copy instructions",
+    "uk": "Копіювати інструкцію",
+    "de": "Anweisung kopieren",
+    "fr": "Copier les instructions",
+    "pl": "Kopiuj instrukcje"
+  },
+  "LicensePaymentPreviewDialog.btnClose": {
+    "en": "Close",
+    "uk": "Закрити",
+    "de": "Schließen",
+    "fr": "Fermer",
+    "pl": "Zamknij"
+  },
+  "LicensePaymentPreviewDialog.msgCopied": {
+    "en": "Payment instructions copied.",
+    "uk": "Інструкцію з оплати скопійовано.",
+    "de": "Zahlungsanweisung kopiert.",
+    "fr": "Instructions de paiement copiées.",
+    "pl": "Instrukcje płatności skopiowano."
+  },
+  "RuntimeAlert.ibApiVersionUpdateRequired": {
+    "en": "IBKR [2172]: потрібно оновити версію API/TWS.",
+    "uk": "IBKR [2172]: потрібно оновити версію API/TWS."
+  },
+  "StatusBar.brokerStateUnknown": {
+    "en": "UNKNOWN",
+    "uk": "НЕВІДОМО"
+  },
+  "IBConnectionDialog.msgConnectionFailed": {
+    "en": "IB connection failed. Check that TWS / IB Gateway is running, API socket clients are enabled, and use TWS Paper 7497 / Live 7496 or IB Gateway Paper 4002 / Live 4001.",
+    "uk": "Не вдалося підключитися до IB. Перевірте, що TWS / IB Gateway запущено, API socket clients дозволено, і використовуйте порти: TWS Paper 7497 / Live 7496 або IB Gateway Paper 4002 / Live 4001.",
+    "de": "IB-Verbindung fehlgeschlagen. Prüfen Sie, ob TWS / IB Gateway läuft, API-Socket-Clients aktiviert sind, und verwenden Sie: TWS Paper 7497 / Live 7496 oder IB Gateway Paper 4002 / Live 4001.",
+    "fr": "Échec de la connexion IB. Vérifiez que TWS / IB Gateway est démarré, que les clients socket API sont autorisés, et utilisez : TWS Paper 7497 / Live 7496 ou IB Gateway Paper 4002 / Live 4001."
+  },
+  "LoginWindow.errorMachineIdentityUnavailable": {
+    "en": "Could not verify the license binding because the Windows machine identifier is temporarily unavailable. Do not delete LGE.conf and do not activate again. Close LGE and try once more.",
+    "uk": "Не вдалося перевірити прив’язку ліцензії, бо системний ідентифікатор Windows тимчасово недоступний. Не видаляйте LGE.conf і не проходьте повторну активацію. Закрийте LGE та запустіть його ще раз.",
+    "de": "Die Lizenzbindung konnte nicht geprüft werden, weil die Windows-Computerkennung vorübergehend nicht verfügbar ist. Löschen Sie LGE.conf nicht und aktivieren Sie nicht erneut. Schließen Sie LGE und starten Sie es erneut.",
+    "fr": "Impossible de vérifier la liaison de licence, car l’identifiant Windows de l’ordinateur est temporairement indisponible. Ne supprimez pas LGE.conf et ne réactivez pas la licence. Fermez LGE puis relancez-le."
   }
 }

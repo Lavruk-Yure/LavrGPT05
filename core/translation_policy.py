@@ -86,6 +86,63 @@ LGE_TRANSLATION_GLOSSARY: Mapping[str, Mapping[str, str]] = {
 # short isolated machine-translation request. UI modules still call only
 # LangManager.tr(key, fallback); the policy is applied centrally.
 CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
+    # RoadMap111 T111-43: канонічний UI платіжної інструкції.
+    "LicenseRequestDialog.btnViewPayment": {
+        "en": "Payment instructions",
+        "uk": "Інструкція з оплати",
+        "de": "Zahlungsanweisung",
+        "fr": "Instructions de paiement",
+        "pl": "Instrukcje płatności",
+    },
+    "LicenseRequestDialog.btnCopyPayment": {
+        "en": "Copy instructions",
+        "uk": "Копіювати інструкцію",
+        "de": "Anweisung kopieren",
+        "fr": "Copier les instructions",
+        "pl": "Kopiuj instrukcje",
+    },
+    "LicenseRequestDialog.msgPaymentCopied": {
+        "en": "Payment instructions copied.",
+        "uk": "Інструкцію з оплати скопійовано.",
+        "de": "Zahlungsanweisung kopiert.",
+        "fr": "Instructions de paiement copiées.",
+        "pl": "Instrukcje płatności skopiowano.",
+    },
+    "LicensePaymentPreviewDialog.windowTitle": {
+        "en": "Payment instructions (Proforma)",
+        "uk": "Інструкція з оплати (Proforma)",
+        "de": "Zahlungsanweisung (Proforma)",
+        "fr": "Instructions de paiement (Proforma)",
+        "pl": "Instrukcje płatności (Proforma)",
+    },
+    "LicensePaymentPreviewDialog.lblTestWarning": {
+        "en": "TEST PAYMENT DETAILS — DO NOT PAY",
+        "uk": "ТЕСТОВІ РЕКВІЗИТИ — НЕ ОПЛАЧУВАТИ",
+        "de": "TEST-ZAHLUNGSDATEN — NICHT BEZAHLEN",
+        "fr": "COORDONNÉES DE TEST — NE PAS PAYER",
+        "pl": "TESTOWE DANE PŁATNOŚCI — NIE PŁACIĆ",
+    },
+    "LicensePaymentPreviewDialog.btnCopy": {
+        "en": "Copy instructions",
+        "uk": "Копіювати інструкцію",
+        "de": "Anweisung kopieren",
+        "fr": "Copier les instructions",
+        "pl": "Kopiuj instrukcje",
+    },
+    "LicensePaymentPreviewDialog.btnClose": {
+        "en": "Close",
+        "uk": "Закрити",
+        "de": "Schließen",
+        "fr": "Fermer",
+        "pl": "Zamknij",
+    },
+    "LicensePaymentPreviewDialog.msgCopied": {
+        "en": "Payment instructions copied.",
+        "uk": "Інструкцію з оплати скопійовано.",
+        "de": "Zahlungsanweisung kopiert.",
+        "fr": "Instructions de paiement copiées.",
+        "pl": "Instrukcje płatności skopiowano.",
+    },
     "IBConnectionDialog.lblHelp": {
         "en": (
             "Start TWS or IB Gateway first. TWS ports: Paper/DEMO 7497, "
@@ -127,6 +184,31 @@ CENTRAL_TRANSLATION_OVERRIDES: Mapping[str, Mapping[str, str]] = {
             "Échec de la connexion IB. Vérifiez que TWS / IB Gateway est "
             "démarré, que les clients socket API sont autorisés, et utilisez : "
             "TWS Paper 7497 / Live 7496 ou IB Gateway Paper 4002 / Live 4001."
+        ),
+    },
+    "LoginWindow.errorMachineIdentityUnavailable": {
+        "en": (
+            "Could not verify the license binding because the Windows machine "
+            "identifier is temporarily unavailable. Do not delete LGE.conf and "
+            "do not activate again. Close LGE and try once more."
+        ),
+        "uk": (
+            "Не вдалося перевірити прив’язку ліцензії, бо системний "
+            "ідентифікатор Windows тимчасово недоступний. Не видаляйте "
+            "LGE.conf і не проходьте повторну активацію. Закрийте LGE та "
+            "запустіть його ще раз."
+        ),
+        "de": (
+            "Die Lizenzbindung konnte nicht geprüft werden, weil die Windows-"
+            "Computerkennung vorübergehend nicht verfügbar ist. Löschen Sie "
+            "LGE.conf nicht und aktivieren Sie nicht erneut. Schließen Sie LGE "
+            "und starten Sie es erneut."
+        ),
+        "fr": (
+            "Impossible de vérifier la liaison de licence, car l’identifiant "
+            "Windows de l’ordinateur est temporairement indisponible. Ne "
+            "supprimez pas LGE.conf et ne réactivez pas la licence. Fermez LGE "
+            "puis relancez-le."
         ),
     },
     "LoginWindow.errorOtherMachine": {

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 import time
 from pathlib import Path
 
@@ -35,15 +36,21 @@ INVALID_TOKEN_PLACEHOLDERS = {
 
 
 def get_tokens_path() -> Path:
-    """Повертає шлях до файлу токенів (env або project_root/tokens/tokens.json)."""
+    """Повертає canonical шлях до tokens.json для source або frozen runtime."""
     try:
         import os
 
         env_path = os.getenv("TOKENS_PATH", "").strip()
     except (OSError, RuntimeError):
         env_path = ""
+
     if env_path:
         return Path(env_path).expanduser()
+
+    if getattr(sys, "frozen", False):
+        runtime_root = Path(sys.executable).resolve().parent
+        return runtime_root / "tokens" / "tokens.json"
+
     return DEFAULT_TOKENS_PATH
 
 

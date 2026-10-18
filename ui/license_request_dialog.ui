@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>558</width>
-    <height>300</height>
+    <height>340</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,7 +32,7 @@
   <property name="styleSheet">
    <string notr="true">background-color: #245e6d;</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1,0,0">
    <property name="spacing">
     <number>8</number>
    </property>
@@ -48,6 +48,24 @@
    <property name="bottomMargin">
     <number>12</number>
    </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutPayment">
+     <item>
+      <widget class="QPushButton" name="btnViewPayment">
+       <property name="text">
+        <string>[LicenseRequestDialog.btnViewPayment]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCopyPayment">
+       <property name="text">
+        <string>[LicenseRequestDialog.btnCopyPayment]</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
      <item row="9" column="0">

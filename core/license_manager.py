@@ -75,6 +75,10 @@ def load_public_key_b64_from_resources() -> str:
 PUBLIC_KEY_B64 = load_public_key_b64_from_resources()
 
 
+class MachineIdentityUnavailableError(RuntimeError):
+    """Не вдалося надійно прочитати апаратні ідентифікатори Windows."""
+
+
 # -----------------------------
 # Public data structures
 # -----------------------------
@@ -183,8 +187,12 @@ class LicenseManager:
                 )
 
         # 2) machine_id
+        machine_guid, system_uuid = cls._read_machine_identity_parts()
         machine_id_preferred, machine_id_candidates = (
-            cls.compute_machine_id_candidates()
+            cls._machine_id_candidates_from_parts(
+                machine_guid,
+                system_uuid,
+            )
         )
 
         stored_mid = lic.get("machine_id")
@@ -192,6 +200,11 @@ class LicenseManager:
             lic["machine_id"] = machine_id_preferred
         else:
             if stored_mid not in machine_id_candidates:
+                if machine_guid is None or system_uuid is None:
+                    raise MachineIdentityUnavailableError(
+                        "Windows machine identity is temporarily unavailable"
+                    )
+
                 # реальна інша машина
                 lic["status"] = cls.ST_OTHER_MACHINE
                 days_used = cls._days_used(lic, now, set_if_missing=False)
@@ -381,16 +394,18 @@ class LicenseManager:
     # -----------------------------
 
     @classmethod
-    def compute_machine_id(cls) -> str:
-        mg = cls._read_machine_guid() or "NA"
-        su = cls._read_system_uuid() or "NA"
-        raw = f"LGE|v1|{mg}|{su}|{cls._SALT}"
-        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    def _read_machine_identity_parts(cls) -> tuple[Optional[str], Optional[str]]:
+        """Прочитати MachineGuid і SystemUUID одним узгодженим кроком."""
+        return cls._read_machine_guid(), cls._read_system_uuid()
 
     @classmethod
-    def compute_machine_id_candidates(cls) -> tuple[str, set[str]]:
-        mg = cls._read_machine_guid() or "NA"
-        su = cls._read_system_uuid() or "NA"
+    def _machine_id_candidates_from_parts(
+        cls,
+        machine_guid: Optional[str],
+        system_uuid: Optional[str],
+    ) -> tuple[str, set[str]]:
+        mg = machine_guid or "NA"
+        su = system_uuid or "NA"
 
         preferred_raw = f"LGE|v1|{mg}|{su}|{cls._SALT}"
         preferred = hashlib.sha256(preferred_raw.encode("utf-8")).hexdigest()
@@ -403,6 +418,23 @@ class LicenseManager:
         candidates.add(legacy)
 
         return preferred, candidates
+
+    @classmethod
+    def compute_machine_id(cls) -> str:
+        machine_guid, system_uuid = cls._read_machine_identity_parts()
+        preferred, _candidates = cls._machine_id_candidates_from_parts(
+            machine_guid,
+            system_uuid,
+        )
+        return preferred
+
+    @classmethod
+    def compute_machine_id_candidates(cls) -> tuple[str, set[str]]:
+        machine_guid, system_uuid = cls._read_machine_identity_parts()
+        return cls._machine_id_candidates_from_parts(
+            machine_guid,
+            system_uuid,
+        )
 
     @classmethod
     def _build_trial_lock_machine_hash(cls, conf: Dict[str, Any]) -> str:

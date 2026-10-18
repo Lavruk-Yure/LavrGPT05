@@ -371,6 +371,19 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
         """Return immutable WSP broker request/subscription counters."""
         return self._request_accounting.snapshot()
 
+    @staticmethod
+    def _execution_mode_allows_ib_safety_refresh(
+        runtime_engine: Any,
+    ) -> bool:
+        """Дозволити IB safety refresh лише коли виконання ордерів увімкнене."""
+        context = getattr(runtime_engine, "context", None)
+        execution_mode = (
+            str(getattr(context, "execution_mode", "OFF") or "OFF")
+            .strip()
+            .upper()
+        )
+        return execution_mode in {"MANUAL", "SEMI", "AUTO"}
+
     def get_workspace_execution_safety(
         self,
         workspace_uid: str,
@@ -390,6 +403,16 @@ class RuntimeEngineWorkspaceMarketProvider(WorkspaceBrokerMarketProviderProtocol
                 "External IB FX exposure guard is not applicable"
             )
             self._execution_safety[uid] = snapshot
+            return snapshot
+
+        if not self._execution_mode_allows_ib_safety_refresh(
+            self._runtime_engine
+        ):
+            snapshot = WorkspaceExecutionSafetySnapshot.allowed_snapshot(
+                "IB FX external exposure guard skipped while orders are OFF"
+            )
+            self._execution_safety[uid] = snapshot
+            self._execution_safety_checked_at.pop(uid, None)
             return snapshot
 
         now_monotonic = monotonic()

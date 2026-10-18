@@ -40,7 +40,7 @@ from core.config_manager import (
     make_machine_stub,
 )
 from core.lang_manager import LangManager
-from core.license_manager import LicenseManager
+from core.license_manager import LicenseManager, MachineIdentityUnavailableError
 from core.main_logic import MainAppWindow
 from core.ui_translator import UITranslator
 from ui.ui_login import Ui_LoginWindow
@@ -255,6 +255,23 @@ class LoginWindow(QMainWindow):
                     now=datetime.now(UTC),
                     app_version=app_version,
                 )
+            except MachineIdentityUnavailableError:
+                CommonErrorDialog.show_dialog(
+                    parent=self,
+                    lang_mgr=self._lang_mgr,
+                    title="CommonErrorDialog.windowTitle",
+                    header="CommonErrorDialog.lblHeader",
+                    details=self._lang_mgr.tr(
+                        "LoginWindow.errorMachineIdentityUnavailable",
+                        (
+                            "Could not verify the license binding because the "
+                            "Windows machine identifier is temporarily "
+                            "unavailable. Do not delete LGE.conf and do not "
+                            "activate again. Close LGE and try once more."
+                        ),
+                    ),
+                )
+                return
             except Exception:  # noqa
                 self.result = "bad_conf"
                 self.close()

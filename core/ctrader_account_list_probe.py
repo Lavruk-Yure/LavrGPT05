@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import json
 import logging
-from pathlib import Path
 from typing import Any
 
 from ctrader_open_api import Client, Protobuf, TcpProtocol
@@ -30,6 +29,8 @@ from ctrader_open_api.messages.OpenApiMessages_pb2 import (
 )
 from twisted.internet import reactor  # noqa
 from twisted.internet.error import ReactorNotRunning  # noqa
+
+from core.token_manager import get_tokens_path
 
 logger = logging.getLogger(__name__)
 
@@ -61,23 +62,14 @@ def shutdown(client: Client) -> None:
 
 def load_access_token() -> str:
     """
-    Завантажує access_token з tokens.json.
+    Завантажує access_token з canonical tokens.json.
     """
-    root_dir = Path(__file__).resolve().parent.parent
-
-    candidates = [
-        root_dir / "tokens" / "tokens.json",
-    ]
-
-    for tokens_path in candidates:
-        if not tokens_path.exists():
-            continue
-
+    tokens_path = get_tokens_path()
+    if tokens_path.exists():
         with tokens_path.open("r", encoding="utf-8") as file:
             data = json.load(file)
 
         access_token = str(data.get("access_token", "")).strip()
-
         if access_token:
             return access_token
 

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LicensePaymentPreviewDialog</class>
+ <widget class="QDialog" name="LicensePaymentPreviewDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>690</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>500</width>
+    <height>340</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>[LicensePaymentPreviewDialog.windowTitle]</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #245e6d;</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblTestWarning">
+     <property name="styleSheet">
+      <string notr="true">color: #ffe5a5; font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>[LicensePaymentPreviewDialog.lblTestWarning]</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="txtPayment">
+     <property name="styleSheet">
+      <string notr="true">background-color: #f7f9fb; color: #17323b;</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblStatus">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnCopy">
+       <property name="text">
+        <string>[LicensePaymentPreviewDialog.btnCopy]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>[LicensePaymentPreviewDialog.btnClose]</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

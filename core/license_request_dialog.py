@@ -40,6 +40,7 @@ from core.app_meta import calculate_license_price
 from core.app_paths import BASE_DIR
 from core.license_manager import LicenseManager
 from core.ui_translator import UITranslator
+from ui.ui_license_payment_preview_dialog import Ui_LicensePaymentPreviewDialog
 from ui.ui_license_request_dialog import Ui_LicenseRequestDialog
 
 DEBUG_LICENSE_REQUEST = False
@@ -175,6 +176,40 @@ class LicenseOverwriteDialog(QDialog):
         return bool(getattr(chk, "isChecked", lambda: True)())
 
 
+class LicensePaymentPreviewDialog(QDialog):
+    """Штатний Qt-діалог для перегляду та копіювання Proforma."""
+
+    def __init__(
+        self,
+        parent: QWidget | None,
+        lang_mgr,
+        payment_text: str,
+        test_payment: bool,
+    ) -> None:  # noqa: ANN001
+        super().__init__(parent)
+        self._lang_mgr = lang_mgr
+        self.ui = Ui_LicensePaymentPreviewDialog()
+        self.ui.setupUi(self)
+        UITranslator(self._lang_mgr).apply(self)
+
+        self.ui.lblTestWarning.setVisible(test_payment)
+        self.ui.txtPayment.setPlainText(payment_text)
+        self.ui.btnCopy.clicked.connect(self._on_copy)
+        self.ui.btnClose.clicked.connect(self.accept)
+
+    def _on_copy(self) -> None:
+        """Скопіювати видиму Proforma разом із тестовим застереженням."""
+        text = self.ui.txtPayment.toPlainText()
+        if self.ui.lblTestWarning.isVisible():
+            text = f"{self.ui.lblTestWarning.text()}\n\n{text}"
+        QApplication.clipboard().setText(text)
+        self.ui.lblStatus.setText(
+            self._lang_mgr.tr(
+                "LicensePaymentPreviewDialog.msgCopied", "Payment text copied."
+            )
+        )
+
+
 class LicenseRequestDialog(QDialog):
     """Основний діалог генерації license request та інструкції оплати."""
 
@@ -199,6 +234,8 @@ class LicenseRequestDialog(QDialog):
         self.ui.comboEdition.currentIndexChanged.connect(self._sync_price)
         self.ui.btnGenerate.clicked.connect(self._on_generate)
         self.ui.btnCopyEmail.clicked.connect(self._on_copy_email)
+        self.ui.btnViewPayment.clicked.connect(self._on_view_payment)
+        self.ui.btnCopyPayment.clicked.connect(self._on_copy_payment)
         self.ui.btnClose.clicked.connect(self.close)
 
         if hasattr(self.ui, "btnSendEmail"):
@@ -207,9 +244,13 @@ class LicenseRequestDialog(QDialog):
         self._last_order_id: str | None = None
         self._last_subject: str = ""
         self._last_body: str = ""
+        self._last_payment_text: str = ""
+        self.ui.btnViewPayment.setEnabled(False)
+        self.ui.btnCopyPayment.setEnabled(False)
 
         self._prefill_customer_email()
         self._sync_price()
+        self._restore_existing_payment()
 
     # --------------------------
     # Helpers
@@ -614,6 +655,9 @@ class LicenseRequestDialog(QDialog):
         self._last_order_id = order_id
         self._last_subject = subject
         self._last_body = body
+        self._last_payment_text = payment_text
+        self.ui.btnViewPayment.setEnabled(True)
+        self.ui.btnCopyPayment.setEnabled(True)
 
         self._set_status("LicenseRequestDialog.msgRequestGenerated")
         log_cp(
@@ -622,6 +666,84 @@ class LicenseRequestDialog(QDialog):
             request=str(request_path),
             payment=str(payment_path),
         )
+
+    def _restore_existing_payment(self) -> None:
+        """Повернути Proforma лише для цього ПК і поточного email."""
+        req_dir = BASE_DIR / "licenses" / "requests"
+        req_json, _ = self._find_existing_requests(req_dir)
+        if len(req_json) != 1:
+            return
+
+        try:
+            payload = json.loads(req_json[0].read_text(encoding="utf-8"))
+            if not isinstance(payload, dict):
+                return
+            order_id = _safe_str(payload.get("order_id"))
+            if not order_id or req_json[0].name != f"request_{order_id}.json":
+                return
+
+            saved_email = _safe_str(payload.get("customer", {}).get("email"))
+            current_email = self.ui.editEmail.text().strip()
+            if not saved_email or saved_email.lower() != current_email.lower():
+                return
+
+            saved_id = _safe_str(payload.get("device", {}).get("fingerprint_hash"))
+            current_id = LicenseManager.compute_machine_id().strip()
+            if current_id.upper().startswith("SHA256:"):
+                current_id = current_id.split(":", 1)[1].strip()
+            if not saved_id or saved_id.lower() != current_id.lower():
+                return
+
+            payment_path = req_dir / f"payment_instructions_{order_id}.txt"
+            payment_text = payment_path.read_text(encoding="utf-8")
+            if order_id not in payment_text:
+                return
+        except Exception:  # noqa
+            logger.debug("Cannot restore saved Proforma", exc_info=True)
+            return
+
+        self._last_order_id = order_id
+        self._last_payment_text = payment_text
+        self.ui.btnViewPayment.setEnabled(True)
+        self.ui.btnCopyPayment.setEnabled(True)
+
+    def _test_payment_details(self) -> bool:
+        """Попередити й про тестові реквізити зі збереженої Proforma."""
+        placeholder = "1111 2222 3333 4444"
+        return (
+            placeholder in self._last_payment_text
+            or str(app_meta.PAYMENT_CARD_OR_IBAN).strip() == placeholder
+        )
+
+    def _on_view_payment(self) -> None:
+        """Відкрити штатний діалог Proforma для сформованої заявки."""
+        if not self._last_order_id or not self._last_payment_text:
+            self._set_status("LicenseRequestDialog.msgGenerateFirst")
+            return
+
+        dialog = LicensePaymentPreviewDialog(
+            self,
+            self._lang_mgr,
+            self._last_payment_text,
+            self._test_payment_details(),
+        )
+        dialog.exec()
+
+    def _on_copy_payment(self) -> None:
+        """Скопіювати Proforma з попередженням для тестових реквізитів."""
+        if not self._last_order_id or not self._last_payment_text:
+            self._set_status("LicenseRequestDialog.msgGenerateFirst")
+            return
+
+        text = self._last_payment_text
+        if self._test_payment_details():
+            notice = self._lang_mgr.tr(
+                "LicensePaymentPreviewDialog.lblTestWarning",
+                "TEST PAYMENT DETAILS — DO NOT PAY",
+            )
+            text = f"{notice}\n\n{text}"
+        QApplication.clipboard().setText(text)
+        self._set_status("LicenseRequestDialog.msgPaymentCopied")
 
     def _on_copy_email(self) -> None:
         """Скопіювати email-текст у буфер."""

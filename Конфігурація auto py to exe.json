@@ -56,6 +56,6 @@
  ],
  "nonPyinstallerOptions": {
   "increaseRecursionLimit": true,
-  "manualArguments": "--clean --paths \"D:\\LavrGPT\\LavrGPT05\" --hidden-import=resources_rc"
+  "manualArguments": "--clean --paths \"D:\\LavrGPT\\LavrGPT05\" --hidden-import=resources_rc --hidden-import=cryptography.hazmat.bindings._rust --collect-binaries=cryptography"
  }
 }

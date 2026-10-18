@@ -16,9 +16,12 @@ LGE — точка входу (Patch 9.1 + QSS fix).
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
 import sys
 import unicodedata
+from pathlib import Path
 from typing import Any, Dict
 
 from PySide6.QtCore import QCoreApplication, QFile, QIODevice, QProcess
@@ -33,7 +36,53 @@ from core.login_logic import LoginWindow
 from core.register_logic import RegisterWindow
 from core.splash_runner import run_splash
 
+
+def _dispatch_internal_probe_module() -> int | None:
+    """Запустити cTrader probe замість GUI у frozen EXE."""
+    if len(sys.argv) != 3 or sys.argv[1] != "-m":
+        return None
+
+    module_name = sys.argv[2]
+
+    if module_name == "core.ctrader_account_list_probe_runner":
+        from core.ctrader_account_list_probe_runner import main as runner_main
+
+        return int(runner_main())
+
+    if module_name == "core.ctrader_account_snapshot_probe_runner":
+        from core.ctrader_account_snapshot_probe_runner import main as runner_main
+
+        return int(runner_main())
+
+    return None
+
+
+if __name__ == "__main__":
+    _internal_probe_exit_code = _dispatch_internal_probe_module()
+    if _internal_probe_exit_code is not None:
+        raise SystemExit(_internal_probe_exit_code)
+
+
 DEBUG_LGE = False
+
+
+def _restart_application() -> None:
+    """Перезапустити LGE коректно для source та PyInstaller onefile."""
+    if getattr(sys, "frozen", False):
+        env = os.environ.copy()
+        env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+        subprocess.Popen(
+            [sys.executable, *sys.argv[1:]],
+            cwd=str(Path(sys.executable).resolve().parent),
+            env=env,
+        )
+        return
+
+    QProcess.startDetached(
+        sys.executable,
+        [str(BASE_DIR / "LGE.py"), *sys.argv[1:]],
+        str(BASE_DIR),
+    )
 
 
 def _apply_qss(app: QApplication) -> None:
@@ -301,11 +350,7 @@ def main() -> None:
     run_splash(app, after_splash)
     exit_code = app.exec()
     if bool(app.property("lge_restart_requested")):
-        QProcess.startDetached(
-            sys.executable,
-            [str(BASE_DIR / "LGE.py"), *sys.argv[1:]],
-            str(BASE_DIR),
-        )
+        _restart_application()
     sys.exit(exit_code)
 
 
