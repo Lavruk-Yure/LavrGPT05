@@ -478,6 +478,8 @@ class WorkspaceRuntime:
         self.owned_snapshot = WorkspaceOwnedSnapshot(orders=(), positions=())
         self._replay_completion_logged = False
         self._live_quote_received = False
+        self._ib_warmup_last_timestamp: datetime | None = None
+        self._ib_live_boundary_pending = False
         self._append_journal(
             "LIFECYCLE",
             "RUNTIME_CREATED",
@@ -650,6 +652,8 @@ class WorkspaceRuntime:
         )
         self.context.last_error = None
         self.context.current_market_event = None
+        self._ib_warmup_last_timestamp = None
+        self._ib_live_boundary_pending = False
         self.context.current_execution_event = None
         self.context.market_event_count = 0
         self._clear_pending_replay_execution()
@@ -1332,6 +1336,8 @@ class WorkspaceRuntime:
             symbol=self.context.symbol,
             timeframe=self.context.timeframe,
         )
+        self._ib_warmup_last_timestamp = None
+        self._ib_live_boundary_pending = False
         if events:
             self.context.warmup_bars_processed = 0
             self.context.warmup_complete = self.context.warmup_bars_required == 0
@@ -1962,6 +1968,26 @@ class WorkspaceRuntime:
         warmup_only: bool = False,
         advance_replay_execution: bool = True,
     ) -> None:
+        # Лише перша межа IB BROKER warm-up/live. Replay не зачіпаємо.
+        ib_broker = (
+            self.context.data_mode == WORKSPACE_DATA_MODE_BROKER
+            and str(self.context.broker).upper() == "IB"
+        )
+        if (
+            ib_broker
+            and origin == "LIVE_READ_ONLY"
+            and self._ib_live_boundary_pending
+            and self._ib_warmup_last_timestamp is not None
+            and event.timestamp <= self._ib_warmup_last_timestamp
+        ):
+            return
+        first_new_ib_live = (
+            ib_broker
+            and origin == "LIVE_READ_ONLY"
+            and self._ib_live_boundary_pending
+            and self._ib_warmup_last_timestamp is not None
+            and event.timestamp > self._ib_warmup_last_timestamp
+        )
         self.context.event_processing = True
         try:
             previous_event = self.context.current_market_event
@@ -1996,6 +2022,13 @@ class WorkspaceRuntime:
                 signal_allowed=self.context.signal_allowed,
             )
             self._dispatch_market_event_to_algorithm(event)
+            if ib_broker and origin == "BROKER_WARMUP":
+                # Запам'ятовуємо лише успішно оброблений історичний бар.
+                self._ib_warmup_last_timestamp = event.timestamp
+                self._ib_live_boundary_pending = True
+            elif first_new_ib_live:
+                # Після першого нового live-бару строгі перевірки діють знову.
+                self._ib_live_boundary_pending = False
         finally:
             self.context.event_processing = False
 
