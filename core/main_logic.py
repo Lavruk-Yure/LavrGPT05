@@ -1950,4 +1950,16 @@ QToolButton#tbExit:pressed {
                             runtime_engine.start_ib_reconnect_watch()
 
                     elif broker_name == "cTrader":
-                        runtime_engine.start_ctrader_reconnect_watch()
+                        conf_obj = getattr(session_state, "CURRENT_CONFIG", None)
+                        auto_ctrader = False
+
+                        if conf_obj is not None:
+                            conf = conf_obj.to_dict()
+                            auto_ctrader = bool(
+                                conf.get("engine", {})
+                                .get("auto_connect", {})
+                                .get("ctrader", False)
+                            )
+
+                        if auto_ctrader:
+                            runtime_engine.start_ctrader_reconnect_watch()

@@ -1461,3 +1461,47 @@ OFF, відкритих ордерів і позицій 0.
 Статус: T111-50 GREEN на LAVRUK і в короткій серверній GUI-перевірці.
 Це прийняте production-виправлення межі, але не підтвердження тривалої
 стабільності й не доказ початкової першопричини збою.
+
+# 30. RoadMap110 — machine-bound licensing та cTrader connection contract
+
+RoadMap110 закріплює machine-bound поведінку `LGE.conf` і канонічний
+контракт нового/перенесеного інсталяційного середовища. Валідний `LGE.conf`
+не є переносною ліцензією: якщо збережений machine fingerprint не належить
+поточній машині, `LicenseManager` повертає `OTHER_MACHINE`, а login-path
+блокує відкриття `MainAppWindow` і показує локалізоване пояснення про нову
+активацію для цього комп'ютера. Новий локальний конфіг не переносить broker
+credentials з іншої машини.
+
+## 30.1. Free / trial capability baseline
+
+Канонічна policy для `NO_LICENSE` і активного trial: UI, broker connection,
+signal view та manual mode дозволені; SEMI/AUTO заблоковані. Production
+тривалість нового trial — 180 днів. Для ще не стартованого free-конфіга
+застаріла policy може бути оновлена до 180 днів; уже стартований trial
+заднім числом не переписується. Оплату перевіряє LGEOffice; LGE перевіряє
+підпис, edition, machine binding та license status/capabilities.
+
+## 30.2. cTrader local configuration and startup/reconnect intent
+
+`Client ID`, `Client Secret`, account mode та вибраний account є локальними
+налаштуваннями `LGE.conf`. Runtime створює cTrader adapter через explicit
+credentials із конфіга, а не через Windows environment. Якщо account ще не
+вибраний, account-list discovery виконується до runtime connect; вибраний
+account зберігається до підключення.
+
+Успішне ручне cTrader connect записує `auto_connect.ctrader=True`, явне
+Disconnect — `False`. Startup AutoConnect і broker-state reconnect-watch
+зобов'язані поважати цей intent. Після T110-15 cTrader reconnect-watch не
+стартує при `auto_connect.ctrader=False`; IB reconnect gate не змінений.
+
+20.10.2026 production smoke на standalone `LGE.exe` на LAVR-SRV підтвердив
+обидві сторони контракту: з увімкненим auto-connect після старту cTrader та
+IB працювали `2/2`; після явного cTrader Disconnect і restart cTrader не
+підключився сам, тоді як IB лишився доступним (`1/2`); ручне cTrader Connect
+успішно відновило `2/2` і live M15 data. Нормальні відмінності OHLC між
+cTrader та IB не трактуються як feed failure, якщо latest completed M15
+узгоджений за часовою межею.
+
+Статус RoadMap110 після T110-15/T110-16: production fix runtime-confirmed;
+наступний крок — canonical closure audit без broker requests.
+
