@@ -1505,3 +1505,19 @@ cTrader та IB не трактуються як feed failure, якщо latest c
 Статус RoadMap110 після T110-15/T110-16: production fix runtime-confirmed;
 наступний крок — canonical closure audit без broker requests.
 
+## 30.3. IB Gateway unattended runtime on LAVR-SRV
+
+На `LAVR-SRV` production runtime працює під `LAVR\AdminLavr` з
+`IB Gateway 10.50 Paper Trading` та API port `4002`. Авторизація IBKR,
+щоденний Auto Restart о `23:45` і подальше відновлення Gateway/LGE
+підтверджені без ручного втручання.
+
+Для завершення RDP без завершення робочого Console-сеансу використовується
+`tscon`; це зберігає runtime IB Gateway та LGE після від'єднання
+адміністративного RDP-сеансу. Підтверджено стабільне відновлення broker
+connectivity до стану `2/2`.
+
+Статус RoadMap113 після T113-32/34, T113-46, T113-50 і T113-51:
+`CLOSED / GREEN`; production LGE, Candidate F та trading logic не
+змінювалися. RoadMap113 закривав лише server/runtime-контур IB Gateway та
+unattended recovery.
