@@ -153,6 +153,7 @@ class WorkspaceIndicatorProfilesDialog(QDialog):
         self.ui = Ui_WorkspaceIndicatorProfilesDialog()
         self.ui.setupUi(self)
         self.tree_profiles = self.ui.treeProfiles
+        self._apply_profile_tree_contrast()
         self.edt_name = self.ui.edtName
         self.stack_indicator = self.ui.stackIndicator
 
@@ -171,6 +172,44 @@ class WorkspaceIndicatorProfilesDialog(QDialog):
 
         self.apply_translation()
         self._rebuild_tree(self._current_macd_profile_uid())
+
+    def _apply_profile_tree_contrast(self) -> None:
+        """Забезпечити читабельність списку профілів незалежно від палітри Windows."""
+        self.tree_profiles.setStyleSheet(
+            """
+            QTreeWidget#treeProfiles {
+                background-color: #123441;
+                alternate-background-color: #204755;
+                color: #F2F8FA;
+                border: 1px solid #547786;
+                selection-background-color: #287B98;
+                selection-color: #FFFFFF;
+            }
+            QTreeWidget#treeProfiles::item {
+                color: #F2F8FA;
+                padding: 2px 3px;
+            }
+            QTreeWidget#treeProfiles::item:alternate {
+                background-color: #204755;
+                color: #F2F8FA;
+            }
+            QTreeWidget#treeProfiles::item:selected,
+            QTreeWidget#treeProfiles::item:selected:!active {
+                background-color: #287B98;
+                color: #FFFFFF;
+            }
+            QTreeWidget#treeProfiles::item:hover:!selected {
+                background-color: #295A6A;
+                color: #FFFFFF;
+            }
+            QTreeWidget#treeProfiles QHeaderView::section {
+                background-color: #174150;
+                color: #FFFFFF;
+                border: 1px solid #537685;
+                padding: 4px;
+            }
+            """
+        )
 
     def indicator_profile_bindings(self) -> dict[str, dict[str, object]]:
         """Повернути bindings, які слід зберегти разом із параметрами WSP."""

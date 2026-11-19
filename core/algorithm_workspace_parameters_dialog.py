@@ -172,6 +172,7 @@ class AlgorithmWorkspaceParametersDialog(QDialog):
         self.lbl_context = self.ui.lblContext
         self.split_parameters = self.ui.splitParameters
         self.tree_parameters = self.ui.treeParameters
+        self._apply_parameter_tree_contrast()
         self.pnl_editor = self.ui.pnlEditor
         self.lbl_parameter_title = self.ui.lblParameterTitle
         self.lbl_parameter_description = self.ui.lblParameterDescription
@@ -204,6 +205,48 @@ class AlgorithmWorkspaceParametersDialog(QDialog):
         self.btn_close.clicked.connect(self._request_close)
 
         self.apply_translation(workspace)
+
+    def _apply_parameter_tree_contrast(self) -> None:
+        """Забезпечити читабельність рядків WSP незалежно від системної палітри.
+
+        Стилізуємо лише дерево параметрів: контраст тексту, чергування
+        рядків, заголовок і виділення. Інші елементи теми не змінюємо.
+        """
+        self.tree_parameters.setStyleSheet(
+            """
+            QTreeWidget#treeParameters {
+                background-color: #123441;
+                alternate-background-color: #204755;
+                color: #F2F8FA;
+                border: 1px solid #547786;
+                selection-background-color: #287B98;
+                selection-color: #FFFFFF;
+            }
+            QTreeWidget#treeParameters::item {
+                color: #F2F8FA;
+                padding: 2px 3px;
+            }
+            QTreeWidget#treeParameters::item:alternate {
+                background-color: #204755;
+                color: #F2F8FA;
+            }
+            QTreeWidget#treeParameters::item:selected,
+            QTreeWidget#treeParameters::item:selected:!active {
+                background-color: #287B98;
+                color: #FFFFFF;
+            }
+            QTreeWidget#treeParameters::item:hover:!selected {
+                background-color: #295A6A;
+                color: #FFFFFF;
+            }
+            QTreeWidget#treeParameters QHeaderView::section {
+                background-color: #174150;
+                color: #FFFFFF;
+                border: 1px solid #537685;
+                padding: 4px;
+            }
+            """
+        )
 
     def _stabilize_parameter_splitter_height(self) -> None:
         """Не дозволяти правому editor змінювати вертикальну висоту дерева.
