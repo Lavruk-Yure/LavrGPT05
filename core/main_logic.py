@@ -446,6 +446,21 @@ QToolButton#tbExit:pressed {
             session_state.CURRENT_RUNTIME_ENGINE = runtime_engine
             logger.info("RuntimeEngine created for MainAppWindow.")
 
+        # T116-12A: до startup узгодити execution mode зі збереженою конфігурацією.
+        conf_obj = getattr(session_state, "CURRENT_CONFIG", None)
+        conf = conf_obj.to_dict() if conf_obj is not None else {}
+        engine_conf = conf.get("engine", {}) if isinstance(conf, dict) else {}
+        if not isinstance(engine_conf, dict):
+            engine_conf = {}
+
+        configured_mode = engine_conf.get("execution_mode") or "OFF"
+        execution_mode = str(configured_mode).strip().upper()
+        if execution_mode not in ("OFF", "MANUAL", "SEMI", "AUTO"):
+            execution_mode = "OFF"
+
+        if runtime_engine.context.execution_mode != execution_mode:
+            runtime_engine.set_execution_mode(execution_mode)
+
         self.runtime_engine = runtime_engine
 
         if hasattr(self, "page_orders"):

@@ -4744,6 +4744,16 @@ class RuntimeEngine:
         """
         Відкрити manual MARKET order через IB Paper.
         """
+        # T116-11: не створювати Trade/OrderPlan та broker request, якщо
+        # глобальний режим не дозволяє ручне відкриття ордера.
+        runtime_context = getattr(self, "context", None)
+        global_execution_mode = str(
+            getattr(runtime_context, "execution_mode", "") or ""
+        ).strip().upper()
+        if global_execution_mode not in {"MANUAL", "SEMI", "AUTO"}:
+            raise RuntimeError(
+                "Manual broker submission requires global MANUAL, SEMI or AUTO"
+            )
 
         service = self.ib_runtime_service
 
@@ -5320,6 +5330,16 @@ class RuntimeEngine:
             control_mode,
         )
 
+        # T116-10: перед новим Workspace-ордером обов'язково перевірити режим.
+        runtime_context = getattr(self, "context", None)
+        global_execution_mode = str(
+            getattr(runtime_context, "execution_mode", "") or ""
+        ).strip().upper()
+        if global_execution_mode != "AUTO" or control_mode != "AUTO":
+            raise RuntimeError(
+                "Workspace broker submission requires global AUTO and WSP AUTO"
+            )
+
         submission_started_utc = datetime.now(UTC)
         try:
             if broker == "IB":
@@ -5623,6 +5643,17 @@ class RuntimeEngine:
         Trade -> OrderPlan -> BrokerOrder -> Position
         через quantity delta matching.
         """
+        # T116-11: незалежний fail-closed guard перед будь-яким
+        # ручним маршрутом, persistence або broker submission.
+        runtime_context = getattr(self, "context", None)
+        global_execution_mode = str(
+            getattr(runtime_context, "execution_mode", "") or ""
+        ).strip().upper()
+        if global_execution_mode not in {"MANUAL", "SEMI", "AUTO"}:
+            raise RuntimeError(
+                "Manual broker submission requires global MANUAL, SEMI or AUTO"
+            )
+
         broker = self.get_active_broker()
 
         if broker == "IB":

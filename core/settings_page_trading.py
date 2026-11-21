@@ -28,6 +28,7 @@ from typing import Any
 
 from PySide6.QtWidgets import QMessageBox, QWidget
 
+from core import session_state
 from core.ctrader_connection_dialog import (
     CTraderConnectionDialog,
 )
@@ -304,14 +305,35 @@ class SettingsPageTrading(QWidget):
                 )
                 return False
 
+            from copy import deepcopy
+
             conf_obj = session_state.CURRENT_CONFIG
             password = session_state.CURRENT_PASSWORD
+            current_data = conf_obj.to_dict()
+            staged_data = deepcopy(current_data)
+            staged_engine = staged_data.get("engine")
+            if not isinstance(staged_engine, dict):
+                staged_engine = {}
+                staged_data["engine"] = staged_engine
+            staged_engine.update(
+                broker=values["broker"],
+                account_mode=values["account_mode"],
+                execution_mode=values["execution_mode"],
+            )
 
-            conf_obj.set("engine", "broker", values["broker"])
-            conf_obj.set("engine", "account_mode", values["account_mode"])
-            conf_obj.set("engine", "execution_mode", values["execution_mode"])
+            # T116-14A: не змінювати CURRENT_CONFIG до успішного запису.
+            ConfigManager(ROOT_CONF_PATH).save(staged_data, password)
 
-            ConfigManager(ROOT_CONF_PATH).save(conf_obj.to_dict(), password)
+            # Зберегти посилання на чинну секцію engine в пам'яті.
+            current_engine = current_data.get("engine")
+            if isinstance(current_engine, dict):
+                current_engine.clear()
+                current_engine.update(staged_engine)
+            else:
+                current_data["engine"] = staged_engine
+            for metadata_key in ("created_at", "updated_at"):
+                if metadata_key in staged_data:
+                    current_data[metadata_key] = staged_data[metadata_key]
 
             logger.info("Trading settings saved: %s", values)
             return True
@@ -424,6 +446,29 @@ class SettingsPageTrading(QWidget):
 
         if not self._save_to_conf(values):
             return False
+
+        # T116-12B: оновлювати shared runtime лише після успішного запису конфігурації.
+        execution_mode = str(values.get("execution_mode") or "OFF").strip().upper()
+        if execution_mode not in ("OFF", "MANUAL", "SEMI", "AUTO"):
+            execution_mode = "OFF"
+
+        runtime_engine = getattr(session_state, "CURRENT_RUNTIME_ENGINE", None)
+        if runtime_engine is not None:
+            try:
+                if runtime_engine.context.execution_mode != execution_mode:
+                    runtime_engine.set_execution_mode(execution_mode)
+            except Exception:  # noqa
+                logger.exception("Failed to synchronize runtime execution mode")
+                # Якщо setter не відпрацював, заборонити виконання в поточній сесії.
+                runtime_engine.context.execution_mode = "OFF"
+                self._show_warning(
+                    self._lang_mgr.tr(
+                        "SettingsPageTrading.msgRuntimeSyncFailed",
+                        "Execution mode synchronization failed. Orders are disabled.",
+                    )
+                )
+                self._notify_main_window()
+                return False
 
         self._snapshot = values.copy()
         self._notify_main_window()
