@@ -52,12 +52,14 @@ def check_transaction(
     disk = harness.store.snapshot
     runtime_mode = harness.engine.context.execution_mode
     expect_mode = initial if fail_save else selected
+    # Після невдалого Apply збережене AUTO не переозброює runtime.
+    expect_runtime = "OFF" if fail_save and initial == "AUTO" else expect_mode
 
     matching = (
         outcome is not fail_save
         and memory == disk
         and memory["engine"]["execution_mode"] == expect_mode
-        and runtime_mode == expect_mode
+        and runtime_mode == expect_runtime
         and memory["other_section"] == initial_data["other_section"]
         and memory["engine"] is engine_reference
     )

@@ -458,8 +458,20 @@ QToolButton#tbExit:pressed {
         if execution_mode not in ("OFF", "MANUAL", "SEMI", "AUTO"):
             execution_mode = "OFF"
 
+        # T116-14C-02: збережене AUTO не є дозволом поточної GUI-сесії.
+        armed = getattr(runtime_engine, "execution_auto_session_armed", False) is True
+        if execution_mode == "AUTO" and not armed:
+            execution_mode = "OFF"
+        if execution_mode != "AUTO":
+            runtime_engine.execution_auto_session_armed = False
+
         if runtime_engine.context.execution_mode != execution_mode:
-            runtime_engine.set_execution_mode(execution_mode)
+            try:
+                runtime_engine.set_execution_mode(execution_mode)
+            except Exception:  # noqa
+                logger.exception("Failed to set startup execution mode; forcing OFF")
+                runtime_engine.execution_auto_session_armed = False
+                runtime_engine.context.execution_mode = "OFF"
 
         self.runtime_engine = runtime_engine
 
@@ -1049,8 +1061,8 @@ QToolButton#tbExit:pressed {
         """
         Повертає текст режиму ордерів для status bar.
 
-        Джерело істини:
-        LGE.conf -> engine.execution_mode
+        Джерело істини: стан активного RuntimeEngine.
+        Без RuntimeEngine використовується LGE.conf.
 
         OFF    -> Orders: OFF
         MANUAL -> Orders: MANUAL
@@ -1070,6 +1082,20 @@ QToolButton#tbExit:pressed {
 
         if execution_mode not in ("OFF", "MANUAL", "SEMI", "AUTO"):
             execution_mode = "OFF"
+
+        # Показувати фактичний допущений режим, а не застаріле AUTO з LGE.conf.
+        runtime_engine = getattr(session_state, "CURRENT_RUNTIME_ENGINE", None)
+        if runtime_engine is not None:
+            runtime_context = getattr(runtime_engine, "context", None)
+            execution_mode = str(
+                getattr(runtime_context, "execution_mode", "OFF") or "OFF"
+            ).strip().upper()
+            if execution_mode not in ("OFF", "MANUAL", "SEMI", "AUTO"):
+                execution_mode = "OFF"
+            if execution_mode == "AUTO" and not getattr(
+                runtime_engine, "execution_auto_session_armed", False
+            ):
+                execution_mode = "OFF"
 
         orders_label = self._lang_mgr.tr("StatusBar.ordersLabel", "Orders")
 

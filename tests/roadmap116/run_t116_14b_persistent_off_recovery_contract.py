@@ -41,6 +41,7 @@ def check_case(
 
     expect_failure = setter_failure is not None
     expected_mode = "OFF" if expect_failure else selected
+    expected_cold = "OFF" if expected_mode == "AUTO" else expected_mode
     expected_boundary = "INTERCEPTED" if expected_mode == "AUTO" else "BLOCKED"
     expected_writes = [selected, "OFF"] if expect_failure else [selected]
     expected_warnings = 1 if expect_failure else 0
@@ -48,7 +49,8 @@ def check_case(
     matching = (
         apply_ok is not expect_failure
         and memory == disk == gui == runtime == expected_mode
-        and reused_mode == cold_mode == expected_mode
+        and reused_mode == expected_mode
+        and cold_mode == expected_cold
         and boundary == expected_boundary
         and harness.store.attempts == expected_writes
         and len(harness.warnings) == expected_warnings

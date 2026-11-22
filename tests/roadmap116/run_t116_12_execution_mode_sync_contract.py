@@ -120,7 +120,8 @@ def check_startup(config_mode: str, existing_mode: str | None) -> bool:
 
     expected = config_mode.strip().upper()
     valid = {"OFF", "MANUAL", "SEMI", "AUTO"}
-    if expected not in valid:
+    if expected not in valid or expected == "AUTO":
+        # T116-14C-02: AUTO після запуску потребує нового дозволу сесії.
         expected = "OFF"
     observed = engine.context.execution_mode
     before_startup = engine.startup_execution_mode

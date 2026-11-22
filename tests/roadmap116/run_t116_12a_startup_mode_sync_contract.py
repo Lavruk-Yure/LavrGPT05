@@ -17,7 +17,7 @@ from run_t116_12_execution_mode_sync_contract import check_startup  # noqa: E402
 
 
 def test_t116_12a_startup_mode_sync() -> None:
-    """Новий і повторно використаний runtime мають приймати режим до запуску."""
+    """Startup синхронізує режими; збережений AUTO стартує тільки як OFF."""
     print("T116-12A TEST_ONLY | startup/reused RuntimeEngine execution-mode sync")
 
     cases = [

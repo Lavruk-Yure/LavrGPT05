@@ -64,7 +64,10 @@ def check_apply(
             config.data["engine"].update(values)
         return save_ok
 
+    combo_execution_mode = SimpleNamespace(value=selected)
     settings = SimpleNamespace(
+        ui=SimpleNamespace(comboExecutionMode=combo_execution_mode),
+        _set_combo_by_data=lambda combo, mode: setattr(combo, "value", mode),
         current_values=lambda: {
             "broker": "CTRADER",
             "account_mode": "DEMO",
@@ -79,8 +82,17 @@ def check_apply(
     )
     result = apply_method(settings)
 
-    assert len(saved) == 1
-    expected_config = selected if save_ok else before
+    expected_writes = 2 if save_ok and setter_failure else 1
+    assert len(saved) == expected_writes
+    if setter_failure and save_ok:
+        assert saved[-1]["execution_mode"] == "OFF"
+        assert getattr(settings, "_snapshot")["execution_mode"] == "OFF"
+        assert combo_execution_mode.value == "OFF"
+    else:
+        assert combo_execution_mode.value == selected
+    expected_config = (
+        "OFF" if save_ok and setter_failure else selected if save_ok else before
+    )
     assert config.data["engine"]["execution_mode"] == expected_config
     if not save_ok:
         assert result is False

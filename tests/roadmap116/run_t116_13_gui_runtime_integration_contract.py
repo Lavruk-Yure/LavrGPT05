@@ -205,12 +205,21 @@ class GUIRuntimeHarness:
         assert service.place_market_order.call_count == int(observed == "INTERCEPTED")
         return observed
 
-    def report(self, case: str, expected: str) -> bool:
+    def report(
+        self, case: str, expected: str, *, unarmed_saved_auto: bool = False
+    ) -> bool:
         runtime_mode = self.engine.context.execution_mode
         config_mode = self.config.data["engine"]["execution_mode"]
         gui_mode = self.main.status_text.removeprefix("Orders: ")
         actual = self.workspace_attempt()
         matching = runtime_mode == config_mode == gui_mode and actual == expected
+        if unarmed_saved_auto:
+            # Єдиний дозволений розрив: старе AUTO у conf, але OFF у сесії.
+            matching = (
+                config_mode == "AUTO"
+                and gui_mode == runtime_mode == "OFF"
+                and actual == expected == "BLOCKED"
+            )
         print(
             f"case={case} config={config_mode} gui={gui_mode} "
             f"runtime={runtime_mode} boundary={actual} "
@@ -245,7 +254,12 @@ def test_t116_13_gui_runtime_integration() -> None:
 
         harness.config.data["engine"]["execution_mode"] = "AUTO"
         harness.start_or_reuse()
-        checks.append(harness.report("REUSED_RUNTIME_RELOAD_AUTO", "INTERCEPTED"))
+        checks.append(
+            harness.report(
+                "REUSED_RUNTIME_UNARMED_AUTO", "BLOCKED",
+                unarmed_saved_auto=True,
+            )
+        )
 
         assert harness.change_mode("OFF") is True
         assert harness.change_mode("AUTO", fail_setter=True) is False

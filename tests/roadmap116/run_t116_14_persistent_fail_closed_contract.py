@@ -216,10 +216,16 @@ def check_case(
     expected_boundary = (
         "INTERCEPTED" if expected_safe_mode == "AUTO" else "BLOCKED"
     )
+    # При відмові запису OFF старий AUTO може лишитися на диску,
+    # однак session interlock забороняє виконання та повторне AUTO.
+    expected_saved = requested if fail_protective_off else expected_safe_mode
+    expected_cold = "OFF" if expected_saved == "AUTO" else expected_saved
     matching = (
         outcome is expected_apply
-        and memory == disk == gui == runtime == expected_safe_mode
-        and reuse == cold == expected_safe_mode
+        and memory == disk == expected_saved
+        and gui == runtime == expected_safe_mode
+        and reuse == expected_safe_mode
+        and cold == expected_cold
         and boundary == expected_boundary
     )
     print(

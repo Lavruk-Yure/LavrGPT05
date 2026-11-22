@@ -274,6 +274,16 @@ class SettingsPageTrading(QWidget):
                     DEFAULT_ENGINE["execution_mode"],
                 )
             )
+            runtime_engine = getattr(session_state, "CURRENT_RUNTIME_ENGINE", None)
+            if runtime_engine is not None:
+                runtime_context = getattr(runtime_engine, "context", None)
+                execution_mode = self._normalize_execution_mode(
+                    getattr(runtime_context, "execution_mode", "OFF")
+                )
+                if execution_mode == "AUTO" and not getattr(
+                    runtime_engine, "execution_auto_session_armed", False
+                ):
+                    execution_mode = "OFF"
 
             return {
                 "broker": broker,
@@ -454,13 +464,29 @@ class SettingsPageTrading(QWidget):
 
         runtime_engine = getattr(session_state, "CURRENT_RUNTIME_ENGINE", None)
         if runtime_engine is not None:
+            # Дозвіл AUTO діє лише після успішного Apply у поточній сесії.
+            runtime_engine.execution_auto_session_armed = False
             try:
                 if runtime_engine.context.execution_mode != execution_mode:
                     runtime_engine.set_execution_mode(execution_mode)
+                runtime_engine.execution_auto_session_armed = execution_mode == "AUTO"
             except Exception:  # noqa
                 logger.exception("Failed to synchronize runtime execution mode")
-                # Якщо setter не відпрацював, заборонити виконання в поточній сесії.
+                # Відкликати дозвіл навіть при відмові захисного запису OFF.
+                runtime_engine.execution_auto_session_armed = False
                 runtime_engine.context.execution_mode = "OFF"
+                protective_values = values.copy()
+                protective_values["execution_mode"] = "OFF"
+                if self._save_to_conf(protective_values):
+                    self._snapshot = protective_values.copy()
+                    combo = getattr(
+                        getattr(self, "ui", None), "comboExecutionMode", None
+                    )
+                    if combo is not None:
+                        self._set_combo_by_data(combo, "OFF")
+                else:
+                    # Відмову захисного запису окремо контролює T116-14C.
+                    logger.critical("Protective execution_mode=OFF was not persisted")
                 self._show_warning(
                     self._lang_mgr.tr(
                         "SettingsPageTrading.msgRuntimeSyncFailed",
