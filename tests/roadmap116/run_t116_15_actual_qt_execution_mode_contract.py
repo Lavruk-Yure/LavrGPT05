@@ -12,6 +12,7 @@ import ast
 import copy
 import importlib.util
 import sys
+from enum import StrEnum
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 from typing import Any
@@ -72,15 +73,35 @@ class FakeConfig:
         return self.data.get(section, {}).get(key, default)
 
 
+class FakeRuntimeState(StrEnum):
+    """Стани лише для перевірки гілки startup без реального двигуна."""
+
+    OFF = "OFF"
+    STARTING = "STARTING"
+    RUNNING = "RUNNING"
+    STOPPING = "STOPPING"
+    ERROR = "ERROR"
+
+
 class FakeEngine:
-    """Лише контекст і setter, без конструктора production RuntimeEngine."""
+    """Контекст, setter і startup без брокерів, scheduler та БД."""
 
     def __init__(self) -> None:
-        self.context = SimpleNamespace(execution_mode="OFF")
+        self.context = SimpleNamespace(
+            execution_mode="OFF",
+            runtime_state=FakeRuntimeState.OFF,
+        )
         self.execution_auto_session_armed = False
         self.ib_runtime_service = object()
         self.ctrader_runtime_service = object()
         self.fail_setter: str | None = None
+        self.startup_calls = 0
+
+    def startup(self) -> None:
+        """Імітувати OFF → RUNNING без побічних ефектів."""
+        assert self.context.runtime_state == FakeRuntimeState.OFF
+        self.context.runtime_state = FakeRuntimeState.RUNNING
+        self.startup_calls += 1
 
     def set_execution_mode(self, mode: str) -> None:
         if self.fail_setter == "BEFORE_ASSIGN":
@@ -167,6 +188,7 @@ STATE.CURRENT_RUNTIME_ENGINE = None
 MAIN_ENV = {
     "session_state": STATE,
     "RuntimeEngine": FakeEngine,
+    "RuntimeState": FakeRuntimeState,
     "logger": Mock(),
     "get_trial_days_left": lambda _lic: None,
 }
@@ -377,6 +399,8 @@ def test_t116_15_actual_qt_execution_mode() -> None:
     ):
         cold = QtHarness("AUTO")
         cases.append(cold)
+        assert cold.engine.startup_calls == 1, "TEST_ONLY: startup not exercised"
+        assert cold.engine.context.runtime_state == FakeRuntimeState.RUNNING
         checks.append(
             report_case(
                 "COLD_SAVED_AUTO",

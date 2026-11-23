@@ -477,16 +477,19 @@ class SettingsPageTrading(QWidget):
                 runtime_engine.context.execution_mode = "OFF"
                 protective_values = values.copy()
                 protective_values["execution_mode"] = "OFF"
-                if self._save_to_conf(protective_values):
-                    self._snapshot = protective_values.copy()
-                    combo = getattr(
-                        getattr(self, "ui", None), "comboExecutionMode", None
-                    )
-                    if combo is not None:
-                        self._set_combo_by_data(combo, "OFF")
-                else:
-                    # Відмову захисного запису окремо контролює T116-14C.
+                if not self._save_to_conf(protective_values):
+                    # Збережений AUTO не є дозволом для поточної сесії.
                     logger.critical("Protective execution_mode=OFF was not persisted")
+
+                # T116-15A: GUI відображає фактичний OFF незалежно від запису.
+                self._snapshot = protective_values.copy()
+                ui = getattr(self, "ui", None)
+                combo = getattr(ui, "comboExecutionMode", None)
+                if combo is not None:
+                    self._set_combo_by_data(combo, "OFF")
+                apply_button = getattr(ui, "btnApply", None)
+                if apply_button is not None:
+                    apply_button.setEnabled(False)
                 self._show_warning(
                     self._lang_mgr.tr(
                         "SettingsPageTrading.msgRuntimeSyncFailed",
