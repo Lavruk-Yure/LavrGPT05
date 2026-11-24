@@ -13,28 +13,26 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Callable, cast
 
+
 ROOT = Path(__file__).resolve().parents[2]
 TELEMETRY_FILE = (
     ROOT / "tests" / "roadmap116" / "run_t116_19_ctrader_raw_spot_telemetry.py"
 )
 ADAPTER_FILE = ROOT / "engine" / "ctrader_adapter.py"
 AUTHORIZED_CTRADER_API_ID = 46368962
-TRADE_METHODS = frozenset(
-    {
-        "place_market_buy",
-        "place_market_sell",
-        "place_market_order",
-        "close_position",
-        "modify_position_sl_tp",
-    }
-)
+TRADE_METHODS = frozenset({
+    "place_market_buy",
+    "place_market_sell",
+    "place_market_order",
+    "close_position",
+    "modify_position_sl_tp",
+})
 
 
 def function_node(tree: ast.Module, name: str) -> ast.FunctionDef:
     """Знайти точну функцію верхнього рівня у файлі."""
     return next(
-        item
-        for item in tree.body
+        item for item in tree.body
         if isinstance(item, ast.FunctionDef) and item.name == name
     )
 
@@ -42,8 +40,7 @@ def function_node(tree: ast.Module, name: str) -> ast.FunctionDef:
 def nested_function(node: ast.FunctionDef, name: str) -> ast.FunctionDef:
     """Знайти вкладену функцію без виконання її батьківського коду."""
     return next(
-        item
-        for item in ast.walk(node)
+        item for item in ast.walk(node)
         if isinstance(item, ast.FunctionDef) and item.name == name
     )
 
@@ -54,19 +51,20 @@ def demo_account_guard(launcher: ast.FunctionDef) -> Callable[..., None]:
     code_module = ast.Module(body=[cast(ast.stmt, source_function)], type_ignores=[])
     ast.fix_missing_locations(code_module)
 
-    def intercepted_constructor(
-        instance: object, _config: object, _logger: object = None
-    ) -> None:
+    def intercepted_constructor(instance: object, _config: object,
+                                _logger: object = None) -> None:
         setattr(instance, "constructed", True)
 
-    namespace: dict[str, Any] = {"original_init": intercepted_constructor}
+    namespace: dict[str, Any] = {
+        "original_init": intercepted_constructor,
+        "constructed_adapters": [],
+    }
     exec(compile(code_module, str(TELEMETRY_FILE), "exec"), namespace)
     return cast(Callable[..., None], namespace["demo_only_init"])
 
 
-def constructor_permits(
-    guard: Callable[..., None], *, mode: str, account_id: int
-) -> bool:
+def constructor_permits(guard: Callable[..., None], *, mode: str,
+                        account_id: int) -> bool:
     """Перевірити дозвіл без створення адаптера або TCP-клієнта."""
     instance = SimpleNamespace(constructed=False)
     config = SimpleNamespace(
@@ -89,8 +87,7 @@ def installed_trade_guards(launcher: ast.FunctionDef) -> set[str]:
         if not isinstance(loop.iter, (ast.Tuple, ast.List)):
             continue
         names = {
-            element.value
-            for element in loop.iter.elts
+            element.value for element in loop.iter.elts
             if isinstance(element, ast.Constant) and isinstance(element.value, str)
         }
         for statement in loop.body:
@@ -103,10 +100,8 @@ def installed_trade_guards(launcher: ast.FunctionDef) -> set[str]:
                     continue
                 instance, target, replacement = call.args
                 if (
-                    isinstance(instance, ast.Name)
-                    and instance.id == "adapter"
-                    and isinstance(target, ast.Name)
-                    and target.id == loop.target.id
+                    isinstance(instance, ast.Name) and instance.id == "adapter"
+                    and isinstance(target, ast.Name) and target.id == loop.target.id
                     and isinstance(replacement, ast.Name)
                     and replacement.id == "deny_trade"
                 ):
@@ -117,10 +112,8 @@ def installed_trade_guards(launcher: ast.FunctionDef) -> set[str]:
 def source_mentions(node: ast.AST, identifiers: set[str]) -> bool:
     """Виявити явне звернення до зовнішньої залежності у LIVE launcher."""
     return any(
-        isinstance(item, ast.Name)
-        and item.id in identifiers
-        or isinstance(item, ast.Attribute)
-        and item.attr in identifiers
+        isinstance(item, ast.Name) and item.id in identifiers
+        or isinstance(item, ast.Attribute) and item.attr in identifiers
         for item in ast.walk(node)
     )
 
@@ -169,8 +162,7 @@ def test_t116_20_ctrader_live_telemetry_safety_preflight() -> None:
     guard = demo_account_guard(launcher)
 
     adapter_class = next(
-        item
-        for item in adapter.body
+        item for item in adapter.body
         if isinstance(item, ast.ClassDef) and item.name == "CTraderAdapter"
     )
     declared_methods = {
@@ -241,14 +233,10 @@ def test_t116_20_ctrader_live_telemetry_safety_preflight() -> None:
     print("real_database_writes=0")
     print("real_config_disk_writes=0")
     print("production_changes=0")
-    print(
-        "T116-20="
-        + (
-            "GREEN_OFFLINE_LIVE_SAFETY_PREFLIGHT"
-            if mismatches == 0
-            else "RED_LIVE_SAFETY_PREFLIGHT"
-        )
-    )
+    print("T116-20=" + (
+        "GREEN_OFFLINE_LIVE_SAFETY_PREFLIGHT"
+        if mismatches == 0 else "RED_LIVE_SAFETY_PREFLIGHT"
+    ))
     if mismatches:
         raise AssertionError(
             f"T116-20: відсутні {mismatches} із {len(checks)} захисних умов"
