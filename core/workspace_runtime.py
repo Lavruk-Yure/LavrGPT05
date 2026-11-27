@@ -462,6 +462,8 @@ class WorkspaceRuntime:
         self.signal_record_observer = signal_record_observer
         self.algorithm: WorkspaceAlgorithm | None = None
         self._chart_algorithm: WorkspaceAlgorithm | None = None
+        # Окремий volatile шлях; звичайний START завжди залишається без змін.
+        self._market_data_only = False
         self.replay_session: WorkspaceReplaySession | None = None
         self.replay_execution: WorkspaceReplayExecutionEngine | None = None
         self._pending_replay_execution_window_index: int | None = None
@@ -644,12 +646,40 @@ class WorkspaceRuntime:
             "Session restore completed; automatic start is disabled.",
         )
 
+    def begin_market_data_only_start(self) -> None:
+        """Почати окремий BROKER DEMO runtime без алгоритму й execution.
+
+        Не прив'язаний до GUI. Дозволений тільки явний виклик цього методу.
+        """
+        self._require_state(
+            {WORKSPACE_STATE_STOPPED, WORKSPACE_STATE_RESTORED},
+            "start market data only",
+        )
+        if (
+            self.context.data_mode != WORKSPACE_DATA_MODE_BROKER
+            or str(self.context.broker).upper() != "CTRADER"
+            or str(self.context.account_mode).upper() != "DEMO"
+            or not str(self.context.account_id or "").strip()
+        ):
+            raise WorkspaceRuntimeError(
+                "Market Data Only currently requires cTrader DEMO BROKER binding"
+            )
+        if self.broker_market_provider is None:
+            raise WorkspaceRuntimeError("Market Data Only requires broker provider")
+        if self.algorithm is not None or self.replay_execution is not None:
+            raise WorkspaceRuntimeError("Market Data Only requires no active algorithm")
+        self.begin_start()
+        self._market_data_only = True
+        self.context.signal_allowed = False
+        self.context.signal_block_reason = "market data only"
+
     def begin_start(self) -> None:
         """Enter STARTING and reject repeated or unsafe starts."""
         self._require_state(
             {WORKSPACE_STATE_STOPPED, WORKSPACE_STATE_RESTORED},
             "start",
         )
+        self._market_data_only = False
         self.context.last_error = None
         self.context.current_market_event = None
         self._ib_warmup_last_timestamp = None
@@ -719,7 +749,10 @@ class WorkspaceRuntime:
             if self.context.data_mode == WORKSPACE_DATA_MODE_REPLAY:
                 self._complete_replay_start()
             elif self.context.data_mode == WORKSPACE_DATA_MODE_BROKER:
-                self._complete_broker_start()
+                if getattr(self, "_market_data_only", False):
+                    self._complete_market_data_only_start()
+                else:
+                    self._complete_broker_start()
             else:
                 raise WorkspaceRuntimeError(
                     f"Unsupported workspace data mode: {self.context.data_mode}"
@@ -986,6 +1019,57 @@ class WorkspaceRuntime:
         self._sync_replay_execution_snapshot(snapshot_utc=event.timestamp)
         self._evaluate_profit_protection_at(event.timestamp)
 
+    def _complete_market_data_only_start(self) -> None:
+        """Увімкнути лише read-only feed і завершені бари без risk/signal."""
+        provider = self.broker_market_provider
+        if provider is None:
+            raise WorkspaceRuntimeError("Market Data Only provider is missing")
+        if self.algorithm is not None or self.replay_execution is not None:
+            raise WorkspaceRuntimeError(
+                "Market Data Only algorithm/execution is present"
+            )
+        workspace_uid = self.context.workspace_uid
+        if not provider.is_workspace_broker_connected(workspace_uid):
+            raise WorkspaceRuntimeError("Market Data Only broker is disconnected")
+        try:
+            events = provider.start_workspace(
+                workspace_uid=workspace_uid,
+                broker=self.context.broker,
+                account_id=self.context.account_id,
+                symbol=self.context.symbol,
+                timeframe=self.context.timeframe,
+                warmup_bars=self.context.warmup_bars_required,
+                spread_limit=self.context.spread_limit,
+            )
+            for event in events:
+                self._accept_market_event(
+                    event,
+                    origin="BROKER_WARMUP",
+                    warmup_only=True,
+                )
+        # noinspection PyBroadException
+        except Exception as exc:
+            raise WorkspaceRuntimeError("Market Data Only startup failed") from exc
+        self.context.warmup_bars_processed = len(events)
+        self.context.warmup_complete = (
+            len(events) >= self.context.warmup_bars_required
+        )
+        self.context.signal_allowed = False
+        self.context.signal_block_reason = "market data only"
+        self._transition(WORKSPACE_STATE_RUNNING, "Market Data Only feed started.")
+        self._transition_startup_phase(
+            WORKSPACE_STARTUP_PHASE_RUNNING,
+            "Read-only market data without algorithm or execution.",
+        )
+        self._append_journal(
+            "BROKER", "MARKET_DATA_ONLY_STARTED",
+            "Read-only broker feed active without algorithm or execution.",
+            broker=self.context.broker,
+            account_id=self.context.account_id,
+            symbol=self.context.symbol,
+            timeframe=self.context.timeframe,
+        )
+
     def _complete_broker_start(self) -> None:
         """Load historical warm-up and activate Live Read-only quotes."""
         provider = self.broker_market_provider
@@ -1065,6 +1149,8 @@ class WorkspaceRuntime:
 
     def advance_broker_market(self) -> WorkspaceMarketEvent | None:
         """Poll one changed broker quote and process it read-only."""
+        if getattr(self, "_market_data_only", False):
+            return self._advance_market_data_only()
         if self.context.data_mode != WORKSPACE_DATA_MODE_BROKER:
             raise WorkspaceRuntimeError(
                 "Broker market polling requires BROKER data mode"
@@ -1148,6 +1234,25 @@ class WorkspaceRuntime:
             ),
         )
         return event
+
+    def _advance_market_data_only(self) -> WorkspaceMarketEvent | None:
+        """Один completed bar від provider, без risk та execution."""
+        self._require_state({WORKSPACE_STATE_RUNNING}, "poll market data only")
+        provider = self.broker_market_provider
+        if provider is None:
+            self.fail("Market Data Only provider is missing")
+            raise WorkspaceRuntimeError("Market Data Only provider is missing")
+        try:
+            if not provider.is_workspace_broker_connected(self.context.workspace_uid):
+                raise WorkspaceRuntimeError("Market Data Only broker disconnected")
+            event = provider.poll_workspace(self.context.workspace_uid)
+            if event is not None:
+                self._accept_market_event(event, origin="LIVE_READ_ONLY")
+            return event
+        # noinspection PyBroadException
+        except Exception as exc:
+            self.fail(exc)
+            raise WorkspaceRuntimeError("Market Data Only polling failed") from exc
 
     def _workspace_execution_guard_mode(self) -> str:
         """Map the WSP account mode to the execution guard contract."""
@@ -1422,7 +1527,9 @@ class WorkspaceRuntime:
             WORKSPACE_STATE_STOPPED,
             "Runtime stopped; broker positions were not closed automatically.",
         )
-        self.evaluate_profit_protection()
+        if not getattr(self, "_market_data_only", False):
+            self.evaluate_profit_protection()
+        self._market_data_only = False
 
     def stop(self, reason: str = "Stop requested.") -> None:
         """Synchronous convenience stop used by runtime checks."""
@@ -1444,7 +1551,9 @@ class WorkspaceRuntime:
             self.broker_market_provider.stop_workspace(self.context.workspace_uid)
         self._stop_algorithm(suppress_errors=True)
         self._append_journal("ERROR", "RUNTIME_ERROR", message)
-        self.evaluate_profit_protection()
+        if not getattr(self, "_market_data_only", False):
+            self.evaluate_profit_protection()
+        self._market_data_only = False
 
     def set_replay_speed(self, speed: int) -> None:
         normalized_speed = int(speed)
@@ -1866,6 +1975,8 @@ class WorkspaceRuntime:
         self,
     ) -> tuple[WorkspaceProfitProtectionDecision, ...]:
         """Evaluate current owned positions without broker execution."""
+        if getattr(self, "_market_data_only", False):
+            return ()
         market_event = self.context.current_market_event
         timestamp = (
             market_event.timestamp if market_event is not None else datetime.now(UTC)
@@ -1968,6 +2079,9 @@ class WorkspaceRuntime:
         warmup_only: bool = False,
         advance_replay_execution: bool = True,
     ) -> None:
+        if getattr(self, "_market_data_only", False):
+            self._accept_market_data_only_event(event, origin=origin)
+            return
         # Лише перша межа IB BROKER warm-up/live. Replay не зачіпаємо.
         ib_broker = (
             self.context.data_mode == WORKSPACE_DATA_MODE_BROKER
@@ -2029,6 +2143,43 @@ class WorkspaceRuntime:
             elif first_new_ib_live:
                 # Після першого нового live-бару строгі перевірки діють знову.
                 self._ib_live_boundary_pending = False
+        finally:
+            self.context.event_processing = False
+
+    def _accept_market_data_only_event(
+        self,
+        event: WorkspaceMarketEvent,
+        *,
+        origin: str,
+    ) -> None:
+        """Лише завершений бар у chart; жодних signal/risk/replay effects."""
+        if origin not in {"BROKER_WARMUP", "LIVE_READ_ONLY"}:
+            raise WorkspaceRuntimeError("Market Data Only rejects non-broker event")
+        if (
+            event.broker != self.context.broker
+            or event.symbol != self.context.symbol
+            or event.timeframe != self.context.timeframe
+        ):
+            raise WorkspaceRuntimeError("Market Data Only broker binding mismatch")
+        if self.algorithm is not None or self.replay_execution is not None:
+            raise WorkspaceRuntimeError("Market Data Only cannot process algorithm")
+        self.context.event_processing = True
+        try:
+            self.context.current_market_event = event
+            self.context.market_event_count += 1
+            self.chart_model.append(event)
+            self.context.current_spread = event.spread
+            self.context.spread_ok = False
+            self.context.signal_allowed = False
+            self.context.signal_block_reason = "market data only"
+            self._append_journal(
+                "MARKET", "MARKET_DATA_ONLY_BAR",
+                f"{origin} {event.symbol} {event.timeframe}: "
+                f"close={event.close:.6f}.",
+                timestamp=event.timestamp.isoformat(),
+                origin=origin,
+                signal_allowed=False,
+            )
         finally:
             self.context.event_processing = False
 

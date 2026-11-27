@@ -104,5 +104,9 @@
   "WorkspaceParameter.profitDrawdownClosePercent.description": {
     "en": "Local close decision after the configured profit drawdown.",
     "uk": "Рішення про закриття позиції на місцевому рівні після налаштованого відкату прибутку."
+  },
+  "AlgorithmWorkspaceParametersDialog.panelJournal": {
+    "en": "Journal",
+    "uk": "Журнал"
   }
 }
